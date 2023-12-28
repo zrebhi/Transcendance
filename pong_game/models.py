@@ -46,10 +46,10 @@ class Player:
 # models.py
 
 class Ball:
-    def __init__(self, xpos, ypos, radius):
+    def __init__(self, xpos, ypos):
         self.xpos = xpos
         self.ypos = ypos
-        self.radius = radius
+        self.radius = 10
         self.x_speed = 5  # Adjust the speed as needed
         self.y_speed = 5  # Adjust the speed as needed
 
@@ -72,6 +72,7 @@ class Ball:
             'ypos': self.ypos,
             'x_speed': self.x_speed,
             'y_speed': self.y_speed,
+            'radius': self.radius,
         }
 
 
