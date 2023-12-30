@@ -22,79 +22,8 @@
 
 
 <body>
-{#    <script>#}
-{#        // Set up a JavaScript object with the dynamic data#}
-{#        const pongData = {#}
-{#            player1: {{ player1|safe }},#}
-{#            player2: {{ player2|safe }},#}
-{#            ball: {{ ball|safe }},#}
-{#            window: {{ window|safe }}#}
-{#        };#}
-{#    </script>#}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-{#    <script src="{% static 'pong_game/pong_template.js' %}"></script>#}
-    <script>
-        let url = `ws://${window.location.host}/ws/socket-server/`;
-        const gameSocket = new WebSocket(url);
-
-        let windowData = { width: 800, height: 600 }; // Initialize with default values
-        let player1Data;
-        let player2Data;
-        let ballData;
-
-        gameSocket.onopen = function (event) {
-            console.log("WebSocket connection opened:", event);
-            // Set up event listeners for key presses
-            window.addEventListener('keydown', handleKeyDown);
-
-            gameSocket.send(JSON.stringify({ message: 'get_initial_data' }));
-        };
-
-        gameSocket.onmessage = function (event) {
-            const data = JSON.parse(event.data)
-                 player1Data = data.player1;
-                 player2Data = data.player2;
-                 ballData = data.ball;
-
-                 draw();
-        };
-
-        gameSocket.onclose = function (event) {
-        console.log("WebSocket connection closed:", event);
-
-        // Remove event listeners when the connection is closed
-        window.removeEventListener('keydown', handleKeyDown);
-        };
-
-        gameSocket.onerror = function (event) {
-            console.error("WebSocket error:", event);
-        };
-
-        function handleKeyDown(event) {
-            // Send a message to the backend when a key is pressed
-            if (event.key === 'ArrowUp') {
-                gameSocket.send(JSON.stringify({ message: 'move_up_player' }));
-            } else if (event.key === 'ArrowDown') {
-                gameSocket.send(JSON.stringify({ message: 'move_down_player' }));
-            }
-        }
-        function setup() {
-            createCanvas(windowData.width, windowData.height);
-        }
-
-        function draw() {
-            background(0);
-            // Draw players and ball
-            fill(255); // White color
-            rect(player1Data.xpos, player1Data.ypos, player1Data.width, player1Data.height);
-            rect(player2Data.xpos, player2Data.ypos, player2Data.width, player2Data.height);
-
-            fill(255);
-            ellipse(ballData.xpos, ballData.ypos, ballData.radius * 2);
-        }
-
-
-    </script>
+    <script src="{% static 'pong_game/pong_template.js' %}"></script>
 </body>
 </html>
 
