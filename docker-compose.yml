@@ -1,10 +1,20 @@
 version: '3'
 services:
-  web:
-    image: python:latest
-    working_dir: /app
+  game:
+    build: ./game
     volumes:
-      - .:/app
-    command: bash -c "pip install --upgrade pip && pip install -r requirements.txt && sleep infinity"
+      - ./game/django_project:/game
+    command: python manage.py runserver 0.0.0.0:8000
+    expose:
+      - 8000
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/certs:/etc/nginx/certs
     ports:
-      - "8080:8080"
+      - 80:80
+      - 443:443
+    depends_on:
+      - game
