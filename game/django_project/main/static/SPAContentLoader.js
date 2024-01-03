@@ -41,6 +41,7 @@ function clearPage() {
 let socketCreated = false;
 
 document.getElementById('playButton').addEventListener('click', function() {
+    clearPage(); // From pong_template.js
     loadView('https://localhost/pong/')
         .then(() => loadScripts([
             'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js',
@@ -59,7 +60,7 @@ document.getElementById('playButton').addEventListener('click', function() {
 document.getElementById('homeButton').addEventListener('click', function() {
     clearPage(); // From pong_template.js
 
-    loadView('https://localhost/pong/')
+    loadView('https://localhost/home/')
     .catch(error => console.error('Error:', error));
 
 });
