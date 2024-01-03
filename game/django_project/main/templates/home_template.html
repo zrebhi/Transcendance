@@ -5,6 +5,23 @@
     <title>Home</title>
 </head>
 <body>
-<h1>Surprise and the Fuckle</h1>
+
+<div id="logo-container"></div>
+
+<style>
+    #logo-container {
+        width: 512px;
+        height: 512px;
+        background-image: url('static/main/pong_background.png');
+        background-size: contain; /* This will ensure the image fits inside the container */
+        background-repeat: no-repeat;
+        position: absolute; /* Position it relative to the nearest positioned ancestor or to the containing block */
+        top: 50%; /* Position the top edge of the element at the middle of the parent */
+        left: 50%; /* Position the left edge of the element at the middle of the parent */
+        transform: translate(-50%, -50%); /* Offset the element to center it */
+    }
+</style>
+
+
 </body>
 </html>
