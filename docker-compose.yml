@@ -1,0 +1,20 @@
+version: '3'
+services:
+  game:
+    build: ./game
+    volumes:
+      - ./game/django_project:/game
+    command: python manage.py runserver 0.0.0.0:8000
+    expose:
+      - 8000
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/certs:/etc/nginx/certs
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - game
