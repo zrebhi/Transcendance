@@ -1,9 +1,9 @@
 version: '3'
 services:
-  game:
-    build: ./game
+  frontend:
+    build: frontend
     volumes:
-      - ./game/django_project:/game
+      - ./frontend/django_project:/frontend
     command: python manage.py runserver 0.0.0.0:8000
     expose:
       - 8000
@@ -17,4 +17,4 @@ services:
       - 80:80
       - 443:443
     depends_on:
-      - game
+      - frontend
