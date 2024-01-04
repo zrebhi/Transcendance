@@ -3,7 +3,6 @@ function loadView(viewUrl) {
         .then(response => response.text())
         .then(data => {
             document.getElementById('pageContainer').innerHTML = data;
-            return data; // Resolve the promise with the fetched data
         });
 }
 
@@ -24,6 +23,37 @@ function loadScript(src) {
         document.head.appendChild(script);
     });
 }
+
+// Allow form submission via AJAX without refreshing the page
+document.getElementById('pageContainer').addEventListener('submit', function(event) {
+    // Check if the event target is a form
+    if (event.target.matches('form')) {
+        event.preventDefault();  // Prevent the default form submission
+
+        var form = event.target;
+        var submissionUrl = form.action; // Assuming the form's 'action' attribute is set
+        var csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(submissionUrl, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadView(`https://localhost${data.next_url}`); // Load next view for successful submission
+            } else {
+                document.getElementById('pageContainer').innerHTML = data.form_html;
+                // No need to re-attach the event listener
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+});
 
 function clearPage() {
     // Call clearCanvas if it's available
@@ -66,47 +96,11 @@ document.getElementById('homeButton').addEventListener('click', function() {
 
 });
 
-function attachFormSubmitListener() {
-    const form = document.querySelector('#pageContainer form');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            var csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
-            var viewUrl = this.action;
-
-            fetch(viewUrl, {
-                method: 'POST',
-                body: new FormData(this),
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': csrfToken
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    loadView(`https://localhost${data.next_url}`);
-                } else {
-                    document.getElementById('pageContainer').innerHTML = data.form_html;
-                    attachFormSubmitListener(); // Re-attach listener to the new form
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    } else {
-        console.error('Form not found in the DOM');
-    }
-}
-
 
 document.getElementById('registerButton').addEventListener('click', function() {
     clearPage();
-    loadView('https://localhost/users/register/')
-        .then(() => {
-            attachFormSubmitListener(); // This is now called after the form is loaded
-        })
-        .catch(error => console.error('Error:', error));
+
+    loadView('https://localhost/users/register/');
 });
 
 
