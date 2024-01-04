@@ -3,8 +3,10 @@ function loadView(viewUrl) {
         .then(response => response.text())
         .then(data => {
             document.getElementById('pageContainer').innerHTML = data;
+            return data; // Resolve the promise with the fetched data
         });
 }
+
 
 function loadScripts(scriptUrls, callback) {
     return scriptUrls.reduce((promise, scriptUrl) => {
@@ -21,39 +23,6 @@ function loadScript(src) {
         script.onerror = reject;
         document.head.appendChild(script);
     });
-}
-
-// Allows us to handle form submissions without reloading the page
-function attachFormSubmitListener() {
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            fetch('https://localhost/users/register/', {
-                method: 'POST',
-                body: new FormData(this),
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': csrfToken
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    loadView(`https://localhost${data.next_url}`);
-                } else {
-                    document.getElementById('pageContainer').innerHTML = data.form_html;
-                    attachFormSubmitListener(); // Re-attach listener to the new form
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    } else {
-        console.error('Form not found in the DOM');
-    }
 }
 
 function clearPage() {
@@ -97,13 +66,50 @@ document.getElementById('homeButton').addEventListener('click', function() {
 
 });
 
+function attachFormSubmitListener() {
+    const form = document.querySelector('#pageContainer form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch('https://localhost/users/register/', {
+                method: 'POST',
+                body: new FormData(this),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadView(`https://localhost${data.next_url}`);
+                } else {
+                    document.getElementById('pageContainer').innerHTML = data.form_html;
+                    attachFormSubmitListener(); // Re-attach listener to the new form
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    } else {
+        console.error('Form not found in the DOM');
+    }
+}
+
+
 document.getElementById('registerButton').addEventListener('click', function() {
     clearPage();
-
-    loadView('https://localhost/users/register/', function() {
-        attachFormSubmitListener(); // Attach listener when the form is initially loaded
-    });
+    loadView('https://localhost/users/register/')
+        .then(() => {
+            attachFormSubmitListener(); // This is now called after the form is loaded
+        })
+        .catch(error => console.error('Error:', error));
 });
+
+
+
 
 
 
