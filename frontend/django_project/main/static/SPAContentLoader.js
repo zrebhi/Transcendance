@@ -73,8 +73,9 @@ function attachFormSubmitListener() {
             event.preventDefault();
 
             var csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+            var viewUrl = this.action;
 
-            fetch('https://localhost/users/register/', {
+            fetch(viewUrl, {
                 method: 'POST',
                 body: new FormData(this),
                 headers: {
