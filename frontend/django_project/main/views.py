@@ -8,3 +8,12 @@ def home_view(request):
     html = render_to_string('home_template.html')
     return HttpResponse(html)
 
+from django.shortcuts import render
+
+def navbar_view(request):
+    return render(request, 'navbar.html')
+
+def sidebar_view(request):
+    return render(request, 'sidebar.html')
+
+

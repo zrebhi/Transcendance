@@ -1,65 +1,54 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}" defer></script>
 
-    <title>Single Page App Navbar</title>
+<style>
+    /* Custom Navbar Styles */
+    .navbar-custom {
+        {#background-color: #222; /* Soft black background color */#}
+        position: relative; /* Relative position for absolute children */
+    }
 
-    <style>
-        /* Custom Navbar Styles */
-        .navbar-custom {
-            {#background-color: #222; /* Soft black background color */#}
-            position: relative; /* Relative position for absolute children */
-        }
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link {
+        color: #000000; /* White text color */
+        position: relative; /* Relative position for underline */
+    }
 
-        .navbar-custom .navbar-brand,
-        .navbar-custom .nav-link {
-            color: #000000; /* White text color */
-            position: relative; /* Relative position for underline */
-        }
+    .navbar-custom .nav-link:hover,
+    .navbar-custom .nav-link.active {
+        color: #007bff; /* Red text color on hover and active */
+    }
 
-        .navbar-custom .nav-link:hover,
-        .navbar-custom .nav-link.active {
-            color: #24924C; /* Red text color on hover and active */
-        }
+    /* Red underline for active and hover states */
+    .navbar-custom .nav-link::after {
+        content: "";
+        position: absolute; /* Absolute position for the underline */
+        bottom: 0; /* Align at the bottom of the navbar */
+        left: 0; /* Start from the left edge */
+        right: 0; /* Stretch to the right edge */
+        width: 0; /* Initially set to zero */
+        height: 2px;
+        background-color: #007bff; /* Red color for the underline */
+        transition: width 0.3s; /* Smooth transition for the underline */
+        margin-left: auto; /* Centering */
+        margin-right: auto; /* Centering */
+    }
 
-        /* Red underline for active and hover states */
-        .navbar-custom .nav-link::after {
-            content: "";
-            position: absolute; /* Absolute position for the underline */
-            bottom: 0; /* Align at the bottom of the navbar */
-            left: 0; /* Start from the left edge */
-            right: 0; /* Stretch to the right edge */
-            width: 0; /* Initially set to zero */
-            height: 2px;
-            background-color: #24924C; /* Red color for the underline */
-            transition: width 0.3s; /* Smooth transition for the underline */
-            margin-left: auto; /* Centering */
-            margin-right: auto; /* Centering */
-        }
+    .navbar-custom .nav-link:hover::after,
+    .navbar-custom .nav-link.active::after {
+        width: 100%; /* Full width on hover and active */
+    }
 
-        .navbar-custom .nav-link:hover::after,
-        .navbar-custom .nav-link.active::after {
-            width: 100%; /* Full width on hover and active */
-        }
+    /* Centering the navbar items */
+    .navbar-nav {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
 
-        /* Centering the navbar items */
-        .navbar-nav {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .nav-item {
-            margin: 0 5px; /* Optional: Adds spacing between items */
-        }
-    </style>
-</head>
-<body>
+    .nav-item {
+        margin: 0 5px; /* Optional: Adds spacing between items */
+    }
+</style>
 
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
@@ -74,29 +63,24 @@
                 <li class="nav-item">
                     <button id="playButton" class="nav-link btn btn-link" type="button">Play</button>
                 </li>
-                <li class="nav-item">
-                    <button id="registerButton" class="nav-link btn btn-link" type="button">Register</button>
-                </li>
+                {% if user.is_superuser %}
+                    <li class="nav-item">
+                       <a id="adminButton" class="nav-link btn btn-link" href="https://localhost/admin/" target="_blank" rel="noopener noreferrer">Admin</a>
+                    </li>
+                {% endif %}
+                {% if not user.is_authenticated %}
+                    <li class="nav-item">
+                        <button id="loginButton" class="nav-link btn btn-link" type="button">Login</button>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <button id="logoutButton" class="nav-link btn btn-link" type="button">Logout</button>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
 
-<!-- Your page content goes here -->
+<script src="{% static 'js/navbar.js' %}"></script>
 
-<script>
-    // JavaScript code to handle button clicks and toggle active states
-    const buttons = document.querySelectorAll(".navbar-nav .nav-link");
-
-    buttons.forEach((button) => {
-        button.addEventListener("click", function () {
-            buttons.forEach((otherButton) => {
-                otherButton.classList.remove("active");
-            });
-            this.classList.add("active");
-        });
-    });
-</script>
-
-</body>
-</html>

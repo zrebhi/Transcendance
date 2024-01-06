@@ -1,0 +1,85 @@
+{% load static %}
+
+<style>
+    
+    .sidebar {
+        padding: 0;
+        margin: 0;
+        background-color: rgba(255, 255, 255, 0.7); /* White with slight opacity */
+        {#border-left: 1px solid #222; /* Solid blue border on the left */#}
+        box-shadow: 2px 0 5px 0 rgba(50, 50, 50, 0.3); /* Shadow effect to the left */
+    }
+    
+    .user-section {
+        width: 100%;
+        margin-top: 0;
+        display: flex; /* Enable Flexbox */
+        flex-direction: column; /* Stack elements vertically */
+        align-items: center; /* Center-align items horizontally */
+        justify-content: center; /* Center-align items vertically */
+    }
+
+    .user-section-buttons {
+        display: flex; /* Enable Flexbox for buttons */
+        flex-direction: row; /* Align buttons in a row */
+        justify-content: center; /* Center-align buttons horizontally */
+        margin-top: 10px; /* Space above the buttons */
+    }
+
+    .sidebar-button {
+        font-family: 'Oswald', sans-serif;
+        font-size: 15px;
+        border: none;
+        box-shadow: 2px 2px 5px 0 rgba(50, 50, 50, 0.3);
+        margin: 0 3px; /* Space between buttons */
+    }
+    
+    .username {
+        color: #333; /* Light color for the username text */
+        font-family: 'Rubik Doodle Shadow', system-ui;
+        font-size: 24px;
+        font-weight: 400;
+        margin: 0; /* Remove any default margin */
+    }
+
+    .avatar-border {
+    border: 1px solid rgba(50, 50, 50, 0.5); /* Blue border */
+    box-shadow: 0 0 10px rgba(50, 50, 50, 0.3); /* Blue glow effect */
+    }
+
+    
+    .friend-list {
+        overflow-y: auto;
+        width: 100%;
+        height: 100%;
+        font-family: 'Satoshi', system-ui;
+        font-size: 16px;
+        font-weight: 500;
+        margin: 0; /* Remove any default margin */
+        padding: 0;
+    }
+
+</style>
+
+{% if user.is_authenticated %}
+    <div class="sidebar position-absolute d-flex flex-column align-items-center" style="width: 300px; height: 100vh;">
+        <!-- User Profile Section -->
+        <div class="user-section my-3 d-flex flex-column align-items-center">
+            <p class="username">{{ user.username }}</p>
+            <img src="{% static 'img/default_avatar2.jpg' %}" alt="Avatar" class="rounded-circle avatar-border" style="width: 125px; height: 125px;">
+            
+            <!-- Buttons Side by Side -->
+            <div class="user-section-buttons">
+                <button type="button" class="btn btn-primary btn-sm sidebar-button">Settings</button>
+                <button type="button" class="btn btn-primary btn-sm sidebar-button">Profile</button>
+            </div>
+        </div>
+    
+        <!-- Friend List Section -->
+        <div class="friend-list d-flex flex-column align-items-center">
+            <p style="font-family: 'Rubik Doodle Shadow', system-ui; font-size: 20px; color: #333; margin-top: -2px;">Friends</p>
+            <button type="button" class="btn btn-primary btn-sm sidebar-button" style="margin-top: -5px;">Add a Friend</button>
+        </div>
+    </div>
+{% endif %}
+

@@ -6,16 +6,34 @@
     <meta charset="UTF-8">
     <title>Transcendance</title>
 
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/main/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Rubik+Doodle+Shadow&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href={% static "img/favicon.ico" %}>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}" defer></script>
+    
+    <style>
+        body {
+            background-color: rgba(230, 230, 230, 0.5); /* White with slight opacity */
+        }
+    </style>
 
 </head>
 <body>
 
-{% include 'navbar.html' %}
+<div id="sidebarContainer">
+    {% include 'sidebar.html' %}
+</div>
+
+<div id="navbarContainer">
+    {% include 'navbar.html' %}
+</div>
 
 <div id="pageContainer"> {% include 'home_template.html' %} </div>
 
-<script src="/static/main/SPAContentLoader.js"></script>
+<script src="{% static 'js/SPAContentLoader.js' %}"></script>
 
 </body>
 </html>

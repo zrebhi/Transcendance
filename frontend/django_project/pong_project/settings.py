@@ -35,7 +35,8 @@ CSRF_TRUSTED_ORIGINS = ['https://localhost']
 INSTALLED_APPS = [
     'channels',
     'daphne',
-    'corsheaders',
+    'widget_tweaks',
+    'bootstrap5',
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -138,7 +139,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [('pong_app', os.path.join(BASE_DIR, 'pong_app', 'static')),
-                    ('main', os.path.join(BASE_DIR, 'main', 'static')),]
+                    ('main', os.path.join(BASE_DIR, 'main', 'static')),
+                    ('users', os.path.join(BASE_DIR, 'users', 'static')),]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
