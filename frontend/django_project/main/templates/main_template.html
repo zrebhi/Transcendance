@@ -10,15 +10,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Rubik+Doodle+Shadow&display=swap" rel="stylesheet">
     
-    <link rel="icon" type="image/png" sizes="32x32" href={% static "img/favicon.ico" %}>
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}" defer></script>
+    <link rel="icon" type="image/png" sizes="32x32" href={% static "main/img/favicon.ico" %}>
+    <link rel="stylesheet" href="{% static 'main/bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'main/bootstrap/js/bootstrap.bundle.min.js' %}" defer></script>
     
-    <style>
-        body {
-            background-color: rgba(230, 230, 230, 0.5); /* White with slight opacity */
-        }
-    </style>
+<style>
+    body {
+        background-color: rgba(230, 230, 230, 0.5); /* White with slight opacity */
+        display: flex; /* Enable flexbox for the body */
+        flex-direction: column; /* Stack elements vertically */
+    }
+
+    #sidebarContainer {
+        
+    }
+
+    #navbarContainer {
+        /* Adjust the width and positioning as needed */
+    }
+
+    #pageContainer {
+        display: flex; /* Enable flexbox for centering contents */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        flex-grow: 1; /* Allow the container to fill the available space */
+        margin-left: 300px; /* Same as the sidebar width */
+        padding-right: 300px; /* Same as the sidebar width */
+        padding-bottom: 200px;
+    }
+</style>
+
 
 </head>
 <body>
@@ -33,7 +54,7 @@
 
 <div id="pageContainer"> {% include 'home_template.html' %} </div>
 
-<script src="{% static 'js/SPAContentLoader.js' %}"></script>
+<script type="module" src="{% static 'main/js/eventHandlers.js' %}"></script>
 
 </body>
 </html>

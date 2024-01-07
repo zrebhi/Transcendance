@@ -1,14 +1,17 @@
-# routing.py
-
-from django.urls import re_path
+from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from pong_app.consumers import GameConsumer
-
-websocket_urlpatterns = [
-    re_path("ws/socket-server/", GameConsumer.as_asgi()),
-]
+from pong_app.routing import websocket_urlpatterns as pong_websocket_urlpatterns
+from matchmaking.routing import websocket_urlpatterns as matchmaking_websocket_urlpatterns
 
 application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
+    # Django's ASGI application to handle traditional HTTP requests
+    "http": get_asgi_application(),
+
+    # Django Channels routing for websocket
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            pong_websocket_urlpatterns + matchmaking_websocket_urlpatterns
+        )
+    ),
 })

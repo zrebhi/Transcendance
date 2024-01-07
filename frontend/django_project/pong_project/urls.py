@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('main.urls')),
     path('pong/', include('pong_app.urls')),
     path('users/', include('users.urls')),
+    path('matchmaking/', include('matchmaking.urls')),
 ]
 
 if settings.DEBUG:

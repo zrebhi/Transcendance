@@ -8,6 +8,8 @@
         background-color: rgba(255, 255, 255, 0.7); /* White with slight opacity */
         {#border-left: 1px solid #222; /* Solid blue border on the left */#}
         box-shadow: 2px 0 5px 0 rgba(50, 50, 50, 0.3); /* Shadow effect to the left */
+        width: 300px;
+        height: 100vh;
     }
     
     .user-section {
@@ -62,11 +64,11 @@
 </style>
 
 {% if user.is_authenticated %}
-    <div class="sidebar position-absolute d-flex flex-column align-items-center" style="width: 300px; height: 100vh;">
+    <div class="sidebar position-absolute d-flex flex-column align-items-center">
         <!-- User Profile Section -->
         <div class="user-section my-3 d-flex flex-column align-items-center">
             <p class="username">{{ user.username }}</p>
-            <img src="{% static 'img/default_avatar2.jpg' %}" alt="Avatar" class="rounded-circle avatar-border" style="width: 125px; height: 125px;">
+            <img src="{% static 'main/img/default_avatar2.jpg' %}" alt="Avatar" class="rounded-circle avatar-border" style="width: 125px; height: 125px;">
             
             <!-- Buttons Side by Side -->
             <div class="user-section-buttons">

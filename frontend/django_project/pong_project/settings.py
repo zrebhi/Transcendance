@@ -35,8 +35,6 @@ CSRF_TRUSTED_ORIGINS = ['https://localhost']
 INSTALLED_APPS = [
     'channels',
     'daphne',
-    'widget_tweaks',
-    'bootstrap5',
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,6 +46,7 @@ INSTALLED_APPS = [
     'pong_app',
     'main',
     'users',
+    'matchmaking',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +64,7 @@ ROOT_URLCONF = 'pong_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'pong_app/templates']
+        'DIRS': []
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -138,9 +137,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [('pong_app', os.path.join(BASE_DIR, 'pong_app', 'static')),
-                    ('main', os.path.join(BASE_DIR, 'main', 'static')),
-                    ('users', os.path.join(BASE_DIR, 'users', 'static')),]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
