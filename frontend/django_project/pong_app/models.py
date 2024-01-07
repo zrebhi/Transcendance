@@ -86,6 +86,7 @@ class Game:
     def __init__(self, window):
         self.window = window
         self.reset_game()
+        print('Game initialized')
 
     def reset_game(self):
         self.players = {0: None, 1: None}

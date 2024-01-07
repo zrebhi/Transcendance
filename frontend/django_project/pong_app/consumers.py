@@ -29,7 +29,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
 
         # Retrieve the game session and verify the user's participation
-        self.game_session = await database_sync_to_async(GameSession.objects.get)(id=self.game_session_id)
+        self.game_session = await self.get_game_session_async(self.game_session_id)
         if self.user not in [self.game_session.player1, self.game_session.player2]:
             await self.close()
             return
@@ -37,11 +37,20 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Join the game group for broadcasting messages
         await self.channel_layer.group_add(self.game_group_name, self.channel_name)
         await self.accept()
+        self.closed_socket = False
 
         # Initialize or retrieve the game instance
         self.game = get_game_for_session(self.game_session_id)
         self.assign_player()
         self.manage_game_state_on_connection()
+
+    @database_sync_to_async
+    def get_game_session_async(self, session_id):
+        """Asynchronously retrieve a GameSession object."""
+        try:
+            return GameSession.objects.select_related('player1', 'player2').get(id=session_id)
+        except GameSession.DoesNotExist:
+            return None
 
     def assign_player(self):
         """Assign the connected user to a player slot in the game."""
@@ -105,3 +114,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                 }
             )
             await asyncio.sleep(1 / FPS)
+
+    async def game_state_update(self, event):
+        """
+        Receive game state updates and send them to the WebSocket client.
+        """
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({
+            'type': 'game_state',
+            'data': event['message']
+        }))

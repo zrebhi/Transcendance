@@ -1,24 +1,27 @@
-function createWebSocket() {
-    const wsType = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const url = `${wsType}://${window.location.host}/ws/socket-server/`;
-    console.log(url);
+function createGameSessionWebSocket(sessionId) {
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const url = `${protocol}://${window.location.host}/ws/game/${sessionId}/`; // Update with the correct URL pattern
+    console.log("Game session WebSocket URL:", url);
     return new WebSocket(url);
 }
-
 function setupWebSocketListeners(socket) {
+    retrieveData = false;
     socket.onopen = (event) => {
         console.log("WebSocket connection opened:", event);
         requestAnimationFrame(() => handleKeyDown(socket));
     };
 
     socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        window.windowData = data.window;
-        window.player1Data = data.player1;
-        window.player2Data = data.player2;
-        window.ballData = data.ball;
-        window.pauseGame = data.pause;
-    };
+        const message = JSON.parse(event.data);
+        if (message.type === 'game_state') {
+            const gameData = message.data;
+            window.windowData = gameData.window;
+            window.player1Data = gameData.player1;
+            window.player2Data = gameData.player2;
+            window.ballData = gameData.ball;
+            window.pauseGame = gameData.pause;
+        }
+    }
 
     socket.onclose = (event) => {
         console.log("WebSocket connection closed:", event);
@@ -36,7 +39,7 @@ async function waitForWindowData() {
     }
 }
 
-async function initGame() {
+async function initGame(sessionId) {
     window.myp5 = null;
     window.player1Data = null;
     window.player2Data = null;
@@ -45,7 +48,7 @@ async function initGame() {
     window.windowData = null;
     window.keyState = {};
 
-    let gameSocket = createWebSocket();
+    let gameSocket = createGameSessionWebSocket(sessionId);
     setupWebSocketListeners(gameSocket);
     await waitForWindowData();
     setupPlayerMovement(gameSocket);
@@ -84,11 +87,13 @@ function drawCanvas() {
             if (window.windowData) {
                 let canvas = sketch.createCanvas(window.windowData.width, window.windowData.height);
                 canvas.parent("pageContainer");
+                console.log("Canvas created");
             }
         };
 
         sketch.draw = () => {
             if (window.windowData) {
+                console.log("Drawing canvas");
                 sketch.background(0);
                 sketch.fill(255);
                 sketch.rect(window.player1Data.xpos, window.player1Data.ypos, window.player1Data.width, window.player1Data.height);
