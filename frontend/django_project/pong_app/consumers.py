@@ -110,14 +110,14 @@ class GameConsumer(AsyncWebsocketConsumer):
     def remove_channel_name_from_session(self, channel_name):
         """Removes the channel name from the session."""
         session = self.scope["session"]
-        if "channel_names" not in session:
-            return
-        if channel_name in session["channel_names"]:
-            session["channel_names"].remove(channel_name)
-            # Mark the session as modified to ensure the changes are saved
-            # in the async context
-            session.modified = True
-            session.save()
+        try:
+            if "channel_names" in session and channel_name in session["channel_names"]:
+                session["channel_names"].remove(channel_name)
+                session.modified = True
+                session.save()
+        except Exception as e:
+            # Handle exceptions, such as session not existing or save errors
+            print(f"Error updating session: {e}")
     async def leave_message(self, event):
         """Message sent by the server when the user logs out."""
         await self.disconnect(1001)
