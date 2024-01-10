@@ -1,0 +1,33 @@
+{% load static %}
+
+<link href="{% static 'users/css/user_profile.css' %}" rel="stylesheet">
+
+<div class="player-profile-container">
+    <div class="profile-header text-center">
+        <img src="{% static 'users/img/user_avatar.jpg' %}" alt="Player Avatar" class="avatar img-thumbnail mb-3">
+        <h2>Player Name</h2>
+        <p class="record">50W - 50L (50% Winrate)</p>
+    </div>
+
+    <div class="match-history mt-5">
+        <h3 class="text-center mb-4">Match History</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Opponent</th>
+                    <th scope="col">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Repeat this row for each match -->
+                <tr>
+                    <td>2024-01-08</td>
+                    <td>Opponent Name</td>
+                    <td>Win/Loss</td>
+                </tr>
+                <!-- End of match row -->
+            </tbody>
+        </table>
+    </div>
+</div>

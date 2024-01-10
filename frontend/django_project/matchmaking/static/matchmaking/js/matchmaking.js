@@ -1,34 +1,41 @@
-import {clearPage, getCsrfToken, loadScripts, loadView} from "./SPAContentLoader.js";
+import {getCsrfToken, loadGame, loadView} from "/static/main/js/SPAContentLoader.js";
+import {showQueueUI, hideQueueUI} from "/static/main/js/queue.js";
 
-// Modify connectToQueueWebSocket to use startGameSession
+let queueSocket = null;
+
 function connectToQueueWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const socket = new WebSocket(protocol + '://' + window.location.host + '/ws/queue/');
+    queueSocket = new WebSocket(protocol + '://' + window.location.host + '/ws/queue/');
 
-    socket.onopen = (event) => {
+    queueSocket.onopen = (event) => {
         console.log("Queue WebSocket connection opened:", event);
     };
 
-    socket.onmessage = (event) => {
+    queueSocket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'game_matched') {
             console.log('Game matched:', data);
-            loadGame(data.session_id);
+        // Display "Match found" in the queue container
+        document.getElementById('queueContainer').innerHTML = '<p>Match found!</p>';
+
+        setTimeout(function() {
+            hideQueueUI();
+            loadGame(data["session_id"]);
+        }, 3000);
         }
     };
 
-    socket.onclose = (event) => {
+    queueSocket.onclose = (event) => {
         console.log("Queue WebSocket connection closed:", event);
     };
 
-    socket.onerror = (event) => {
+    queueSocket.onerror = (event) => {
         console.error("Queue WebSocket error:", event);
     };
 }
 
-
 export function joinQueue() {
-    fetch('https://localhost/matchmaking/', {  // Update with the correct URL
+    fetch('/matchmaking/', {  // Update with the correct URL
         method: 'POST',
         headers: {
             'X-CSRFToken': getCsrfToken(), // Include CSRF token if needed
@@ -38,6 +45,10 @@ export function joinQueue() {
     })
         .then(response => {
             console.log(response); // Check what the response looks like
+            if (response.status === 401) {
+               loadView('https://localhost/users/login/')
+                        .catch(error => console.error('Error:', error));
+            }
             return response.text(); // Use text() if you're not sure it's JSON
         })
         .then(text => {
@@ -47,7 +58,9 @@ export function joinQueue() {
                 if (data.status === 'success') {
                     // Connect to the WebSocket for queue updates
                     connectToQueueWebSocket();
-                } else {
+                    showQueueUI();
+                }
+                else {
                     // Handle error (user already in queue, not authenticated, etc.)
                     console.error('Error joining queue:', data.message);
                 }
@@ -57,21 +70,14 @@ export function joinQueue() {
         })
 }
 
-let socketCreated = false;
-
-function loadGame(sessionId) {
-    clearPage();
-    loadView('https://localhost/pong/')
-        .then(() => loadScripts([
-            'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js',
-            'https://localhost/static/pong_app/js/pong_template.js',
-        ], () => {
-            if (!socketCreated) {
-                initGame(sessionId);
-                socketCreated = true;
-            } else {
-                drawCanvas();
-            }
-        }))
-        .catch(error => console.error('Error:', error));
+export function cancelQueue() {
+    if (queueSocket && queueSocket.readyState === WebSocket.OPEN) {
+        queueSocket.send(JSON.stringify({
+            type: 'leave_message'
+        }));
+        console.log('Leaving queue');
+        hideQueueUI();
+    } else {
+        console.error('WebSocket is not connected');
+    }
 }

@@ -1,3 +1,6 @@
+import {setupNavbar} from './navbar.js';
+import {eventHandlers} from './eventHandlers.js';
+import {initGame, drawCanvas, clearCanvas} from '/static/pong_app/js/pong_template.js';
 // Functions for dynamic content management in a Single Page Application (SPA)
 
 /**
@@ -18,11 +21,31 @@ export function adjustPageContainerHeight() {
  * @param {string} viewUrl - The URL to fetch view content from.
  */
 export function loadView(viewUrl) {
+    clearPage();
+
     return fetch(viewUrl)
         .then(response => response.text())
         .then(data => {
             document.getElementById('pageContainer').innerHTML = data;
         });
+}
+
+export function loadGame(sessionId) {
+    if (!window.socketCreated)
+        window.socketCreated = false;
+    loadView('/pong/')
+        .then(() => loadScripts([
+            'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js',
+            '/static/pong_app/js/pong_template.js',
+        ], async () => {
+            if (!window.socketCreated) {
+                await initGame(sessionId);
+                window.socketCreated = true;
+            } else {
+                drawCanvas();
+            }
+        }))
+        .catch(error => console.error('Error:', error));
 }
 
 /**
@@ -44,6 +67,7 @@ function loadScript(src) {
     return new Promise((resolve, reject) => {
         let script = document.createElement('script');
         script.src = src;
+        script.type = 'module';
         script.className = 'dynamic-script';
         script.onload = resolve;
         script.onerror = reject;
@@ -59,7 +83,6 @@ export function clearPage() {
 
     const dynamicScripts = document.querySelectorAll('.dynamic-script');
     dynamicScripts.forEach(script => script.parentNode.removeChild(script));
-
     document.getElementById('pageContainer').innerHTML = '';
 }
 
@@ -67,7 +90,7 @@ export function clearPage() {
  * Fetches and updates the navbar HTML content.
  */
 export function updateNavbar() {
-    fetch('https://localhost/navbar/')
+    fetch('/navbar/')
         .then(response => response.text())
         .then(navbarHtml => {
             document.getElementById('navbarContainer').innerHTML = navbarHtml;
@@ -80,10 +103,29 @@ export function updateNavbar() {
  * Fetches and updates the sidebar HTML content.
  */
 export function updateSidebar() {
-    fetch('https://localhost/sidebar/')
+    fetch('/sidebar/')
         .then(response => response.text())
         .then(sidebarHtml => {
             document.getElementById('sidebarContainer').innerHTML = sidebarHtml;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+export function updatePage() {
+    fetch('/')
+        .then(response => response.text())
+        .then(pageHtml => {
+            document.body.innerHTML = pageHtml;
+        })
+        .then(() => {
+            loadScripts(["/static/main/js/eventHandlers.js",
+            "/static/main/js/navbar.js",
+            "/static/main/bootstrap/js/bootstrap.bundle.min.js"
+            ], () => {
+                eventHandlers();
+                setupNavbar();
+            })
+                .catch(error => console.error('Error:', error));
         })
         .catch(error => console.error('Error:', error));
 }

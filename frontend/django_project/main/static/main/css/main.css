@@ -1,0 +1,53 @@
+body {
+    background-color: rgba(230, 230, 230, 0.5); /* White with slight opacity */
+    display: flex; /* Enable flexbox for the body */
+    flex-direction: row; /* Align elements horizontally */
+    height: 100vh; /* Full viewport height */
+}
+
+#mainContentWrapper {
+    flex-grow: 1; /* Take up remaining space */
+    display: flex;
+    flex-direction: column; /* Stack navbar and pageContainer vertically */
+    justify-content: center;
+    align-items: center;
+}
+
+#navbarContainer, #pageContainer {
+    width: 100%; /* Ensure they take full width of the wrapper */
+    /* Additional styling as needed */
+}
+
+#pageContainer {
+    flex-grow: 1; /* Allow page container to grow and fill the space */
+    display: flex;
+    justify-content: center;
+}
+
+#queueContainer {
+    display: none;
+    position: absolute;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    bottom: 50px;
+    width: 20%; /* Or a fixed width, e.g., 300px */
+    max-width: 300px; /* Optional: maximum width */
+    height: 10%;
+    max-height: 150px;
+    border: 2px solid #eee;
+    border-radius: 10px; /* Rounded corners */
+    background-color: white; /* Or any color that fits your design */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add some shadow for depth */
+    box-sizing: border-box; /* Include padding and border in the width */
+    padding: 10px;
+}
+
+/* Optional: Responsive adjustments for smaller screens */
+@media (max-width: 600px) {
+    #queueContainer {
+        width: 95%;
+        bottom: 20px;
+        padding: 15px;
+    }
+}

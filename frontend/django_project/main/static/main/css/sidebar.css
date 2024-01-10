@@ -1,0 +1,83 @@
+/* Sidebar Styles */
+.sidebar {
+    display: flex; /* Make sidebar a flex container */
+    flex-direction: column; /* Arrange children in a column */
+    background-color: #ffffff;
+    width: 300px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: 100vh;
+    max-height: 100vh;
+}
+
+/* User Info Styles */
+.user-info {
+
+}
+
+.avatar {
+    width: 125px; /* Avatar size */
+    height: 125px; /* Keep the aspect ratio */
+    object-fit: cover; /* Ensure the image covers the area */
+    border: 3px solid rgba(0, 0, 0, 0.1); /* Border color matching Bootstrap's primary color */
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-family: "Rubik Doodle Shadow", system-ui;
+}
+
+/* Navigation Buttons */
+.nav-buttons .btn {
+    margin-bottom: 10px; /* Space between buttons */
+}
+
+/* Friend List Styles */
+
+.friend-list {
+    flex-grow: 1; /* Allow to take up available space */
+    display: flex; /* Make it a flex container */
+    flex-direction: column; /* Stack children vertically */
+    overflow: hidden; /* Hide overflow inside friend-list */
+}
+
+.friend-list .list-group {
+    overflow-y: auto; /* Enable vertical scrolling */
+    flex-grow: 1; /* Grow within friend-list */
+}
+
+.friend-list h4 {
+    color: #007bff; /* Primary color for the header */
+    border-bottom: 2px solid #eee; /* Light border under the header */
+    padding-bottom: 10px;
+}
+
+.friend-list .list-group-item {
+    border: none; /* Remove default borders */
+    padding: 10px 15px; /* Padding inside each list item */
+    background-color: #f8f9fa; /* Light background for each item */
+    margin-bottom: 5px; /* Space between list items */
+    border-radius: 5px; /* Rounded corners for list items */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+}
+
+/* Add Friend Button */
+.friend-list .btn-success {
+    background-color: #28a745; /* Bootstrap success color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+/* Scrollbar Styles (optional) */
+.friend-list .list-group::-webkit-scrollbar {
+    width: 8px;
+}
+
+.friend-list .list-group::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* Scroll thumb color */
+    border-radius: 10px;
+}
+
+.friend-list .list-group::-webkit-scrollbar-track {
+    background-color: #f8f9fa; /* Scroll track color */
+}

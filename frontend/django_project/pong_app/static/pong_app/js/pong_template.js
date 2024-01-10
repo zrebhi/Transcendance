@@ -5,7 +5,6 @@ function createGameSessionWebSocket(sessionId) {
     return new WebSocket(url);
 }
 function setupWebSocketListeners(socket) {
-    retrieveData = false;
     socket.onopen = (event) => {
         console.log("WebSocket connection opened:", event);
         requestAnimationFrame(() => handleKeyDown(socket));
@@ -15,11 +14,11 @@ function setupWebSocketListeners(socket) {
         const message = JSON.parse(event.data);
         if (message.type === 'game_state') {
             const gameData = message.data;
-            window.windowData = gameData.window;
-            window.player1Data = gameData.player1;
-            window.player2Data = gameData.player2;
-            window.ballData = gameData.ball;
-            window.pauseGame = gameData.pause;
+            window.windowData = gameData["window"];
+            window.player1Data = gameData["player1"];
+            window.player2Data = gameData["player2"];
+            window.ballData = gameData["ball"];
+            window.pauseGame = gameData["pause"];
         }
     }
 
@@ -39,7 +38,7 @@ async function waitForWindowData() {
     }
 }
 
-async function initGame(sessionId) {
+export async function initGame(sessionId) {
     window.myp5 = null;
     window.player1Data = null;
     window.player2Data = null;
@@ -81,19 +80,17 @@ function handleKeyDown(socket) {
     requestAnimationFrame(() => handleKeyDown(socket));
 }
 
-function drawCanvas() {
+export function drawCanvas() {
     const s = (sketch) => {
         sketch.setup = () => {
             if (window.windowData) {
                 let canvas = sketch.createCanvas(window.windowData.width, window.windowData.height);
                 canvas.parent("pageContainer");
-                console.log("Canvas created");
             }
         };
 
         sketch.draw = () => {
             if (window.windowData) {
-                console.log("Drawing canvas");
                 sketch.background(0);
                 sketch.fill(255);
                 sketch.rect(window.player1Data.xpos, window.player1Data.ypos, window.player1Data.width, window.player1Data.height);
@@ -113,7 +110,7 @@ function drawCanvas() {
     window.myp5 = new p5(s);
 }
 
-function clearCanvas() {
+export function clearCanvas() {
     if (window.myp5)
         window.myp5.remove();
 }

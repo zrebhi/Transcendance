@@ -35,9 +35,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             return
 
         # Join the game group for broadcasting messages
-        await self.channel_layer.group_add(self.game_group_name, self.channel_name)
         await self.accept()
+        await self.channel_layer.group_add(self.game_group_name, self.channel_name)
         self.closed_socket = False
+
+        # Add the channel name to the user's session so we can close it on logout
+        await self.add_channel_name_to_session(self.channel_name)
+
 
         # Initialize or retrieve the game instance
         self.game = get_game_for_session(self.game_session_id)
@@ -52,6 +56,19 @@ class GameConsumer(AsyncWebsocketConsumer):
         except GameSession.DoesNotExist:
             return None
 
+    @database_sync_to_async
+    def add_channel_name_to_session(self, channel_name):
+        """Add the channel name to an array in the session so we can close them on logout."""
+        session = self.scope["session"]
+        if "channel_names" not in session:
+            session["channel_names"] = []
+        if channel_name not in session["channel_names"]:
+            session["channel_names"].append(channel_name)
+            # Mark the session as modified to ensure the changes are saved
+            # in the async context
+            session.modified = True
+            session.save()
+
     def assign_player(self):
         """Assign the connected user to a player slot in the game."""
         if self.user == self.game_session.player1:
@@ -62,8 +79,10 @@ class GameConsumer(AsyncWebsocketConsumer):
     def manage_game_state_on_connection(self):
         """Manage the game state when a player connects."""
         if not self.is_game_full():
-            self.game.pause_game = False
+            self.game.pause_game = True
             self.start_game_tasks()
+        else:
+            self.game.pause_game = False
 
     def is_game_full(self):
         """Check if both player slots in the game are filled."""
@@ -84,6 +103,23 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.game.players[0] = None
         else:
             self.game.players[1] = None
+        await self.remove_channel_name_from_session(self.channel_name)
+        await self.close()
+
+    @database_sync_to_async
+    def remove_channel_name_from_session(self, channel_name):
+        """Removes the channel name from the session."""
+        session = self.scope["session"]
+        if "channel_names" not in session:
+            return
+        if channel_name in session["channel_names"]:
+            session["channel_names"].remove(channel_name)
+            # Mark the session as modified to ensure the changes are saved
+            # in the async context
+            session.modified = True
+            session.save()
+    async def leave_message(self, event):
+        """Message sent by the server when the user logs out."""
         await self.close()
 
     async def receive(self, text_data):

@@ -1,11 +1,16 @@
 from .forms import CustomUserCreationForm, CustomLoginForm
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.shortcuts import render
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 def register_view(request):
+    """
+    Handle user registration. If the request is POST, process the form data
+    to register a new user. If the request is GET, display the registration form.
+    """
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -13,7 +18,6 @@ def register_view(request):
             login(request, user)
             return JsonResponse({'success': True, 'next_url': '/home/'})
         else:
-            # Render the form with errors to a string
             form_html = render_to_string('register.html', {'form': form}, request=request)
             return JsonResponse({'success': False, 'form_html': form_html})
     else:
@@ -21,7 +25,12 @@ def register_view(request):
 
     return render(request, 'register.html', {'form': form})
 
+
 def login_view(request):
+    """
+    Handle user login. On POST, validate the form and authenticate the user.
+    If valid, log in the user and redirect. For GET requests, show the login form.
+    """
     if request.method == 'POST':
         form = CustomLoginForm(data=request.POST)
         if form.is_valid():
@@ -31,9 +40,7 @@ def login_view(request):
                 login(request, user)
                 return JsonResponse({'success': True, 'next_url': '/home/'})
             else:
-                # Handle case where authentication fails
                 form.add_error(None, 'Invalid username or password')
-        # Render the form with errors to a string for AJAX response
         form_html = render_to_string('login.html', {'form': form}, request=request)
         return JsonResponse({'success': False, 'form_html': form_html})
     else:
@@ -41,8 +48,30 @@ def login_view(request):
 
     return render(request, 'login.html', {'form': form})
 
+
 def logout_view(request):
+    """
+    Handle the user logout process. This includes logging out the user and
+    closing any active WebSocket connections associated with their session.
+    """
+
+    channel_layer = get_channel_layer()
+    channel_names = request.session.pop('channel_names', [])
+    for channel_name in channel_names:
+        async_to_sync(channel_layer.send)(
+            channel_name,
+            {'type': 'leave_message'}
+        )
+        print(f"logout message sent to {channel_name}")
+
+    request.session.save()
     logout(request)
     return JsonResponse({'success': True, 'next_url': '/home/'})
+
+
+
+def user_profile_view(request):
+    return render(request, 'user_profile.html')
+
 
 

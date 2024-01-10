@@ -1,33 +1,92 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .matchmaking import match_users
+from channels.db import database_sync_to_async
+from .models import QueueEntry
 import json
 
 class QueueConsumer(AsyncWebsocketConsumer):
     """
-    WebSocket consumer for the game matchmaking queue.
+    WebSocket consumer that handles the matchmaking queue logic.
     """
 
     async def connect(self):
-        # Assign a unique group for each user
+        """
+        Handle new WebSocket connection.
+        Assigns a unique group for each user and initiates the matchmaking process.
+        """
+        # Assign a unique group based on the user's ID to manage matchmaking
         self.user = self.scope["user"]
         self.room_group_name = f'queue_{self.user.id}'
 
-        # Add to group and accept the connection
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        # Add the user to their group and accept the WebSocket connection
         await self.accept()
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        await self.add_channel_name_to_session(self.channel_name)
 
-        # Initiate the matchmaking process
+        # Start matchmaking process
         await match_users()
 
+    @database_sync_to_async
+    def add_channel_name_to_session(self, channel_name):
+        """Add the channel name to an array in the session."""
+        session = self.scope["session"]
+        if "channel_names" not in session:
+            session["channel_names"] = []
+        if channel_name not in session["channel_names"]:
+            session["channel_names"].append(channel_name)
+            session.modified = True
+            session.save()
+
     async def disconnect(self, close_code):
-        # Remove from group on disconnect
+        """
+        Handle disconnection of WebSocket.
+        Removes the user from the matchmaking group and deletes their queue entry.
+        """
+        # Remove the user from their matchmaking group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
+        await self.remove_channel_name_from_session(self.channel_name)
+        # Remove the user's entry from the matchmaking queue
+        await self.delete_queue_entry()
         await self.close()
+        print(f"disconnected from {self.room_group_name}")
+
+    @database_sync_to_async
+    def delete_queue_entry(self):
+        """
+        Deletes the user's queue entry from the database.
+        This method is an asynchronous database operation.
+        """
+        QueueEntry.objects.filter(user=self.user).delete()
+
+    @database_sync_to_async
+    def remove_channel_name_from_session(self, channel_name):
+        """Removes the channel name from the session."""
+        session = self.scope["session"]
+        try:
+            if "channel_names" in session and channel_name in session["channel_names"]:
+                session["channel_names"].remove(channel_name)
+                session.modified = True
+                session.save()
+        except Exception as e:
+            # Handle exceptions, such as session not existing or save errors
+            print(f"Error updating session: {e}")
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message_type = text_data_json.get('type')
+
+        if message_type == 'leave_message':
+            await self.leave_message(text_data_json)
+
+    async def leave_message(self, event):
+        """Message sent by the server when the user logs out."""
+        await self.disconnect(1001)
 
     async def game_matched(self, data):
         """
-        Sends a game_matched message to the WebSocket.
-        This is triggered when a game session is successfully created for the user.
+        Notify the user when a game match is found.
+        Sends a message to the WebSocket client with the session ID of the matched game.
         """
         await self.send(text_data=json.dumps({
             'type': 'game_matched',
