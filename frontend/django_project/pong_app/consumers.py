@@ -120,7 +120,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             session.save()
     async def leave_message(self, event):
         """Message sent by the server when the user logs out."""
-        await self.close()
+        await self.disconnect(1001)
 
     async def receive(self, text_data):
         """Receive and handle messages from WebSocket."""
