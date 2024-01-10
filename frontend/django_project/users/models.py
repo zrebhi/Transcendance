@@ -4,6 +4,8 @@ from django.utils import timezone
 
 class CustomUser(AbstractUser):
     session_id = models.IntegerField(null=True, blank=True, default=None)
+    def __str__(self):
+        return f'User: {self.username}, ID: {self.session_id}'
 
 class OldUser(models.Model):
     username = models.CharField(max_length=150, unique=True)

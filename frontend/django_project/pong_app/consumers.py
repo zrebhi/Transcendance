@@ -37,6 +37,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Join the game group for broadcasting messages
         await self.accept()
         await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+        await self.update_user_session_id(self.game_session_id)
+        print(self.user.session_id)
         self.closed_socket = False
 
         # Add the channel name to the user's session so we can close it on logout
@@ -69,20 +71,27 @@ class GameConsumer(AsyncWebsocketConsumer):
             session.modified = True
             session.save()
 
+    @database_sync_to_async
+    def update_user_session_id(self, new_session_id):
+        """Update the user's session_id."""
+        self.user.session_id = new_session_id
+        self.user.save()
+
     def assign_player(self):
-        """Assign the connected user to a player slot in the game."""
+        """Assign the connected user to a player slot in the game.
+        In local play player1 and player2 are both the user."""
         if self.user == self.game_session.player1:
             self.game.players[0] = self.user
-        else:
+        if self.user == self.game_session.player2:
             self.game.players[1] = self.user
 
     def manage_game_state_on_connection(self):
         """Manage the game state when a player connects."""
         if not self.is_game_full():
             self.game.pause_game = True
-            self.start_game_tasks()
         else:
             self.game.pause_game = False
+            self.start_game_tasks()
 
     def is_game_full(self):
         """Check if both player slots in the game are filled."""
@@ -101,8 +110,10 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.closed_socket = True
         if self.user == self.game_session.player1:
             self.game.players[0] = None
-        else:
+        if self.user == self.game_session.player2:
             self.game.players[1] = None
+
+        await self.update_user_session_id(None)
         await self.remove_channel_name_from_session(self.channel_name)
         await self.close()
 
@@ -118,20 +129,33 @@ class GameConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             # Handle exceptions, such as session not existing or save errors
             print(f"Error updating session: {e}")
-    async def leave_message(self, event):
-        """Message sent by the server when the user logs out."""
-        await self.disconnect(1001)
 
     async def receive(self, text_data):
         """Receive and handle messages from WebSocket."""
         data = json.loads(text_data)
-        self.handle_player_movement(data['message'])
+        if data.get('type') == "leave_game":
+            await self.disconnect(1001)
+        elif data['message'] == "game_init_request":
+            await self.send_game_init()
+        else:
+            self.handle_player_movement(data['message'])
+
+    async def leave_message(self, event):
+        """Message sent by the server when the user logs out."""
+        await self.disconnect(1001)
 
     def handle_player_movement(self, message):
         """Handle player movement commands."""
-        player_number = 1 if self.game.players[0] == self.user else 2
-        direction = 'up' if message == 'move_up_player' else 'down'
+        if not self.local_game():
+            player_number = 1 if self.game.players[0] == self.user else 2
+        else:
+            player_number = 1 if '1' in message else 2
+        direction = 'up' if 'move_up_player' in message else 'down'
         self.game.move_player(player_number, direction)
+
+    def local_game(self):
+        """Check if the game is a local game."""
+        return self.game_session.player1 == self.game_session.player2
 
     async def run_game_loop(self):
         """Run the game loop, updating the game state."""
@@ -141,7 +165,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def broadcast_game_state(self):
         """Broadcast the game state to all players in the game group."""
-        while not self.closed_socket:
+        while True:
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {
@@ -151,12 +175,27 @@ class GameConsumer(AsyncWebsocketConsumer):
             )
             await asyncio.sleep(1 / FPS)
 
+
     async def game_state_update(self, event):
-        """
-        Receive game state updates and send them to the WebSocket client.
-        """
+        """Receive game state updates and send them to the WebSocket client."""
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'type': 'game_state',
-            'data': event['message']
-        }))
+        if not self.closed_socket:
+            await self.send(text_data=json.dumps({
+                'type': 'game_state',
+                'data': event['message']
+            }))
+
+    async def send_game_init(self):
+        game_type = "Local" if self.local_game() else "Online"
+        init_message = {
+            'window': self.game.window.to_dict(),
+            'gameType': game_type,
+        }
+        init_message.update(self.game.get_state())
+        print(init_message)
+
+        if not self.closed_socket:
+            await self.send(text_data=json.dumps({
+                'type': 'game_init',
+                'data': init_message
+            }))

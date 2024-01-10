@@ -81,3 +81,27 @@ export function cancelQueue() {
         console.error('WebSocket is not connected');
     }
 }
+
+export function startLocalGame() {
+    fetch('/matchmaking/local_game/', {  // Update with the correct URL
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCsrfToken(),  // Include CSRF token if needed
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'  // Necessary for including cookies (like CSRF token)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Local game response:', data);
+        if (data.status === 'success') {
+            loadGame(data["session_id"]);
+        } else {
+            // Handle error (user already in a game, etc.)
+            console.error('Error starting local game:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}

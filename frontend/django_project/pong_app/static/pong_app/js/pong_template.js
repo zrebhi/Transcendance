@@ -1,3 +1,20 @@
+export async function initGame(sessionId) {
+    window.myp5 = null;
+    window.player1Data = null;
+    window.player2Data = null;
+    window.ballData = null;
+    window.pauseGame = null;
+    window.windowData = null;
+    window.gameType = null;
+    window.keyState = {};
+
+    let gameSocket = createGameSessionWebSocket(sessionId);
+    setupWebSocketListeners(gameSocket);
+    await waitForWindowData(gameSocket);
+    setupPlayerMovement(gameSocket);
+    drawCanvas();
+}
+
 function createGameSessionWebSocket(sessionId) {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const url = `${protocol}://${window.location.host}/ws/game/${sessionId}/`; // Update with the correct URL pattern
@@ -12,9 +29,12 @@ function setupWebSocketListeners(socket) {
 
     socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        if (message.type === 'game_state') {
-            const gameData = message.data;
+        const gameData = message.data;
+        if (message.type === 'game_init') {
             window.windowData = gameData["window"];
+            window.gameType = gameData["gameType"];
+        }
+        if (message.type === 'game_state' || message.type === 'game_init') {
             window.player1Data = gameData["player1"];
             window.player2Data = gameData["player2"];
             window.ballData = gameData["ball"];
@@ -24,6 +44,8 @@ function setupWebSocketListeners(socket) {
 
     socket.onclose = (event) => {
         console.log("WebSocket connection closed:", event);
+        if (window.socketCreated)
+            window.socketCreated = false;
         window.removeEventListener('keydown', handleKeyDown);
     };
 
@@ -32,26 +54,12 @@ function setupWebSocketListeners(socket) {
     };
 }
 
-async function waitForWindowData() {
+async function waitForWindowData(socket) {
     while (window.windowData === null) {
+        if (socket.readyState === WebSocket.OPEN)
+            socket.send(JSON.stringify({ message: "game_init_request" }));
         await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 100ms before checking again
     }
-}
-
-export async function initGame(sessionId) {
-    window.myp5 = null;
-    window.player1Data = null;
-    window.player2Data = null;
-    window.ballData = null;
-    window.pauseGame = null;
-    window.windowData = null;
-    window.keyState = {};
-
-    let gameSocket = createGameSessionWebSocket(sessionId);
-    setupWebSocketListeners(gameSocket);
-    await waitForWindowData();
-    setupPlayerMovement(gameSocket);
-    drawCanvas();
 }
 
 function setupPlayerMovement(socket) {
@@ -68,11 +76,22 @@ function setupPlayerMovement(socket) {
 }
 
 function sendMoveMessage(socket) {
-    if (window.keyState['ArrowUp']) {
-        socket.send(JSON.stringify({ message: 'move_up_player' }));
-    } else if (window.keyState['ArrowDown']) {
-        socket.send(JSON.stringify({ message: 'move_down_player' }));
+    let move_message;
+
+    if (window.gameType === "Local") {
+        if (window.keyState['z'])
+            move_message = "move_up_player1"
+        else if (window.keyState['s'])
+            move_message = "move_down_player1"
     }
+
+    if (window.keyState['ArrowUp'])
+        window.gameType === "Online" ? move_message = "move_up_player" : move_message = "move_up_player2";
+    else if (window.keyState['ArrowDown'])
+        window.gameType === "Online" ? move_message = "move_down_player" : move_message = "move_down_player2";
+
+    if (move_message)
+        socket.send(JSON.stringify({message: move_message}));
 }
 
 function handleKeyDown(socket) {

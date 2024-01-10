@@ -77,11 +77,7 @@ class QueueConsumer(AsyncWebsocketConsumer):
         message_type = text_data_json.get('type')
 
         if message_type == 'leave_message':
-            await self.leave_message(text_data_json)
-
-    async def leave_message(self, event):
-        """Message sent by the server when the user logs out."""
-        await self.disconnect(1001)
+            await self.disconnect(1001)
 
     async def game_matched(self, data):
         """

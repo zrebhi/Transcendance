@@ -73,5 +73,9 @@ def logout_view(request):
 def user_profile_view(request):
     return render(request, 'user_profile.html')
 
+def get_user_session(request):
+    return JsonResponse({'session_id': request.user.session_id})
+
+
 
 

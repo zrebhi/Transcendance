@@ -1,5 +1,6 @@
-import {loadView, getCsrfToken, adjustPageContainerHeight, updatePage, loadGame} from './SPAContentLoader.js';
-import {joinQueue, cancelQueue} from "/static/matchmaking/js/matchmaking.js";
+import {loadView, getCsrfToken, adjustPageContainerHeight, updatePage, loadGame, clearPage} from './SPAContentLoader.js';
+import {joinQueue, cancelQueue, startLocalGame} from "/static/matchmaking/js/matchmaking.js";
+import {drawCanvas} from "/static/pong_app/js/pong_template.js";
 
 export function eventHandlers() {
     console.log("eventHandlers.js loaded");
@@ -52,7 +53,10 @@ export function eventHandlers() {
             loadView(`/${targetId === 'homeButton' ? 'home' : 'users/login'}/`)
                 .catch(error => console.error('Error:', error));
         } else if (targetId === 'playButton') {
-            loadGame();
+            if (window.socketCreated) {
+                clearPage();
+                drawCanvas();
+            }
         } else if (targetId === 'logoutButton') {
             handleLogoutButtonClick(event);
         }
@@ -77,12 +81,10 @@ export function eventHandlers() {
             loadView(`/${event.target.id === 'registerButton' ? 'users/register' : 'users/login'}/`)
                 .catch(error => console.error('Error:', error));
         }
-        if (event.target.id === 'joinQueueButton') {
-            joinQueue();
+        if (event.target.id === 'joinQueueButton' || event.target.id === 'localPlayButton') {
+            event.target.id === 'joinQueueButton' ? joinQueue() : startLocalGame();
         }
-        if (event.target.id === 'cancelQueueButton') {
-            cancelQueue();
-        }
+
     });
 
     document.getElementById('queueWrapper').addEventListener('click', function(event) {

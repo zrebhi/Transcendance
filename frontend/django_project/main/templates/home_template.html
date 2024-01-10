@@ -19,8 +19,13 @@
             <p class="card-title">Play Online</p>
             <p class="card-text">Play against foes from all around the world!</p>
             {% if not user.is_authenticated %}<p class="card-text">(Requires to be logged in)</p>{% endif %}
-        </div>    
-        
+        </div>
+    
+        <div{% if user.is_authenticated %} id="localPlayButton"{% else %} id="loginButton"{% endif %} class="item card" style="background-image: url({% static 'main/img/online_play.png' %});">
+            <p class="card-title">Local Game</p>
+            <p class="card-text">Play against your friends on the same machine!</p>
+            {% if not user.is_authenticated %}<p class="card-text">(Requires to be logged in)</p>{% endif %}
+        </div>
     </div>
 
 </div>

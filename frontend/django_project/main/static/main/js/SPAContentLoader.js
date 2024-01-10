@@ -41,6 +41,7 @@ export function loadGame(sessionId) {
             if (!window.socketCreated) {
                 await initGame(sessionId);
                 window.socketCreated = true;
+                updateNavbar();
             } else {
                 drawCanvas();
             }

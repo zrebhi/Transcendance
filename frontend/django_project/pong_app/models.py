@@ -99,7 +99,7 @@ class Game:
     def __init__(self, window):
         self.window = window
         self.reset_game()
-        asyncio.create_task(self.delay_game_for(10))
+        asyncio.create_task(self.delay_game_for(0))
 
     def reset_game(self):
         """Initialize or reset the game to its starting state."""
@@ -159,7 +159,7 @@ class Game:
     def get_state(self):
         """Get the current state of the game for broadcasting to clients."""
         return {
-            'window': self.window.to_dict(),
+
             'player1': self.player1.to_dict(),
             'player2': self.player2.to_dict(),
             'ball': self.ball.to_dict(),
