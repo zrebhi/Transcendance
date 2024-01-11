@@ -1,167 +1,172 @@
 import asyncio
 
+from django.db import models
+
+WINNING_SCORE = 3
+PLAYER_WIDTH, PLAYER_HEIGHT = 20, 100
+BALL_RADIUS = 10
+BALL_SPEED = 10
+PLAYER_SPEED = 6
+BALL_RESET_COOLDOWN = 1500
+
+#Paddle class
 class Player:
-    """Represents a player in the game with position, size, and movement capabilities."""
+	#Movement speed of the paddle
+	def __init__(self, x, y):
+		self.xpos = x
+		self.ypos = y
+		self.width = PLAYER_WIDTH
+		self.height = PLAYER_HEIGHT
+		self.vel = PLAYER_SPEED
+		self.score = 0
 
-    def __init__(self, xpos, ypos):
-        self.xpos = xpos
-        self.ypos = ypos
-        self.width = 20
-        self.height = 90
-        self.step = 10
+	def move_up(self):
+		if self.ypos - self.height//2 >= 0:
+			self.ypos -= self.vel
 
-    def move_up(self):
-        """Move the player up, ensuring they don't go past the top boundary."""
-        if self.ypos - self.step >= -self.height / 2:
-            self.ypos -= self.step
+	def move_down(self, window):
+		if self.ypos + self.height//2 <= window.height:
+			self.ypos += self.vel
 
-    def move_down(self, window):
-        """Move the player down, ensuring they don't go past the bottom boundary."""
-        if self.ypos + self.step <= window.height - self.height / 2:
-            self.ypos += self.step
+	def reset(self):
+		self.ypos = window.height//2
 
-    def collides_with(self, ball):
-        """Check for collision with the ball using Axis-Aligned Bounding Box (AABB)."""
-        return (self.xpos < ball.xpos + ball.radius and
-                self.xpos + self.width > ball.xpos - ball.radius and
-                self.ypos < ball.ypos + ball.radius and
-                self.ypos + self.height > ball.ypos - ball.radius)
+	def add_score(self):
+		self.score += 1
 
-    def to_dict(self):
-        """Convert the player's state to a dictionary for easy serialization."""
-        return {
-            'xpos': self.xpos,
-            'ypos': self.ypos,
-            'width': self.width,
-            'height': self.height
-        }
+	def collides_with(self, ball):
+		# Simplified collision check with AABB (Axis-Aligned Bounding Box)
+		return (self.xpos < ball.xpos + ball.radius and
+				self.xpos + self.width > ball.xpos - ball.radius and
+				self.ypos < ball.ypos + ball.radius and
+				self.ypos + self.height > ball.ypos - ball.radius)
 
+	def to_dict(self):
+		return {
+			'xpos': self.xpos,
+			'ypos': self.ypos,
+			'width': self.width,
+			'height': self.height
+		}
+
+#Ball class
 class Ball:
-    """Represents the ball in the game with position, size, and movement capabilities."""
+	def __init__(self, x, y):
+		self.xpos = self.original_x = x
+		self.ypos = self.original_y = y
+		self.radius = BALL_RADIUS
+		self.max_vel = BALL_SPEED
+		self.x_vel = self.max_vel
+		self.y_vel = 0
 
-    def __init__(self, xpos, ypos):
-        self.xpos = xpos
-        self.ypos = ypos
-        self.radius = 10
-        self.velocity = 8
-        self.x_speed = self.velocity  # Horizontal speed
-        self.y_speed = self.velocity  # Vertical speed
+	def move(self):
+		self.xpos += self.x_vel
+		self.ypos += self.y_vel
 
-    def move(self):
-        """Move the ball based on its current speed and direction."""
-        self.xpos += self.x_speed
-        self.ypos += self.y_speed
+	def reset(self):
+		self.direction = (self.x_vel * -1)
+		self.xpos = self.original_x
+		self.ypos = self.original_y
+		self.y_vel = 0
+		self.x_vel = self.direction
+		self.direction = 0
 
-    def reflect_horizontal(self, player_number, player):
-        """Reflect the ball's movement horizontally and reposition to avoid getting stuck."""
-        self.x_speed = -self.x_speed
+	def reflect_vertical(self):
+		self.y_vel = -self.y_vel
 
-        # Reposition the ball outside the player's boundary
-        if player_number == 1:
-            self.xpos = player.xpos + player.width + self.radius
-        elif player_number == 2:
-            self.xpos = player.xpos - player.width - self.radius
+	#Handling ball collision
+	def handle_ball_collision(self, player):
+		self.x_vel *= -1
+		difference_in_y = player.ypos - self.ypos
+		reduction_factor = (player.height / 2) / self.max_vel
+		y_vel = difference_in_y / reduction_factor
+		self.y_vel = -1 * y_vel
 
-    def reflect_vertical(self):
-        """Reflect the ball's movement vertically (change y-direction)."""
-        self.y_speed = -self.y_speed
-
-    def to_dict(self):
-        """Convert the ball's state to a dictionary for easy serialization."""
-        return {
-            'xpos': self.xpos,
-            'ypos': self.ypos,
-            'x_speed': self.x_speed,
-            'y_speed': self.y_speed,
-            'radius': self.radius,
-        }
-
-# ... Player and Game classes remain unchanged ...
-
+	def to_dict(self):
+		return {
+			'xpos': self.xpos,
+			'ypos': self.ypos,
+			'x_speed': self.x_vel,
+			'y_speed': self.y_vel,
+			'radius': self.radius,
+		}
 
 class Window:
-    """Represents the game window with its dimensions."""
+	def __init__(self, width, height):
+		self.width, self.height = width, height
 
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-
-    def to_dict(self):
-        """Convert the window's dimensions to a dictionary for easy serialization."""
-        return {
-            'width': self.width,
-            'height': self.height
-        }
+	def to_dict(self):  
+		return {
+			'width': self.width,
+			'height': self.height
+		}
 
 class Game:
-    """Main game class managing the state and logic of the Pong game."""
+	def __init__(self, window):
+		self.window = window
+		self.reset_game()
+		print('Game initialized')
 
-    def __init__(self, window):
-        self.window = window
-        self.reset_game()
-        asyncio.create_task(self.delay_game_for(0))
+	def reset_game(self):
+		self.players = {0: None, 1: None}
+		self.player1 = Player(50, self.window.height / 2)
+		self.player2 = Player(self.window.width - 50, self.window.height / 2)
+		self.ball = Ball(self.window.width / 2, self.window.height / 2)
+		self.pause_game = True
+		self.running = False
 
-    def reset_game(self):
-        """Initialize or reset the game to its starting state."""
-        self.players = {0: None, 1: None}
-        self.player1 = Player(50, ypos=self.window.height / 2)
-        self.player2 = Player(xpos=self.window.width - 50, ypos=self.window.height / 2)
-        self.ball = Ball(xpos=self.window.width / 2, ypos=self.window.height / 2)
-        self.pause_game = True
-        self.delay = False
-        self.running = False
+	def loop(self):
+		if not self.pause_game:
+			self.ball.move()
+			self.check_collisions()
 
-    def loop(self):
-        """Main game loop that updates the game state if the game is running and not paused."""
-        if not self.pause_game and not self.delay:
-            self.ball.move()
-            self.check_collisions()
+	def move_player(self, player, direction):
+		if player == 1:
+			if direction == 'up':
+				self.player1.move_up()
+			elif direction == 'down':
+				self.player1.move_down(self.window)
+		elif player == 2:
+			if direction == 'up':
+				self.player2.move_up()
+			elif direction == 'down':
+				self.player2.move_down(self.window)
 
-    def move_player(self, player, direction):
-        """Handle player movement based on the player number and direction."""
-        player_obj = self.player1 if player == 1 else self.player2
-        if direction == 'up':
-            player_obj.move_up()
-        elif direction == 'down':
-            player_obj.move_down(self.window)
+	def check_collisions(self):
+		# Player and ball collision
+		if self.player1.collides_with(self.ball):
+			self.ball.handle_ball_collision(self.player1)
+			self.ball.xpos = self.player1.xpos + self.player1.width + self.ball.radius
 
-    def check_collisions(self):
-        """Check and handle collisions between the ball and other game objects."""
+		if self.player2.collides_with(self.ball):
+			self.ball.handle_ball_collision(self.player2)
+			self.ball.xpos = self.player2.xpos - self.ball.radius
 
-        # Check collisions with players
-        if self.player1.collides_with(self.ball):
-            self.ball.reflect_horizontal(1, self.player1)
-        elif self.player2.collides_with(self.ball):
-            self.ball.reflect_horizontal(2, self.player2)
+		if self.ball.ypos - self.ball.radius <= 0 or self.ball.ypos + self.ball.radius >= self.window.height:
+			self.ball.reflect_vertical()
 
-        # Check collisions with walls
-        if self.ball.ypos - self.ball.radius <= 0 or self.ball.ypos + self.ball.radius >= self.window.height:
-            self.ball.reflect_vertical()
+		if self.ball.xpos - self.ball.radius <= 0 or self.ball.xpos + self.ball.radius >= self.window.width:
+			self.handle_score()
+			self.ball.reset()
 
-        # Check if the ball is out of bounds
-        if self.ball.xpos <= 0 or self.ball.xpos >= self.window.width:
-            self.reset_ball()
+	def handle_score(self):
+		if self.ball.xpos - self.ball.radius <= 0:
+			self.player2.add_score()
+		if self.ball.xpos + self.ball.radius >= self.window.width:
+			self.player1.add_score()
+		if self.player1.score == WINNING_SCORE or self.player2.score == WINNING_SCORE:
+			if self.player1.score == WINNING_SCORE:
+				print("Player 1 won !")
+			else:
+				print("Player 2 won !")
+			self.running = False
+			self.pause_game = True
 
-    def reset_ball(self):
-        """Reset the ball to the center and introduce a delay."""
-        self.ball.xpos = self.window.width / 2
-        self.ball.ypos = self.window.height / 2
-        self.ball.x_speed = -self.ball.x_speed
-        asyncio.create_task(self.delay_game_for(1))
-
-    async def delay_game_for(self, seconds):
-        """Delay the game for a specified number of seconds."""
-        self.delay = True
-        print(f'Game delayed for {seconds} seconds')
-        await asyncio.sleep(seconds)
-        self.delay = False
-
-    def get_state(self):
-        """Get the current state of the game for broadcasting to clients."""
-        return {
-
-            'player1': self.player1.to_dict(),
-            'player2': self.player2.to_dict(),
-            'ball': self.ball.to_dict(),
-            'pause': self.pause_game
-        }
+	def get_state(self):
+		return {
+			'window': self.window.to_dict(),
+			'player1': self.player1.to_dict(),
+			'player2': self.player2.to_dict(),
+			'ball': self.ball.to_dict(),
+			'pause': self.pause_game
+		}
