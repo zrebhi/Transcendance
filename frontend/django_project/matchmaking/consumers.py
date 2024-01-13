@@ -1,13 +1,13 @@
+import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .matchmaking import match_users
 from channels.db import database_sync_to_async
 from .models import QueueEntry
-import json
+from .matchmaking import match_users
+from pong_app.consumers import remove_channel_name_from_session
+
 
 class QueueConsumer(AsyncWebsocketConsumer):
-    """
-    WebSocket consumer that handles the matchmaking queue logic.
-    """
+    """WebSocket consumer that handles the matchmaking queue logic."""
 
     async def connect(self):
         """
@@ -45,7 +45,7 @@ class QueueConsumer(AsyncWebsocketConsumer):
         # Remove the user from their matchmaking group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-        await self.remove_channel_name_from_session(self.channel_name)
+        await remove_channel_name_from_session(self.scope, self.channel_name)
         # Remove the user's entry from the matchmaking queue
         await self.delete_queue_entry()
         await self.close()
@@ -59,25 +59,15 @@ class QueueConsumer(AsyncWebsocketConsumer):
         """
         QueueEntry.objects.filter(user=self.user).delete()
 
-    @database_sync_to_async
-    def remove_channel_name_from_session(self, channel_name):
-        """Removes the channel name from the session."""
-        session = self.scope["session"]
-        try:
-            if "channel_names" in session and channel_name in session["channel_names"]:
-                session["channel_names"].remove(channel_name)
-                session.modified = True
-                session.save()
-        except Exception as e:
-            # Handle exceptions, such as session not existing or save errors
-            print(f"Error updating session: {e}")
-
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message_type = text_data_json.get('type')
 
         if message_type == 'leave_message':
-            await self.disconnect(1001)
+            await self.leave_message(self)
+
+    async def leave_message(self, event):
+        await self.disconnect(1001)
 
     async def game_matched(self, data):
         """

@@ -1,73 +1,78 @@
 import asyncio
 
-class Player:
-    """Represents a player in the game with position, size, and movement capabilities."""
+
+class Paddle:
+    """Represents a paddle in the game with position, size, movement capabilities, and score."""
 
     def __init__(self, xpos, ypos):
         self.xpos = xpos
         self.ypos = ypos
         self.width = 20
         self.height = 90
-        self.step = 10
+        self.step = 15
+        self.score = 0
+        self.player_name = None
 
     def move_up(self):
-        """Move the player up, ensuring they don't go past the top boundary."""
+        """Move the paddle up within window boundaries."""
         if self.ypos - self.step >= -self.height / 2:
             self.ypos -= self.step
 
     def move_down(self, window):
-        """Move the player down, ensuring they don't go past the bottom boundary."""
+        """Move the paddle down within window boundaries."""
         if self.ypos + self.step <= window.height - self.height / 2:
             self.ypos += self.step
 
     def collides_with(self, ball):
-        """Check for collision with the ball using Axis-Aligned Bounding Box (AABB)."""
+        """Check if the paddle collides with the ball."""
         return (self.xpos < ball.xpos + ball.radius and
                 self.xpos + self.width > ball.xpos - ball.radius and
                 self.ypos < ball.ypos + ball.radius and
                 self.ypos + self.height > ball.ypos - ball.radius)
 
     def to_dict(self):
-        """Convert the player's state to a dictionary for easy serialization."""
+        """Convert paddle's state to a dictionary for serialization."""
         return {
             'xpos': self.xpos,
             'ypos': self.ypos,
             'width': self.width,
-            'height': self.height
+            'height': self.height,
+            'score': self.score,
         }
 
+
 class Ball:
-    """Represents the ball in the game with position, size, and movement capabilities."""
+    """Represents the ball in the game with position, size, and velocity."""
 
     def __init__(self, xpos, ypos):
         self.xpos = xpos
         self.ypos = ypos
         self.radius = 10
         self.velocity = 8
-        self.x_speed = self.velocity  # Horizontal speed
-        self.y_speed = self.velocity  # Vertical speed
+        self.x_speed = self.velocity
+        self.y_speed = self.velocity
 
     def move(self):
-        """Move the ball based on its current speed and direction."""
+        """Move the ball based on its current velocity."""
         self.xpos += self.x_speed
         self.ypos += self.y_speed
 
     def reflect_horizontal(self, player_number, player):
-        """Reflect the ball's movement horizontally and reposition to avoid getting stuck."""
+        """Reflect the ball horizontally on paddle collision and adjust trajectory."""
         self.x_speed = -self.x_speed
-
-        # Reposition the ball outside the player's boundary
+        hit_pos = (self.ypos - player.ypos) / player.height
+        self.y_speed += hit_pos * self.velocity
         if player_number == 1:
             self.xpos = player.xpos + player.width + self.radius
         elif player_number == 2:
             self.xpos = player.xpos - player.width - self.radius
 
     def reflect_vertical(self):
-        """Reflect the ball's movement vertically (change y-direction)."""
+        """Reflect the ball vertically on wall collision."""
         self.y_speed = -self.y_speed
 
     def to_dict(self):
-        """Convert the ball's state to a dictionary for easy serialization."""
+        """Convert ball's state to a dictionary for serialization."""
         return {
             'xpos': self.xpos,
             'ypos': self.ypos,
@@ -76,92 +81,123 @@ class Ball:
             'radius': self.radius,
         }
 
-# ... Player and Game classes remain unchanged ...
-
 
 class Window:
-    """Represents the game window with its dimensions."""
+    """Represents the game window with dimensions."""
 
     def __init__(self, width, height):
         self.width = width
         self.height = height
 
     def to_dict(self):
-        """Convert the window's dimensions to a dictionary for easy serialization."""
+        """Convert window's dimensions to a dictionary for serialization."""
         return {
             'width': self.width,
             'height': self.height
         }
 
+
 class Game:
     """Main game class managing the state and logic of the Pong game."""
 
-    def __init__(self, window):
-        self.window = window
-        self.reset_game()
-        asyncio.create_task(self.delay_game_for(0))
-
-    def reset_game(self):
-        """Initialize or reset the game to its starting state."""
-        self.players = {0: None, 1: None}
-        self.player1 = Player(50, ypos=self.window.height / 2)
-        self.player2 = Player(xpos=self.window.width - 50, ypos=self.window.height / 2)
+    def __init__(self, winning_score=10):
+        self.window = Window(width=1200, height=900)
+        self.players = [None, None]
+        self.paddle1 = Paddle(50, ypos=self.window.height / 2)
+        self.paddle2 = Paddle(self.window.width - 50, ypos=self.window.height / 2)
         self.ball = Ball(xpos=self.window.width / 2, ypos=self.window.height / 2)
-        self.pause_game = True
-        self.delay = False
-        self.running = False
+        self.move_commands = []
+        self.status = 'pending'
+        self.winning_score = winning_score
+        self.winner = None
+        self.local_game = False
 
-    def loop(self):
-        """Main game loop that updates the game state if the game is running and not paused."""
-        if not self.pause_game and not self.delay:
+    async def ball_loop(self):
+        """Game loop to process movements and update game state."""
+        if self.status == 'ongoing':
             self.ball.move()
             self.check_collisions()
 
-    def move_player(self, player, direction):
-        """Handle player movement based on the player number and direction."""
-        player_obj = self.player1 if player == 1 else self.player2
+    async def paddles_loop(self):
+        """Game loop to process player movements and update game state."""
+        while self.move_commands:
+            player_number, direction = self.move_commands.pop(0)
+            self.move_player(player_number, direction)
+
+    def move_player(self, player_number, direction):
+        """Move the specified player in the given direction."""
+        paddle = self.paddle1 if player_number == 1 else self.paddle2
         if direction == 'up':
-            player_obj.move_up()
+            paddle.move_up()
         elif direction == 'down':
-            player_obj.move_down(self.window)
+            paddle.move_down(self.window)
 
     def check_collisions(self):
-        """Check and handle collisions between the ball and other game objects."""
-
-        # Check collisions with players
-        if self.player1.collides_with(self.ball):
-            self.ball.reflect_horizontal(1, self.player1)
-        elif self.player2.collides_with(self.ball):
-            self.ball.reflect_horizontal(2, self.player2)
-
-        # Check collisions with walls
+        """Check for and handle collisions in the game."""
+        if self.paddle1.collides_with(self.ball):
+            self.handle_paddle_collision(self.paddle1, 1)
+        elif self.paddle2.collides_with(self.ball):
+            self.handle_paddle_collision(self.paddle2, 2)
         if self.ball.ypos - self.ball.radius <= 0 or self.ball.ypos + self.ball.radius >= self.window.height:
             self.ball.reflect_vertical()
+        self.check_ball_out_of_bounds()
 
-        # Check if the ball is out of bounds
+    def handle_paddle_collision(self, paddle, player_number):
+        """Handle ball collision with the specified paddle."""
+        if (self.ball.ypos + self.ball.radius < paddle.ypos or
+                self.ball.ypos - self.ball.radius > paddle.ypos + paddle.height):
+            self.ball.reflect_vertical()
+        else:
+            self.ball.reflect_horizontal(player_number, paddle)
+
+    def check_ball_out_of_bounds(self):
+        """Check if the ball is out of bounds and update scores."""
         if self.ball.xpos <= 0 or self.ball.xpos >= self.window.width:
+            scoring_paddle = self.paddle2 if self.ball.xpos <= 0 else self.paddle1
+            scoring_paddle.score += 1
             self.reset_ball()
+            self.check_win_condition()
+
+    def check_win_condition(self):
+        """Check if a player has reached the winning score."""
+        if self.paddle1.score == self.winning_score:
+            self.winner = self.paddle1.player_name
+        elif self.paddle2.score == self.winning_score:
+            self.winner = self.paddle2.player_name
+        if self.winner:
+            self.status = 'finished'
 
     def reset_ball(self):
-        """Reset the ball to the center and introduce a delay."""
+        """Reset the ball to the center with a delay."""
         self.ball.xpos = self.window.width / 2
         self.ball.ypos = self.window.height / 2
         self.ball.x_speed = -self.ball.x_speed
         asyncio.create_task(self.delay_game_for(1))
 
     async def delay_game_for(self, seconds):
-        """Delay the game for a specified number of seconds."""
-        self.delay = True
-        print(f'Game delayed for {seconds} seconds')
+        """Introduce a delay in the game."""
+        if self.status == 'ongoing':
+            self.status = 'delayed'
         await asyncio.sleep(seconds)
-        self.delay = False
+        if self.status == 'delayed':
+            self.status = 'ongoing'
 
     def get_state(self):
-        """Get the current state of the game for broadcasting to clients."""
+        """Get the current state of the game for broadcasting."""
         return {
-
-            'player1': self.player1.to_dict(),
-            'player2': self.player2.to_dict(),
+            'paddle1': self.paddle1.to_dict(),
+            'paddle2': self.paddle2.to_dict(),
             'ball': self.ball.to_dict(),
-            'pause': self.pause_game
+            'status': self.status,
+        }
+
+    def get_initial_data(self, local_game):
+        """Get initial game data for WebSocket communication."""
+        game_type = "Local" if local_game else "Online"
+        return {
+            'window': self.window.to_dict(),
+            'gameType': game_type,
+            'player1': self.paddle1.player_name,
+            'player2': self.paddle2.player_name,
+            **self.get_state()
         }

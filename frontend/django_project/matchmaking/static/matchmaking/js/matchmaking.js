@@ -16,10 +16,12 @@ function connectToQueueWebSocket() {
         if (data.type === 'game_matched') {
             console.log('Game matched:', data);
         // Display "Match found" in the queue container
+        const queueHtml = document.getElementById('queueContainer').innerHTML;
         document.getElementById('queueContainer').innerHTML = '<p>Match found!</p>';
 
         setTimeout(function() {
             hideQueueUI();
+            document.getElementById('queueContainer').innerHTML = queueHtml;
             loadGame(data["session_id"]);
         }, 3000);
         }
