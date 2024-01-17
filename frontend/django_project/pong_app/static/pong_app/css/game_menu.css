@@ -1,0 +1,54 @@
+#menuToggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 40px; /* Width of the hamburger icon */
+    height: 30px; /* Height of the hamburger icon */
+    position: absolute;
+    top: 20px; /* Position of the icon */
+    left: 20px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+#menuToggle span {
+    display: block;
+    width: 100%;
+    height: 4px;
+    background: #cdcdcd;
+    border-radius: 3px;
+    margin: 4px 0;
+    transition: all 0.3s ease;
+}
+
+/* Animation for hamburger to cross */
+#menuToggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+}
+
+#menuToggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+#menuToggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px);
+}
+
+#menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20%;  /* Adjust width as needed */
+    padding: 10px;
+    background-color: #f2f2f2;
+    transition: transform 0.3s ease;
+    position: absolute;
+    top: 0;
+    bottom: 0; /* Full container height */
+    left: -20%; /* -width of menuToggle */
+}
+
+/* Show the menu */
+.menu-visible {
+    transform: translateX(100%); /* Slide in the menu */
+}

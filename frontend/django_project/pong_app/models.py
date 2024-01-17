@@ -110,7 +110,6 @@ class Game:
         self.status = 'pending'
         self.winning_score = winning_score
         self.winner = None
-        self.local_game = False
 
     async def ball_loop(self):
         """Game loop to process movements and update game state."""
@@ -172,6 +171,7 @@ class Game:
         self.ball.xpos = self.window.width / 2
         self.ball.ypos = self.window.height / 2
         self.ball.x_speed = -self.ball.x_speed
+        self.ball.y_speed = 0
         asyncio.create_task(self.delay_game_for(1))
 
     async def delay_game_for(self, seconds):

@@ -11,6 +11,7 @@ body {
     flex-direction: column; /* Stack navbar and pageContainer vertically */
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
 #navbarContainer, #pageContainer {
@@ -22,25 +23,16 @@ body {
     flex-grow: 1; /* Allow page container to grow and fill the space */
     display: flex;
     justify-content: center;
+
 }
 
 #queueContainer {
-    display: none;
     position: absolute;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
     bottom: 50px;
     width: 20%; /* Or a fixed width, e.g., 300px */
     max-width: 300px; /* Optional: maximum width */
     height: 10%;
     max-height: 150px;
-    border: 2px solid #eee;
-    border-radius: 10px; /* Rounded corners */
-    background-color: white; /* Or any color that fits your design */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add some shadow for depth */
-    box-sizing: border-box; /* Include padding and border in the width */
-    padding: 10px;
 }
 
 /* Optional: Responsive adjustments for smaller screens */

@@ -17,11 +17,10 @@ function connectToQueueWebSocket() {
             console.log('Game matched:', data);
         // Display "Match found" in the queue container
         const queueHtml = document.getElementById('queueContainer').innerHTML;
-        document.getElementById('queueContainer').innerHTML = '<p>Match found!</p>';
+        document.getElementById('queueContent').innerHTML = '<p>Match found!</p>';
 
         setTimeout(function() {
             hideQueueUI();
-            document.getElementById('queueContainer').innerHTML = queueHtml;
             loadGame(data["session_id"]);
         }, 3000);
         }
@@ -47,10 +46,6 @@ export function joinQueue() {
     })
         .then(response => {
             console.log(response); // Check what the response looks like
-            if (response.status === 401) {
-               loadView('https://localhost/users/login/')
-                        .catch(error => console.error('Error:', error));
-            }
             return response.text(); // Use text() if you're not sure it's JSON
         })
         .then(text => {

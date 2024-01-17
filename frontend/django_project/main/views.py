@@ -14,7 +14,8 @@ def navbar_view(request):
 
 
 def sidebar_view(request):
-    return render(request, 'sidebar.html')
+    user = get_user(request)
+    return render(request, 'sidebar.html', {'user': user})
 
 def queue_view(request):
     return render(request, 'queue.html')

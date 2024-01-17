@@ -1,6 +1,7 @@
 import { loadView, getCsrfToken, adjustPageContainerHeight, updatePage, loadGame, clearPage } from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/static/matchmaking/js/matchmaking.js';
-import { drawCanvas } from "/static/pong_app/js/pong_template.js";
+import { drawCanvas } from "/static/pong_app/js/draw.js";
+import { forfeitGame} from "/static/pong_app/js/pong.js";
 
 // Define actions for various buttons in the application
 const buttonActions = {
@@ -12,7 +13,8 @@ const buttonActions = {
     'profileButton': () => loadView('/users/profile/'),
     'joinQueueButton': joinQueue,
     'localPlayButton': startLocalGame,
-    'cancelQueueButton': cancelQueue
+    'cancelQueueButton': cancelQueue,
+    'forfeitGameButton': forfeitGame,
 };
 
 // Initialize event handlers
@@ -24,7 +26,7 @@ export function eventHandlers() {
     // Listen for form submissions in the page container
     document.getElementById('pageContainer').addEventListener('submit', handleSubmit);
     // Add click event listeners to various containers
-    ['navbarContainer', 'pageContainer', 'sidebarContainer', 'queueWrapper'].forEach(containerId => {
+    ['navbarContainer', 'pageContainer', 'sidebarContainer', 'queueContainer'].forEach(containerId => {
         document.getElementById(containerId).addEventListener('click', handleClick);
     });
 }

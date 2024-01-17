@@ -10,6 +10,9 @@ def join_queue(request):
     if QueueEntry.objects.filter(user=request.user).exists():
         return JsonResponse({'status': 'error', 'message': 'User already in queue'}, status=400)
 
+    if request.user.session_id is not None:
+        return JsonResponse({'status': 'error', 'message': 'User already in a game'}, status=400)
+
     QueueEntry.objects.create(user=request.user)
 
     return JsonResponse({'status': 'success', 'message': 'Successfully joined the queue'})
@@ -17,7 +20,10 @@ def join_queue(request):
 def local_game(request):
     if not request.user.is_authenticated:
         return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=400)
-    game_session = GameSession.objects.create(player1=request.user, player2=request.user)
+    if request.user.session_id is not None:
+        return JsonResponse({'status': 'error', 'message': 'User already in a game'}, status=400)
+
+    game_session = GameSession.objects.create(player1=request.user, player2=request.user, mode='local')
     return JsonResponse({'status': 'success', 'message': 'Successfully created a local game', 'session_id': game_session.id})
 
 

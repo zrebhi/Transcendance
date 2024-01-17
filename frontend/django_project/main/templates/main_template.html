@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Rubik+Doodle+Shadow&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Rubik+Doodle+Shadow&family=Lato&family=Bungee+Spice&display=swap" rel="stylesheet">
     
     <link rel="icon" type="image/png" sizes="32x32" href={% static "main/img/favicon.ico" %}>
     <link rel="stylesheet" href="{% static 'main/bootstrap/css/bootstrap.min.css' %}">
@@ -39,11 +39,17 @@
         </div>
         
         <div id="queueContainer">
-            {% include 'queue.html' %}
+            
         </div>
     </div>
-    
+
     <script type="module" src="{% static 'main/js/eventHandlers.js' %}"></script>
     <script src="{% static 'main/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    {% if user.session_id is not None %}
+        <script type='module'>
+            import { loadGame } from '/static/main/js/SPAContentLoader.js'
+            loadGame({{ user.session_id }})
+        </script>
+    {% endif %}
 </body>
 </html>

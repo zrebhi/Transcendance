@@ -1,30 +1,32 @@
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong Game</title>
+<style>
+    /* General and Container Styles */
+    #pongContainer {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        width: 100%;
+        height: 100%;
+    }
+    
+    #canvasContainer {
+        margin: 10px;
+        padding: 0;
+        flex-grow: 1; /* Ensure it grows to fill available space */
+        width: 100%;
+        overflow: hidden;
+    }
 
-    <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap" rel="stylesheet">
+</style>
+
+<link href="{% static 'pong_app/css/forfeit_button.css' %}" rel="stylesheet">
+<link href="{% static 'pong_app/css/game_menu.css' %}" rel="stylesheet">
+
+<div id="pongContainer">
+    {% include 'game_menu.html' %}
+    <div id="canvasContainer"></div>
+</div>
 
 
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
-
-        canvas {
-            display: block;
-            background-color: black;
-            margin: auto;
-        }
-    </style>
-</head>
-
-<body>
-</body>
-</html>
 

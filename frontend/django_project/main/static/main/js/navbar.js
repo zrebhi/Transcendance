@@ -1,5 +1,4 @@
 export function setupNavbar() {
-    console.log("Setup navbar");
     const buttons = document.querySelectorAll(".navbar-nav .nav-link");
 
     buttons.forEach((button) => {

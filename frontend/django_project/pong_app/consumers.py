@@ -35,7 +35,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.game_session_id = self.scope['url_route']['kwargs']['game_session_id']
         self.game_group_name = f'game_{self.game_session_id}'
         self.user = self.scope["user"]
-        self.closed_socket = False
 
     async def verify_user_in_game_session(self):
         """Verify if the connected user is part of the game session."""
@@ -79,11 +78,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     def start_game_tasks(self):
         """Start background tasks for running and broadcasting the game."""
-        if self.game_full():
-            self.game.status = 'ongoing'
+        if self.game.status == 'pending':
             asyncio.create_task(self.run_game_loop('Ball'))
             asyncio.create_task(self.run_game_loop('Paddles'))
             asyncio.create_task(self.broadcast_game_state())
+            self.game.status = 'awaiting players'
+        if self.game_full():
+            self.game.status = 'ongoing'
 
     def game_full(self):
         """Check if both player slots in the game are filled."""
@@ -98,24 +99,34 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.game.paddles_loop()
             await asyncio.sleep(1 / FPS)
             if self.game.status == 'finished':
-                await self.end_game()
                 break
 
     async def broadcast_game_state(self):
         """Broadcast the current game state to all players."""
         while True:
-            await self.channel_layer.group_send(self.game_group_name, {
-                'type': 'game_state_update',
-                'message': self.game.get_state()
-            })
+            await self.broadcast_message({'type': 'game_state_update', 'message': self.game.get_state()})
             await asyncio.sleep(1 / FPS)
             if self.game.status == 'finished':
-                await self.end_game()
+                await self.broadcast_message({'type': 'finished_message'})
                 break
 
+    async def broadcast_message(self, message_data):
+        """Broadcast a server-to-server message to all players. """
+        await self.channel_layer.group_send(self.game_group_name, message_data)
+
     async def game_state_update(self, event):
-        """Receive and send game state updates to the WebSocket client."""
+        """Send game state updates to the WebSocket client."""
         await self.send_json({'type': 'game_state', 'data': event['message']})
+
+    async def finished_message(self, event):
+        if self.game.status == 'finished':
+            await self.end_game()
+
+    async def end_game(self):
+        """End the game session and send the winner message."""
+        await self.send_winner_message()
+        await self.update_user_session_id(None)
+        await self.disconnect(1001)
 
     async def send_json(self, message):
         """Send a JSON message to the WebSocket client, handling any exceptions."""
@@ -126,11 +137,11 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         """Handle WebSocket disconnection."""
-        self.closed_socket = True
         self.handle_disconnect(self.user)
-        await self.update_user_session_id(None)
         await remove_channel_name_from_session(self.scope, self.channel_name)
         await self.close()
+        if self.game.status == 'finished':
+            delete_game_for_session(self.game_session_id)
 
     def handle_disconnect(self, user):
         """Handle a player's disconnection."""
@@ -144,12 +155,19 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         """Handle incoming messages from WebSocket."""
         data = json.loads(text_data)
-        if data.get('type') == "leave_game":
+        if data.get('type') == "leave_message":
             await self.disconnect(1001)
         elif data.get('type') == "game_init_request":
             await self.send_game_init() if self.game_full() else None
         elif data.get('type') == "move_command":
             self.handle_player_movement(data)
+        elif data.get('type') == "forfeit_message":
+            await self.handle_forfeit(data)
+
+    async def send_winner_message(self):
+        """Send the winner message to the WebSocket client."""
+        await self.game_state_update({'message': self.game.get_state()})
+        await self.send_json({'type': 'winner_message', 'winner': self.game.winner})
 
     async def send_game_init(self):
         """Send initial game data to the WebSocket client."""
@@ -173,14 +191,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         """Check if the game is a local game."""
         return self.game_session.player1 == self.game_session.player2
 
-    async def end_game(self):
-        """End the game session and send the winner message."""
-        await self.send_winner_message()
-        await self.update_user_session_id(None)
-        delete_game_for_session(self.game_session_id)
+    async def handle_forfeit(self, data):
+        """Handle a player's forfeit."""
+        self.game.winner = self.game_session.player1.username if self.user == self.game_session.player2 \
+            else self.game_session.player2.username
+        await self.broadcast_message({'type': 'forfeit_notification',
+                                      'message': f'{self.user.username} has forfeited the game'})
+        self.game.status = 'finished'
 
-    async def send_winner_message(self):
-        """Send the winner message to the WebSocket client."""
-        if not self.closed_socket:
-            await self.game_state_update({'message': self.game.get_state()})
-            await self.send_json({'type': 'winner_message', 'winner': self.game.winner})
+    async def forfeit_notification(self, event):
+        """Send a forfeit notification to the WebSocket client."""
+        await self.send_json({'type': 'forfeit_notification', 'message': event['message']})

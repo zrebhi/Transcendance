@@ -18,7 +18,7 @@ def get_queued_users():
 @database_sync_to_async
 def create_game_session_db(user1, user2):
     """Create a new game session in the database for two users."""
-    return GameSession.objects.create(player1=user1, player2=user2)
+    return GameSession.objects.create(player1=user1, player2=user2, mode='online')
 
 
 @database_sync_to_async

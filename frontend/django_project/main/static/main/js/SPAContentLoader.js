@@ -1,6 +1,8 @@
 import { setupNavbar } from './navbar.js';
 import { eventHandlers } from './eventHandlers.js';
-import { getGame, drawCanvas, clearCanvas } from '/static/pong_app/js/pong_template.js';
+import { getGame } from '/static/pong_app/js/pong.js';
+import { clearCanvas } from '/static/pong_app/js/draw.js';
+
 
 export function adjustPageContainerHeight() {
     const navbarHeight = document.querySelector('.navbar').offsetHeight;
@@ -16,12 +18,24 @@ export function loadView(viewUrl) {
 
 export async function loadGame(sessionId) {
     try {
-        await loadView('/pong/');
-        await loadScripts(['/static/pong_app/p5/p5.js', '/static/pong_app/js/pong_template.js']);
-        await getGame(sessionId);  // Awaits getGame to complete before proceeding
+        await hideUI();
+        await loadView(`/pong/${sessionId}/`);
+        await loadScript('/static/pong_app/p5/p5.js');
+        await getGame(sessionId);
+
     } catch (error) {
         console.error('Error:', error);
     }
+}
+
+function hideUI() {
+    document.getElementById('navbarContainer').classList.add('d-none');
+    document.getElementById('sidebarContainer').classList.add('d-none');
+}
+
+export function showUI() {
+    document.getElementById('navbarContainer').classList.remove('d-none');
+    document.getElementById('sidebarContainer').classList.remove('d-none');
 }
 
 export function loadScripts(scriptUrls) {

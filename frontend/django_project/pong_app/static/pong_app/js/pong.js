@@ -1,4 +1,6 @@
 import { updateNavbar } from "/static/main/js/SPAContentLoader.js";
+import {showUI} from "/static/main/js/SPAContentLoader.js";
+import {clearCanvas, drawCanvas, resizeCanvas, drawGame} from "./draw.js";
 
 // Initializes the default state of the game.
 function initGameData() {
@@ -14,13 +16,13 @@ function initGameData() {
         window: null,
         gameType: null,
         winner: null,
+        containerWidth: null,
+        containerHeight: null,
         keyState: {},
-        moveMessageCount: 0,
-        lastResetTime: performance.now()
     };
 }
 
-let gameData = initGameData();
+export let gameData = initGameData();
 
 // Main entry point for starting or resuming a game session.
 export async function getGame(sessionId) {
@@ -36,9 +38,11 @@ export async function getGame(sessionId) {
 async function initGame(sessionId) {
     gameData = initGameData();
     gameData.socket = createGameSessionWebSocket(sessionId);
+    window.gameSocket = gameData.socket;
     setupWebSocketListeners();
     await waitForWindowData();
     setupPlayerMovement();
+    getCanvasContainerSize();
     drawCanvas();
 }
 
@@ -60,13 +64,6 @@ function setupWebSocketListeners() {
     gameData.socket.onerror = (event) => console.error("WebSocket error:", event);
 }
 
-// Sets up key event listeners for player movement.
-function setupPlayerMovement() {
-    window.addEventListener('keydown',
-        (event) => { if (!gameData.keyState[event.key]) gameData.keyState[event.key] = true });
-    window.addEventListener('keyup', (event) => gameData.keyState[event.key] = false);
-}
-
 // Animation loop for handling continuous tasks (keyhold).
 // Limits movement updates per second for better compatibility across browsers.
 function createAnimationLoop() {
@@ -84,10 +81,16 @@ function createAnimationLoop() {
 
     if (gameData.socket && gameData.socket.readyState === WebSocket.OPEN)
         requestAnimationFrame(animate);
-}
-
+    }
 
     return animate;
+}
+
+// Sets up key event listeners for player movement.
+function setupPlayerMovement() {
+    window.addEventListener('keydown',
+        (event) => { if (!gameData.keyState[event.key]) gameData.keyState[event.key] = true });
+    window.addEventListener('keyup', (event) => gameData.keyState[event.key] = false);
 }
 
 // Sends a movement message to the server.
@@ -99,7 +102,6 @@ function sendMoveMessage() {
         });
     }
 }
-
 
 // Determines the movement message based on the current key state.
 function getMoveMessages() {
@@ -116,11 +118,10 @@ function getMoveMessages() {
     return messages;
 }
 
-
-
 // Handles incoming WebSocket messages.
 function handleWebSocketMessage(event) {
     const message = JSON.parse(event.data);
+    if (!gameData.window && message.type !== 'game_init') return;
     switch (message.type) {
         case 'game_init':
             setGameData(message.data);
@@ -130,21 +131,58 @@ function handleWebSocketMessage(event) {
             break;
         case 'winner_message':
             gameData.winner = message.winner;
-            updateNavbar();
             break;
+        case 'forfeit_notification':
+            gameData.forfeitMessage = message.message;
     }
 }
 
 // Updates gameData with incoming data from the server.
 function setGameData(data) {
-    console.log("Initializing game data:", data);
     Object.assign(gameData, data);
-    console.log("Game data:", gameData);
 }
 
 // Updates the game state based on the latest data from the server.
 function updateGameState(data) {
+
+    const scales = getScaleFactors();
+
+    if (data.paddle1) {
+        data.paddle1.xpos *= scales.scaleX;
+        data.paddle1.ypos *= scales.scaleY;
+        data.paddle1.width *= scales.scaleX;
+        data.paddle1.height *= scales.scaleY;
+    }
+    if (data.paddle2) {
+        data.paddle2.xpos *= scales.scaleX;
+        data.paddle2.ypos *= scales.scaleY;
+        data.paddle2.width *= scales.scaleX;
+        data.paddle2.height *= scales.scaleY;
+    }
+
+    if (data.ball) {
+        data.ball.xpos *= scales.scaleX;
+        data.ball.ypos *= scales.scaleY;
+        data.ball.radius *= scales.scaleX;
+    }
+
     Object.assign(gameData, data);
+}
+
+// Adapts the game data to the current canvas size.
+function getScaleFactors() {
+    if (!gameData.myp5) return { scaleX: 1, scaleY: 1 };
+
+    const serverWidth = gameData.window.width;
+    const serverHeight = gameData.window.height;
+
+    const canvasWidth = gameData.myp5.width;
+    const canvasHeight = gameData.myp5.height;
+
+    return {
+        scaleX: canvasWidth / serverWidth,
+        scaleY: canvasHeight / serverHeight
+    };
 }
 
 // Waits for initial game data from the server.
@@ -162,87 +200,48 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Initializes and starts the p5 sketch for the game's canvas.
-export function drawCanvas() {
-    const s = (sketch) => {
-        sketch.setup = () => setupCanvas(sketch);
-        sketch.draw = () => drawGame(sketch);
-    };
-    gameData.myp5 = new p5(s);
-    console.log(gameData.myp5);
-}
-
-// Sets up the canvas with initial configurations.
-function setupCanvas(sketch) {
-    if (gameData.window) {
-        let canvas = sketch.createCanvas(gameData.window.width, gameData.window.height);
-        canvas.parent("pageContainer");
-    }
-}
-
-// Main function for drawing game elements on the canvas.
-function drawGame(sketch) {
-    if (gameData.window) {
-        drawBackground(sketch);
-        drawPaddles(sketch);
-        drawBall(sketch);
-        drawScores(sketch);
-        drawGameStatus(sketch);
-    }
-}
-
-// Draws the game background.
-function drawBackground(sketch) {
-    sketch.background(0);
-    sketch.fill(255);
-}
-
-// Draws the paddles on the canvas.
-function drawPaddles(sketch) {
-    sketch.rect(gameData.paddle1['xpos'], gameData.paddle1['ypos'], gameData.paddle1.width, gameData.paddle1.height);
-    sketch.rect(gameData.paddle2['xpos'], gameData.paddle2['ypos'], gameData.paddle2.width, gameData.paddle2.height);
-}
-
-// Draws the ball on the canvas.
-function drawBall(sketch) {
-    sketch.ellipse(gameData.ball['xpos'], gameData.ball['ypos'], gameData.ball['radius'] * 2);
-}
-
-// Displays the current scores of the players.
-function drawScores(sketch) {
-    sketch.textSize(24);
-    sketch.textFont("Bungee Spice");
-    sketch.text(`${gameData.player1}: ${gameData.paddle1['score']}`, gameData.window.width / 4, 30);
-    sketch.text(`${gameData.player2}: ${gameData.paddle2['score']}`, 3 * gameData.window.width / 4, 30);
-    sketch.text(`${gameData.moveCount}`, gameData.window.width / 2, 30);
-}
-
-// Draws text related to the current game status, like pause or end messages.
-function drawGameStatus(sketch) {
-    if (gameData.status === "paused") {
-        sketch.textSize(32);
-        sketch.textAlign(sketch.CENTER);
-        sketch.text("Awaiting Second Player...", gameData.window.width / 2, gameData.window.height / 10);
-    }
-    if (gameData.winner) {
-        sketch.textSize(50);
-        sketch.textAlign(sketch.CENTER);
-        sketch.text(`${gameData.winner} wins!`, gameData.window.width / 2, gameData.window.height / 2.5);
-        // console.log(gameData.ball);
-    }
-}
-
-// Clears the canvas when necessary, e.g., at the end of a game.
-export function clearCanvas() {
-    if (gameData.myp5) {
-        gameData.myp5.remove();
-    }
-}
 
 // Handles the closing event of the WebSocket connection.
 function handleWebSocketClose(event) {
+    console.log("WebSocket connection closed:", event);
     window.removeEventListener('keydown', (event) => { if (!gameData.keyState[event.key]) gameData.keyState[event.key] = true });
     window.removeEventListener('keyup', (event) => { gameData.keyState[event.key] = false });
     window.gameSocket = null;
-    console.log("WebSocket connection closed:", event);
+    showUI();
+    updateNavbar();
+    hideMenu();
+    gameData.myp5.noLoop();
+    console.log('containerWidth: ', gameData.containerWidth);
 }
+
+function hideMenu() {
+    document.getElementById('menuToggle').classList.add('d-none');
+    document.getElementById('menu').classList.add('d-none');
+
+    let canvasContainer = document.getElementById('canvasContainer');
+    canvasContainer.style.marginLeft = '0'; // Reset margin left
+    canvasContainer.style.width = '100%'; // Reset width
+    resizeCanvas(gameData.myp5);
+}
+
+function getCanvasContainerSize() {
+    showMenu();
+    gameData.containerWidth = document.getElementById('canvasContainer').offsetWidth;
+    gameData.containerHeight = document.getElementById('canvasContainer').offsetHeight;
+    console.log('containerWidth: ', gameData.containerWidth);
+}
+
+export function showMenu() {
+    document.getElementById('menuToggle').classList.remove('d-none');
+    document.getElementById('menu').classList.remove('d-none');
+}
+
+export function forfeitGame() {
+    if (gameData.socket && gameData.socket.readyState === WebSocket.OPEN) {
+        gameData.socket.send(JSON.stringify({
+            type: 'forfeit_message'
+        }));
+        console.log('Forfeiting game');
+    }
+}
+

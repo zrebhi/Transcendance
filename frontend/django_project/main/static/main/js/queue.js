@@ -1,6 +1,10 @@
+import {loadScripts} from "./SPAContentLoader.js";
+
 export function showQueueUI() {
-    document.getElementById('queueContainer').style.display = 'flex';
-    startQueueTimer();
+    fetch('/queue/')
+        .then(response => response.text())
+        .then(data => document.getElementById('queueContainer').innerHTML = data)
+        .then(() => startQueueTimer())
 }
 
 let queueTimerInterval;
@@ -27,5 +31,5 @@ function formatTime(milliseconds) {
 
 export function hideQueueUI() {
     clearInterval(queueTimerInterval);
-    document.getElementById('queueContainer').style.display = 'none';
+    document.getElementById('queueContainer').innerHTML = '';
 }
