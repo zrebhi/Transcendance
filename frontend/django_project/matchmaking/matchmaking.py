@@ -1,6 +1,7 @@
 from channels.db import database_sync_to_async
 from .models import QueueEntry, GameSession
 from channels.layers import get_channel_layer
+from users.consumers import update_user_session_id
 
 
 @database_sync_to_async
@@ -38,6 +39,8 @@ async def match_users():
     for i in range(0, len(queued_users), 2):
         if i + 1 < len(queued_users):
             session = await create_game_session_db(queued_users[i].user, queued_users[i + 1].user)
+            for user in [session.player1, session.player2]:
+                await update_user_session_id(user, session.id)
             await notify_users_of_match(queued_users[i].user.id, queued_users[i + 1].user.id, session.id)
             await delete_queue_entries([queued_users[i].user, queued_users[i + 1].user])
 

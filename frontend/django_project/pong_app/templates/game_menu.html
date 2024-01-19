@@ -28,12 +28,16 @@
 <div id="menu">
     <div id="commands">
         <h3>Commands</h3>
-        {% if game_session.mode == local %}
+        {% if game_session.mode == 'local' %}
             <p>Player1: Z S</p>
             <p>Player2: ↑↓</p>
         {% else %}
             <p>Move: ↑↓</p>
         {% endif %}
     </div>
-    <button id="forfeitGameButton" class="custom-btn btn-1 w-100">Forfeit</button>
+    {% if game_session.mode == 'local' %}
+        <button id="quitGameButton" class="custom-btn btn-1 w-100">Quit</button>
+    {% else %}
+        <button id="forfeitGameButton" class="custom-btn btn-1 w-100">Forfeit</button>
+    {% endif %}
 </div>

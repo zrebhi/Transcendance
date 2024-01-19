@@ -1,7 +1,7 @@
 import { loadView, getCsrfToken, adjustPageContainerHeight, updatePage, loadGame, clearPage } from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/static/matchmaking/js/matchmaking.js';
 import { drawCanvas } from "/static/pong_app/js/draw.js";
-import { forfeitGame} from "/static/pong_app/js/pong.js";
+import { forfeitGame, quitGame} from "/static/pong_app/js/pong.js";
 
 // Define actions for various buttons in the application
 const buttonActions = {
@@ -15,6 +15,7 @@ const buttonActions = {
     'localPlayButton': startLocalGame,
     'cancelQueueButton': cancelQueue,
     'forfeitGameButton': forfeitGame,
+    'quitGameButton': quitGame,
 };
 
 // Initialize event handlers

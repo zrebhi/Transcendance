@@ -4,7 +4,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import Game
 from matchmaking.models import GameSession
-from users.consumers import remove_channel_name_from_session, add_channel_name_to_session
+from users.consumers import remove_channel_name_from_session, add_channel_name_to_session, update_user_session_id
 
 FPS = 60
 GLOBAL_GAMES_STORE = {}
@@ -12,7 +12,7 @@ GLOBAL_GAMES_STORE = {}
 
 def get_game_for_session(session_id):
     """Retrieve or create a Game instance for the session ID."""
-    GLOBAL_GAMES_STORE.setdefault(session_id, Game(winning_score=10))
+    GLOBAL_GAMES_STORE.setdefault(session_id, Game(winning_score=3))
     return GLOBAL_GAMES_STORE[session_id]
 
 
@@ -53,15 +53,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         """Set up the WebSocket connection."""
         await self.accept()
         await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-        await self.update_user_session_id(self.game_session_id)
         await add_channel_name_to_session(self.scope, self.channel_name)
         self.game = get_game_for_session(self.game_session_id)
-
-    @database_sync_to_async
-    def update_user_session_id(self, new_session_id):
-        """Update the user's session_id in the database."""
-        self.user.session_id = new_session_id
-        self.user.save()
 
     def assign_players(self):
         """Assign the connected user to the appropriate player slot."""
@@ -125,8 +118,11 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def end_game(self):
         """End the game session and send the winner message."""
         await self.send_winner_message()
-        await self.update_user_session_id(None)
+        delete_game_for_session(self.game_session_id)
         await self.disconnect(1001)
+        for user in [self.game_session.player1, self.game_session.player2]:
+            await update_user_session_id(user, None)
+
 
     async def send_json(self, message):
         """Send a JSON message to the WebSocket client, handling any exceptions."""
@@ -140,17 +136,15 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.handle_disconnect(self.user)
         await remove_channel_name_from_session(self.scope, self.channel_name)
         await self.close()
-        if self.game.status == 'finished':
-            delete_game_for_session(self.game_session_id)
 
     def handle_disconnect(self, user):
         """Handle a player's disconnection."""
-        if self.game.status != 'finished':
-            self.game.status = 'paused'
-        if user == self.game.players[0]:
-            self.game.players[0] = None
-        if user == self.game.players[1]:
-            self.game.players[1] = None
+        if self.local_game():
+            self.game.status = 'finished'
+            return
+        player_number = 1 if user == self.game.players[0] else 2
+        self.game.players[player_number - 1] = None
+        self.game.pause_request(player_number)
 
     async def receive(self, text_data):
         """Handle incoming messages from WebSocket."""
@@ -158,11 +152,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         if data.get('type') == "leave_message":
             await self.disconnect(1001)
         elif data.get('type') == "game_init_request":
-            await self.send_game_init() if self.game_full() else None
+            await self.send_game_init()
         elif data.get('type') == "move_command":
             self.handle_player_movement(data)
         elif data.get('type') == "forfeit_message":
             await self.handle_forfeit(data)
+        elif data.get('type') == "quit_message" and self.local_game():
+            await self.end_game()
 
     async def send_winner_message(self):
         """Send the winner message to the WebSocket client."""

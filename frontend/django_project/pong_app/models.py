@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 
 class Paddle:
@@ -12,6 +13,8 @@ class Paddle:
         self.step = 15
         self.score = 0
         self.player_name = None
+        self.pause_timer = 120
+        self.pause_request = False
 
     def move_up(self):
         """Move the paddle up within window boundaries."""
@@ -38,6 +41,8 @@ class Paddle:
             'width': self.width,
             'height': self.height,
             'score': self.score,
+            'pause_request': self.pause_request,
+            'pause_timer': self.pause_timer,
         }
 
 
@@ -172,6 +177,10 @@ class Game:
         self.ball.ypos = self.window.height / 2
         self.ball.x_speed = -self.ball.x_speed
         self.ball.y_speed = 0
+        for paddle in [self.paddle1, self.paddle2]:
+            if paddle.pause_request:
+                self.status = 'paused'
+                asyncio.create_task(self.pause_timer_tick(paddle))
         asyncio.create_task(self.delay_game_for(1))
 
     async def delay_game_for(self, seconds):
@@ -180,6 +189,27 @@ class Game:
             self.status = 'delayed'
         await asyncio.sleep(seconds)
         if self.status == 'delayed':
+            self.status = 'ongoing'
+
+    async def pause_timer_tick(self, paddle):
+        """Decrement the pause timer."""
+        while self.status == 'paused':
+            if paddle.pause_timer <= 0:
+                paddle.pause_request = False
+                self.resume_game()
+                break
+            paddle.pause_timer -= 1
+            await asyncio.sleep(1)
+
+    def pause_request(self, player_number):
+        """Handle a player's pause request."""
+        paddle = self.paddle1 if player_number == 1 else self.paddle2
+        if paddle.pause_timer >= 0:
+            paddle.pause_request = True
+
+    def resume_game(self):
+        """Resume the game."""
+        if not self.paddle1.pause_request and not self.paddle2.pause_request:
             self.status = 'ongoing'
 
     def get_state(self):
@@ -193,10 +223,10 @@ class Game:
 
     def get_initial_data(self, local_game):
         """Get initial game data for WebSocket communication."""
-        game_type = "Local" if local_game else "Online"
+        mode = "Local" if local_game else "Online"
         return {
             'window': self.window.to_dict(),
-            'gameType': game_type,
+            'mode': mode,
             'player1': self.paddle1.player_name,
             'player2': self.paddle2.player_name,
             **self.get_state()

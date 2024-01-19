@@ -1,5 +1,5 @@
 import { updateNavbar } from "/static/main/js/SPAContentLoader.js";
-import {showUI} from "/static/main/js/SPAContentLoader.js";
+import {showUI, loadView} from "/static/main/js/SPAContentLoader.js";
 import {clearCanvas, drawCanvas, resizeCanvas, drawGame} from "./draw.js";
 
 // Initializes the default state of the game.
@@ -14,10 +14,10 @@ function initGameData() {
         ball: null,
         status: null,
         window: null,
-        gameType: null,
+        mode: null,
         winner: null,
-        containerWidth: null,
-        containerHeight: null,
+        canvasContainerWidth: null,
+        canvasContainerHeight: null,
         keyState: {},
     };
 }
@@ -107,13 +107,16 @@ function sendMoveMessage() {
 function getMoveMessages() {
     let messages = [];
 
-    // Player 1 Controls
-    if (gameData.keyState['z']) messages.push("move_up_player1");
-    if (gameData.keyState['s']) messages.push("move_down_player1");
+   if (gameData.mode === 'Local') {
+       if (gameData.keyState['z']) messages.push("move_up_player1");
+       if (gameData.keyState['s']) messages.push("move_down_player1");
 
-    // Player 2 Controls
-    if (gameData.keyState['ArrowUp']) messages.push("move_up_player2");
-    if (gameData.keyState['ArrowDown']) messages.push("move_down_player2");
+       if (gameData.keyState['ArrowUp']) messages.push("move_up_player2");
+       if (gameData.keyState['ArrowDown']) messages.push("move_down_player2");
+   } else if (gameData.mode === 'Online') {
+       if (gameData.keyState['ArrowUp']) messages.push("move_up_player");
+       if (gameData.keyState['ArrowDown']) messages.push("move_down_player");
+   }
 
     return messages;
 }
@@ -211,31 +214,42 @@ function handleWebSocketClose(event) {
     updateNavbar();
     hideMenu();
     gameData.myp5.noLoop();
-    console.log('containerWidth: ', gameData.containerWidth);
+    console.log('containerWidth: ', gameData.canvasContainerWidth);
 }
 
 function hideMenu() {
-    document.getElementById('menuToggle').classList.add('d-none');
-    document.getElementById('menu').classList.add('d-none');
+    const menuToggle = document.getElementById('menuToggle');
+    const menu = document.getElementById('menu');
+
+    if (menuToggle)
+        menuToggle.classList.add('d-none');
+
+    if (menu)
+        menu.classList.add('d-none');
 
     let canvasContainer = document.getElementById('canvasContainer');
-    canvasContainer.style.marginLeft = '0'; // Reset margin left
-    canvasContainer.style.width = '100%'; // Reset width
-    resizeCanvas(gameData.myp5);
+    if (canvasContainer) {
+        canvasContainer.style.marginLeft = '0'; // Reset margin left
+        canvasContainer.style.width = '100%'; // Reset width
+        resizeCanvas(gameData.myp5);
+    }
 }
 
+
+// Gets the size of the canvas container. Used for scaling the canvas.
 function getCanvasContainerSize() {
     showMenu();
-    gameData.containerWidth = document.getElementById('canvasContainer').offsetWidth;
-    gameData.containerHeight = document.getElementById('canvasContainer').offsetHeight;
-    console.log('containerWidth: ', gameData.containerWidth);
+    gameData.canvasContainerWidth = document.getElementById('canvasContainer').offsetWidth;
+    gameData.canvasContainerHeight = document.getElementById('canvasContainer').offsetHeight;
 }
 
+// Shows the menu if it was hidden after a game session.
 export function showMenu() {
     document.getElementById('menuToggle').classList.remove('d-none');
     document.getElementById('menu').classList.remove('d-none');
 }
 
+// For online games. Sends a forfeit message to the server.
 export function forfeitGame() {
     if (gameData.socket && gameData.socket.readyState === WebSocket.OPEN) {
         gameData.socket.send(JSON.stringify({
@@ -245,3 +259,13 @@ export function forfeitGame() {
     }
 }
 
+// For local games. Sends a quit message to the server.
+export function quitGame() {
+    if (gameData.socket && gameData.socket.readyState === WebSocket.OPEN) {
+        gameData.socket.send(JSON.stringify({
+            type: 'quit_message'
+        }));
+        console.log('Quitting game');
+    }
+    loadView('/home/').catch(error => console.error('Error:', error))
+}

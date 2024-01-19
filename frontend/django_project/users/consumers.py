@@ -24,3 +24,10 @@ def add_channel_name_to_session(scope, channel_name):
         channel_names.append(channel_name)
         session.modified = True
         session.save()
+
+
+@database_sync_to_async
+def update_user_session_id(user, new_session_id):
+    """Update the user's session_id in the database."""
+    user.session_id = new_session_id
+    user.save()

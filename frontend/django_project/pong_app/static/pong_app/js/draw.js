@@ -15,7 +15,7 @@ export function drawCanvas() {
 }
 
 function setupCanvas(sketch) {
-    let canvas = sketch.createCanvas(gameData.containerWidth, gameData.containerHeight);
+    let canvas = sketch.createCanvas(gameData.canvasContainerWidth, gameData.canvasContainerHeight);
     canvas.parent("canvasContainer");
 }
 
@@ -57,9 +57,9 @@ function drawScores(sketch) {
 // Draws text related to the current game status, like pause or end messages.
 function drawGameStatus(sketch) {
     if (gameData.status === "paused") {
-        sketch.textSize(getAdaptiveTextSize(gameData.myp5.width, gameData.myp5.height, 50));
+        sketch.textSize(getAdaptiveTextSize(gameData.myp5.width, gameData.myp5.height, 30));
         sketch.textAlign(sketch.CENTER);
-        sketch.text("Awaiting Second Player...", gameData.myp5.width / 2, gameData.myp5.height / 10);
+        sketch.text(getPauseMessage(), gameData.myp5.width / 2, gameData.myp5.height / 10);
     }
     if (gameData.forfeitMessage) {
         sketch.textSize(getAdaptiveTextSize(gameData.myp5.width, gameData.myp5.height, 30));
@@ -71,6 +71,21 @@ function drawGameStatus(sketch) {
         sketch.textAlign(sketch.CENTER);
         sketch.text(`${gameData.winner} wins!`, gameData.myp5.width / 2, gameData.myp5.height / 2.5);
     }
+}
+
+function getPauseMessage() {
+    let player, paddle;
+
+    if (gameData.paddle1['pause_request'] && gameData.paddle2['pause_request'])
+        paddle = gameData.paddle1['pause_timer'] > gameData.paddle2['pause_timer'] ? gameData.paddle1 : gameData.paddle2;
+    else if (gameData.paddle1['pause_request'])
+        paddle = gameData.paddle1;
+    else if (gameData.paddle2['pause_request'])
+        paddle = gameData.paddle2;
+
+    player = paddle === gameData.paddle1 ? gameData.player1 : gameData.player2;
+    return `${player} has requested a pause. 
+        Game will resume in ${paddle['pause_timer']} seconds.`;
 }
 
 // Function to adaptively calculate text size based on canvas size
