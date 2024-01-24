@@ -1,0 +1,49 @@
+<style>
+    .card-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 20px;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+    
+    #createTournamentButton {
+        display: block;
+        margin: 20px auto;
+    }
+
+    @media (max-width: 767px) {
+        .card-container .col-md-4 {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div id="tournamentsContainer" class="container mt-4">
+    <button id="createTournamentButton" class="btn btn-primary">Create Tournament</button>
+    <h1 class="text-center">Open Tournaments</h1>
+    <div class="row card-container">
+        {% for tournament in tournaments %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ tournament.creator }}'s Tournament</h5>
+                    <p class="card-text">Players: {{ tournament.participants.count }}/{{ tournament.max_players }}</p>
+                    <p class="card-text">Status: {{ tournament.get_status_display }}</p>
+                    <a href="{% url 'join_tournament' tournament.id %}" class="btn btn-primary">Join Tournament</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p>No open tournaments at the moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
