@@ -82,10 +82,7 @@ export function updatePage() {
         .then(response => response.text())
         .then(pageHtml => document.body.innerHTML = pageHtml)
         .then(() => loadScripts(['/static/main/js/eventHandlers.js', '/static/main/js/navbar.js', '/static/main/bootstrap/js/bootstrap.bundle.min.js']))
-        .then(() => {
-            eventHandlers();
-            setupNavbar();
-        })
+        .then(() => adjustPageContainerHeight())
         .catch(error => console.error('Error:', error));
 }
 

@@ -1,0 +1,119 @@
+.tournament {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 20px auto;
+    padding: 10px;
+    border: 10px solid red;
+    overflow: auto;
+}
+
+.round {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 50px;
+}
+
+.match {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    position: relative;
+}
+
+/* Create a line after each match in round 1 */
+.round .match::after {
+    content: '';
+    position: absolute;
+    right: -20%; /* Adjust as needed */
+    top: 50%;
+    width: 20%; /* Line length */
+    height: 121%;
+    border-top: 2px solid #ccc; /* Horizontal line */
+}
+
+.round .match:nth-child(odd)::after {
+    width: 19%; /* Line thickness */
+    border-right: 2px solid #ccc; /* Vertical line */
+}
+
+/* Create a line before each match */
+.round .match::before {
+    content: '';
+    position: absolute;
+    left: -21%;
+    top: 50%;
+    width: 21%;
+    border-bottom: 2px solid #ccc; /* Horizontal line */
+}
+
+.round:first-child .match::before {
+    display: none;
+}
+
+.round:last-child .match::after {
+    display: none;
+}
+
+.player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+}
+
+.score-number {
+    font-size: 1.5rem;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #eee;
+    margin: 0;
+}
+
+.score-separator {
+    font-size: 1.5rem;
+    margin: 0 5px;
+}
+
+/* Additional styles for left and right sides */
+.player.left {
+    order: 1;
+}
+
+.score {
+    order: 2;
+}
+
+.player.right {
+    order: 3;
+}
+
+.player-avatar {
+    width: 50px; /* Adjust size as needed */
+    height: 50px; /* Adjust size as needed */
+    border-radius: 50%; /* Makes the image round */
+    border: 1px solid #ddd; /* Ensure visibility */
+    margin-bottom: 5px; /* Space between avatar and username */
+}
+
+.player-username {
+    display: block; /* Ensures the username is on a new line */
+    text-align: center; /* Center the username below the avatar */
+    font-family: "Rubik Doodle Shadow", system-ui;
+}

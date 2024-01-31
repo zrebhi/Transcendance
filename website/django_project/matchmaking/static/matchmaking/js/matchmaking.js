@@ -15,13 +15,13 @@ function connectToQueueWebSocket() {
         const data = JSON.parse(event.data);
         if (data.type === 'game_matched') {
             console.log('Game matched:', data);
-        // Display "Match found" in the queue container
-        document.getElementById('queueContent').innerHTML = '<p>Match found!</p>';
+            // Display "Match found" in the queue container
+            document.getElementById('queueContent').innerHTML = '<p>Match found!</p>';
 
-        setTimeout(function() {
-            hideQueueUI();
-            loadGame(data["session_id"]).catch(error => console.error('Error:', error));
-        }, 3000);
+            setTimeout(function() {
+                hideQueueUI();
+                loadGame(data["session_id"]).catch(error => console.error('Error:', error));
+            }, 3000);
         }
     };
 
@@ -59,6 +59,7 @@ export function joinQueue() {
                 else {
                     // Handle error (user already in queue, not authenticated, etc.)
                     console.error('Error joining queue:', data.message);
+                    alert(data.message);
                 }
             } catch (error) {
                 console.error('Error parsing JSON:', error);
@@ -95,6 +96,7 @@ export function startLocalGame() {
         } else {
             // Handle error (user already in a game, etc.)
             console.error('Error starting local game:', data.message);
+            alert(data.message);
         }
     })
     .catch(error => {

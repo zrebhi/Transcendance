@@ -10,19 +10,19 @@ User = get_user_model()
 
 
 class Tournament(models.Model):
-    name = models.CharField(max_length=100)
-    max_players = models.IntegerField()
+    name = models.CharField(max_length=100, blank=True)  # Allow blank names initially
     status = models.CharField(max_length=15, choices=[('open', 'Open'), ('in progress', 'In Progress'),
                                                       ('completed', 'Completed')], default='open')
-    creator = models.ForeignKey(User, related_name='creator', on_delete=models.CASCADE)
+    creator: 'CustomUser' = models.ForeignKey(User, related_name='creator', on_delete=models.CASCADE)
 
-    def clean(self):
-        # Check if max_players is between 4 and 8
-        if self.max_players is None or not 4 <= self.max_players <= 8:
-            raise ValidationError({'max_players': 'Max players must be between 4 and 8.'})
+    def save(self, *args, **kwargs):
+        # Set default name if not provided
+        if not self.name:
+            self.name = f"{self.creator.username}'s Tournament"
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.creator} ({self.status})"
+        return f"{self.name} - {self.status}"
 
 
 class TournamentParticipant(models.Model):

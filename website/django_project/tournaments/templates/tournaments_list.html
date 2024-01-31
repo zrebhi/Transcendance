@@ -34,9 +34,9 @@
             <div class="card h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">{{ tournament.creator }}'s Tournament</h5>
-                    <p class="card-text">Players: {{ tournament.participants.count }}/{{ tournament.max_players }}</p>
+                    <p class="card-text">Players: {{ tournament.participants.count }}/8</p>
                     <p class="card-text">Status: {{ tournament.get_status_display }}</p>
-                    <a href="{% url 'join_tournament' tournament.id %}" class="btn btn-primary">Join Tournament</a>
+                    <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Join Tournament</button>
                 </div>
             </div>
         </div>

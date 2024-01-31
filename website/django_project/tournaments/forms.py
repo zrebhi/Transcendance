@@ -5,17 +5,15 @@ from .models import Tournament
 class TournamentCreationForm(forms.ModelForm):
     class Meta:
         model = Tournament
-        fields = ['max_players']  # List the fields you want in the form
+        fields = ['name']
         widgets = {
-            'max_players': forms.NumberInput(attrs={'class': 'form-control',
-                                                    'placeholder': 'Maximum Number of Players (4 to 8)'}),
-        }
-        labels = {
-            'max_players': 'Maximum Number of Players (4 to 8)',
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Default placeholder'}),  # Default placeholder will be overwritten in __init__
         }
 
-    def clean_max_players(self):
-        max_players = self.cleaned_data.get('max_players')
-        if not 4 <= max_players <= 8:
-            raise forms.ValidationError("Invalid number of players. Choose a number between 4 and 8.")
-        return max_players
+    def __init__(self, *args, **kwargs):
+        creator = kwargs.pop('creator', None)
+        super().__init__(*args, **kwargs)
+        if creator:
+            # This will set the placeholder to the creator's username if a creator is provided
+            self.fields['name'].widget.attrs['placeholder'] = f"{creator}'s tournament"
+
