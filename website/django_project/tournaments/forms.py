@@ -5,9 +5,10 @@ from .models import Tournament
 class TournamentCreationForm(forms.ModelForm):
     class Meta:
         model = Tournament
-        fields = ['name']
+        fields = ['name', 'size']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Default placeholder'}),  # Default placeholder will be overwritten in __init__
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Default placeholder'}),
+            'size': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '8'})
         }
 
     def __init__(self, *args, **kwargs):

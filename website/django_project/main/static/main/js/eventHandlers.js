@@ -1,7 +1,7 @@
-import { loadView, getCsrfToken, adjustPageContainerHeight, updatePage, clearPage } from './SPAContentLoader.js';
+import {loadView, getCsrfToken, adjustPageContainerHeight, updatePage} from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/matchmaking/static/matchmaking/js/matchmaking.js';
-import { drawCanvas } from "/pong_app/static/pong_app/js/draw.js";
 import { forfeitGame, quitGame} from "/pong_app/static/pong_app/js/pong.js";
+import { joinTournament, tournamentView, updateReadyState } from "/tournaments/static/tournaments/js/tournaments.js";
 
 // Define actions for various buttons in the application
 const buttonActions = {
@@ -10,9 +10,11 @@ const buttonActions = {
     'logoutButton': handleLogoutButtonClick,
     'registerButton': () => loadView('/users/register/'),
     'profileButton': () => loadView('/users/profile/'),
-    'tournamentsButton': () => loadView('/tournaments/'),
+    'tournamentsListButton': () => loadView('/tournaments/'),
     'createTournamentButton': () => loadView('/tournaments/create/'),
-    'playButton': () => { if (window.gameSocket) { clearPage(); drawCanvas(); } },
+    'tournamentUserReadyButton': (event) => updateReadyState(event, window.tournamentWebSocket, 'ready'),
+    'tournamentUserNotReadyButton': (event) => updateReadyState(event, window.tournamentWebSocket, 'not_ready'),
+    'tournamentButton': tournamentView,
     'joinQueueButton': joinQueue,
     'localPlayButton': startLocalGame,
     'cancelQueueButton': cancelQueue,
@@ -22,6 +24,8 @@ const buttonActions = {
 
 // Initialize event handlers
 export function eventHandlers() {
+    console.log("Event handlers called");
+
     // Adjust the height of the page container on load and window resize
     window.addEventListener('DOMContentLoaded', adjustPageContainerHeight);
     window.addEventListener('resize', adjustPageContainerHeight);
@@ -77,8 +81,9 @@ function handleSubmit(event) {
 // Processes the response from form submission
 function handleFormResponse(data) {
     if (data.success) {
-        updatePage();
-        loadView(data["next_url"]).catch(error => console.error('Error:', error));
+        loadView(data["next_url"])
+        .then(updatePage)
+        .catch(error => console.error('Error:', error));
     } else {
         document.getElementById('pageContainer').innerHTML = data['form_html'];
     }
@@ -86,7 +91,6 @@ function handleFormResponse(data) {
 
 // Logout button handler
 function handleLogoutButtonClick(event) {
-    console.log("Logout button clicked");
     event.preventDefault();
     fetch('/users/logout/', {
         method: 'POST',
@@ -98,33 +102,11 @@ function handleLogoutButtonClick(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            updatePage();
-            loadView(data["next_url"]).catch(error => console.error('Error:', error));
+            loadView(data["next_url"])
+            .then(updatePage)
+            .then(() => console.log("Logout successful"))
+            .catch(error => console.error('Error:', error));
         }
     })
     .catch(error => console.error('Error:', error));
 }
-
-function joinTournament(event, tournamentId) {
-    fetch(`/tournaments/join/${tournamentId}/`, {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRFToken': getCsrfToken()
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            loadView(data["next_url"]).catch(error => console.error('Error:', error));
-            updatePage();
-        } else {
-            console.error('Join tournament failed:', data.message);
-            alert(data.message);
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-// Execute the event handler setup
-eventHandlers();

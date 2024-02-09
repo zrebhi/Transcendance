@@ -25,9 +25,11 @@ class GameSession(models.Model):
     player1: 'CustomUser' = models.ForeignKey(User, related_name='game_session_as_player1', on_delete=models.CASCADE)
     player2: 'CustomUser' = models.ForeignKey(User, related_name='game_session_as_player2', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, default='pending')
-    mode = models.CharField(max_length=20, null=True)
+    status = models.CharField(max_length=15, choices=[('pending', 'Pending'), ('in progress', 'In Progress'),
+                                                      ('finished', 'Finished')], default='pending')
+    mode = models.CharField(max_length=15, choices=[('online', 'Online'), ('local', 'Local'),
+                                                    ('tournament', 'Tournament')], default='online')
 
     def __str__(self):
-        return (f"Game between {self.player1.username} and {self.player2.username} "
+        return (f"{self.mode} game between {self.player1.username} and {self.player2.username} "
                 f"started at {self.created_at}, status: {self.status}")

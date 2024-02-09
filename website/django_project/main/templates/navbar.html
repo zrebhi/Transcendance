@@ -12,11 +12,6 @@
                 <li class="nav-item">
                     <button id="homeButton" class="nav-link btn btn-link active" type="button">Home</button>
                 </li>
-                {% if user.session_id is not None %}
-                    <li class="nav-item">
-                        <button id="playButton" class="nav-link btn btn-link" type="button">Play</button>
-                    </li>
-                {% endif %}
                 {% if user.is_superuser %}
                     <li class="nav-item">
                        <a id="adminButton" class="nav-link btn btn-link" href="https://localhost/admin/" target="_blank" rel="noopener noreferrer">Admin</a>
@@ -28,7 +23,12 @@
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <button id="tournamentsButton" class="nav-link btn btn-link" type="button">Tournaments</button>
+                    {% if user.tournament_id is None %}
+                        <button id="tournamentsListButton" class="nav-link btn btn-link" type="button">Tournaments</button>
+                    {% else %}
+                        <button id="tournamentButton" class="nav-link btn btn-link" type="button" data-tournament-id="{{ user.tournament_id }}">
+                            Tournament</button>
+                    {% endif %}
                     </li>
                     <li class="nav-item">
                         <button id="logoutButton" class="nav-link btn btn-link" type="button">Logout</button>

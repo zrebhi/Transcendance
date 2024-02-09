@@ -6,7 +6,7 @@ from channels.layers import get_channel_layer
 from .models import Game
 from matchmaking.models import GameSession
 from users.consumers import remove_channel_name_from_session, add_channel_name_to_session, update_user_session_id
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync
 
 FPS = 60
 GLOBAL_GAMES_STORE = {}

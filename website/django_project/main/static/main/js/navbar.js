@@ -9,7 +9,5 @@ export function setupNavbar() {
             this.classList.add("active");
         });
     });
+    console.log("Navbar setup complete");
 }
-
-// Call this function when you load/reload the navbar
-setupNavbar();

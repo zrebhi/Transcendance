@@ -13,7 +13,7 @@ export function loadView(viewUrl) {
     clearPage();
     return fetch(viewUrl)
         .then(response => response.text())
-        .then(data => document.getElementById('pageContainer').innerHTML = data);
+        .then(data => document.getElementById('pageContainer').innerHTML = data)
 }
 
 export async function loadGame(sessionId) {
@@ -39,7 +39,17 @@ export function showUI() {
 }
 
 export function loadScripts(scriptUrls) {
+    removeExistingScripts(scriptUrls);
     return scriptUrls.reduce((promise, scriptUrl) => promise.then(() => loadScript(scriptUrl)), Promise.resolve());
+}
+
+function removeExistingScripts(scriptUrls) {
+    scriptUrls.forEach(url => {
+        let existingScript = document.querySelector(`script[src="${url}"]`);
+        if (existingScript) {
+            existingScript.remove();
+        }
+    });
 }
 
 function loadScript(src) {
@@ -56,7 +66,6 @@ function loadScript(src) {
 
 export function clearPage() {
     if (typeof clearCanvas === 'function') clearCanvas();
-    document.querySelectorAll('.dynamic-script').forEach(script => script.remove());
     document.getElementById('pageContainer').innerHTML = '';
 }
 
@@ -65,6 +74,9 @@ export function updateNavbar() {
         .then(response => response.text())
         .then(navbarHtml => {
             document.getElementById('navbarContainer').innerHTML = navbarHtml;
+        })
+        .then (() => {
+            loadScript('/static/main/js/navbar.js').catch(error => console.error('Error:', error));
             setupNavbar();
         })
         .catch(error => console.error('Error:', error));
@@ -81,8 +93,16 @@ export function updatePage() {
     fetch('/')
         .then(response => response.text())
         .then(pageHtml => document.body.innerHTML = pageHtml)
-        .then(() => loadScripts(['/static/main/js/eventHandlers.js', '/static/main/js/navbar.js', '/static/main/bootstrap/js/bootstrap.bundle.min.js']))
-        .then(() => adjustPageContainerHeight())
+        .then(() => loadScripts([
+            '/static/main/js/eventHandlers.js',
+            '/static/main/js/navbar.js',
+            '/static/main/bootstrap/js/bootstrap.bundle.min.js'
+        ]))
+        .then(() => {
+            adjustPageContainerHeight();
+            setupNavbar();
+            eventHandlers();
+        })
         .catch(error => console.error('Error:', error));
 }
 

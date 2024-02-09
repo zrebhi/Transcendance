@@ -1,0 +1,35 @@
+.participant-list {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.participant-list th, .participant-list td {
+    text-align: left;
+    padding: 8px;
+}
+
+.participant-list th {
+    background-color: #f2f2f2;
+}
+
+.participant-list tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.participant-list tr:hover {
+    background-color: #ddd;
+}
+
+.participant-list-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.participant-list-username {
+    vertical-align: middle;
+}

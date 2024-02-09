@@ -1,5 +1,8 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+from .models import TournamentMatch, MatchParticipant
+from pong_app.consumers import broadcast_message
 
 
 class TournamentConsumer(AsyncWebsocketConsumer):
@@ -32,20 +35,24 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    # Receive message from WebSocket
     async def receive(self, text_data=None, bytes_data=None):
         if text_data:
-            text_data_json = json.loads(text_data)
-            message = text_data_json['message']
+            message = json.loads(text_data)
 
-            # Send message to tournament group
-            await self.channel_layer.group_send(
-                self.tournament_group_name,
-                {
-                    'type': 'tournament_message',
-                    'message': message
-                }
-            )
+            if message['type'] == 'ready_state_update':
+                await self.update_match_participant_ready_state(message['match_id'], message['ready_state'])
+                await broadcast_message(self.tournament_group_name, {'type': 'tournament_message',
+                                                                     'message': 'ready_state_updated'})
+
+    @database_sync_to_async
+    def update_match_participant_ready_state(self, match_id, ready_state):
+        try:
+            match = TournamentMatch.objects.get(id=match_id)
+            participant = match.participants.get(player=self.scope["user"])
+            participant.is_ready = ready_state == "ready"
+            participant.save()
+        except (MatchParticipant.DoesNotExist, TournamentMatch.DoesNotExist) as e:
+            print(f"Error: {str(e)}")
 
     # Receive message from tournament group
     async def tournament_message(self, event):
@@ -53,5 +60,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
+            'type': 'tournament_message',
             'message': message
         }))
