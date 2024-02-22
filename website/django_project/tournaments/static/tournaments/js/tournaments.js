@@ -1,4 +1,4 @@
-import {getCsrfToken, loadView} from "/main/static/main/js/SPAContentLoader.js";
+import {getCsrfToken, loadView, loadGame} from "/main/static/main/js/SPAContentLoader.js";
 
 export function joinTournament(event, tournamentId) {
     fetch(`/tournaments/join/${tournamentId}/`, {
@@ -27,6 +27,8 @@ export function tournamentView(event) {
 }
 
 export function tournamentWebSocketConnection(tournamentId) {
+    if (!tournamentId) return;
+
     let ws;
     window.tournamentWebSocket == null ? ws = getWebSocket() : ws = window.tournamentWebSocket;
 
@@ -35,12 +37,16 @@ export function tournamentWebSocketConnection(tournamentId) {
         window.tournamentWebSocket = ws;
     };
 
-    ws.onmessage = function(event) {
+    ws.onmessage = async function(event) {
         console.log('WebSocket message received:', event);
         const message = JSON.parse(event.data);
         switch (message.type) {
             case 'tournament_message':
-                updateTournament(tournamentId);
+                await updateTournament(tournamentId);
+                break;
+            case 'game_start':
+                await loadGame(message["session_id"])
+                    .catch(error => console.error('Error:', error));
                 break;
         }
     };
@@ -62,6 +68,7 @@ function getWebSocket() {
 }
 
 function updateTournament(tournamentId) {
+    console.log('Updating tournament:', tournamentId);
     const tournamentContainer = document.getElementById('tournament');
     if (tournamentContainer) {
         loadView(`/tournaments/${tournamentId}/`).catch(error => console.error('Error:', error));

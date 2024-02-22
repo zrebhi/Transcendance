@@ -62,6 +62,7 @@ class TournamentMatch(models.Model):
                               max_length=20)
     winner = models.ForeignKey(User, related_name='won_tournament_matches', on_delete=models.SET_NULL,
                                null=True, blank=True)
+    number = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         participants = self.participants.all()

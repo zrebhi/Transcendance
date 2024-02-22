@@ -29,6 +29,8 @@ class GameSession(models.Model):
                                                       ('finished', 'Finished')], default='pending')
     mode = models.CharField(max_length=15, choices=[('online', 'Online'), ('local', 'Local'),
                                                     ('tournament', 'Tournament')], default='online')
+    winner: 'CustomUser' = models.ForeignKey(User, related_name='game_session_winner', on_delete=models.SET_NULL,
+                                             null=True, blank=True)
 
     def __str__(self):
         return (f"{self.mode} game between {self.player1.username} and {self.player2.username} "

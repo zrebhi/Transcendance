@@ -60,3 +60,4 @@ async def notify_users_of_match(user1_id, user2_id, session_id):
             group_name,
             {'type': 'game_matched', 'message': {'session_id': session_id}}
         )
+

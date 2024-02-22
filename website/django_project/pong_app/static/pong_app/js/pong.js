@@ -26,6 +26,7 @@ export let gameData = initGameData();
 
 // Main entry point for starting or resuming a game session.
 export async function getGame(sessionId) {
+    console.log('Getting game:', sessionId);
     if (!window.gameSocket) {
         await initGame(sessionId);
         updateNavbar();

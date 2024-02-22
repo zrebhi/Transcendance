@@ -2,6 +2,7 @@ import { setupNavbar } from './navbar.js';
 import { eventHandlers } from './eventHandlers.js';
 import { getGame } from '/pong_app/static/pong_app/js/pong.js';
 import { clearCanvas } from '/pong_app/static/pong_app/js/draw.js';
+import { tournamentWebSocketConnection } from "/tournaments/static/tournaments/js/tournaments.js";
 
 
 export function adjustPageContainerHeight() {
@@ -10,13 +11,19 @@ export function adjustPageContainerHeight() {
 }
 
 export function loadView(viewUrl) {
+    console.log('Loading view:', viewUrl);
     clearPage();
     return fetch(viewUrl)
         .then(response => response.text())
         .then(data => document.getElementById('pageContainer').innerHTML = data)
+        .then(() => console.log(document.getElementById('menuToggle')))
+        .then(() => document.getElementById('tournament') ? console.log("tournament") : console.log("not tournament"))
+        .catch(error => console.error('Error:', error));
 }
 
 export async function loadGame(sessionId) {
+    if (!sessionId) return;
+
     try {
         await hideUI();
         await loadView(`/pong/${sessionId}/`);
@@ -96,14 +103,35 @@ export function updatePage() {
         .then(() => loadScripts([
             '/static/main/js/eventHandlers.js',
             '/static/main/js/navbar.js',
+            '/static/tournaments/js/tournaments.js',
             '/static/main/bootstrap/js/bootstrap.bundle.min.js'
         ]))
         .then(() => {
             adjustPageContainerHeight();
             setupNavbar();
             eventHandlers();
+            loadGame(getSessionId()).catch(error => console.error('Error:', error));
+            tournamentWebSocketConnection(getTournamentId());
         })
         .catch(error => console.error('Error:', error));
+}
+
+function getSessionId() {
+    const sessionIdMeta = document.querySelector('meta[name="user-session-id"]');
+
+    let sessionId;
+    sessionIdMeta ? sessionId = sessionIdMeta.getAttribute('content') : null;
+
+    return sessionId;
+}
+
+export function getTournamentId() {
+    const tournamentIdMeta = document.querySelector('meta[name="user-tournament-id"]');
+
+    let tournamentId;
+    tournamentIdMeta ? tournamentId = tournamentIdMeta.getAttribute('content') : null;
+
+    return tournamentId;
 }
 
 export function getCsrfToken() {

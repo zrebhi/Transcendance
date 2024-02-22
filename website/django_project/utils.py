@@ -1,5 +1,5 @@
 from users.models import CustomUser
-from tournaments.models import Tournament
+from tournaments.models import Tournament, TournamentMatch, TournamentRound
 
 
 def clear_session_id():
@@ -16,3 +16,11 @@ def clear_tournament_id():
 
 def clear_tournaments():
     Tournament.objects.all().delete()
+
+
+def reset_tournament_matches():
+    for round in TournamentRound.objects.all():
+        if round.status == 'scheduled':
+            for match in round.matches.all():
+                match.status = 'scheduled'
+                match.save()

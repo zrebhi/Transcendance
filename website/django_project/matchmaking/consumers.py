@@ -3,7 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import QueueEntry
 from .matchmaking import match_users
-from pong_app.consumers import remove_channel_name_from_session
+from users.consumers import add_channel_name_to_session, remove_channel_name_from_session
 
 
 class QueueConsumer(AsyncWebsocketConsumer):
@@ -26,21 +26,10 @@ class QueueConsumer(AsyncWebsocketConsumer):
         # Add the user to their group and accept the WebSocket connection
         await self.accept()
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        await self.add_channel_name_to_session(self.channel_name)
+        await add_channel_name_to_session(self.scope, self.channel_name)
 
         # Start matchmaking process
         await match_users()
-
-    @database_sync_to_async
-    def add_channel_name_to_session(self, channel_name):
-        """Add the channel name to an array in the session."""
-        session = self.scope["session"]
-        if "channel_names" not in session:
-            session["channel_names"] = []
-        if channel_name not in session["channel_names"]:
-            session["channel_names"].append(channel_name)
-            session.modified = True
-            session.save()
 
     async def disconnect(self, close_code):
         """
@@ -49,12 +38,11 @@ class QueueConsumer(AsyncWebsocketConsumer):
         """
         # Remove the user from their matchmaking group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-
+        # Remove the channel from the user's session
         await remove_channel_name_from_session(self.scope, self.channel_name)
         # Remove the user's entry from the matchmaking queue
         await self.delete_queue_entry()
         await self.close()
-        print(f"disconnected from {self.room_group_name}")
 
     @database_sync_to_async
     def delete_queue_entry(self):

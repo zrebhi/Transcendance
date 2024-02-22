@@ -21,7 +21,15 @@
         }
     </style>
 
-
+    {% if user.is_authenticated %}
+        {% if user.session_id is not None %}
+            <meta name="user-session-id" content="{{ user.session_id }}">
+        {% endif %}
+        {% if user.tournament_id is not None %}
+            <meta name="user-tournament-id" content="{{ user.tournament_id }}">
+        {% endif %}
+    {% endif %}
+    
 </head>
 <body>
 

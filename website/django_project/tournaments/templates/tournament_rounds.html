@@ -41,15 +41,19 @@
                                     {% endif %}
                                 </span>
                             </div>
-                        {% if participant and participant.match_id == match.id %}
+                            {% if participant and participant.match_id == match.id %}
                                 {% if not participant.is_ready %}
                                     <button id="tournamentUserReadyButton" class="ready-state-button ready btn btn-primary w-100" data-match-id="{{ match.id }}">Ready</button>
                                 {% else %}
                                     <button id="tournamentUserNotReadyButton" class="ready-state-button not-ready btn btn-danger w-100" data-match-id="{{ match.id }}">Not Ready</button>
                                 {% endif %}
-                        {% endif %}
+                            {% endif %}
                         </div>
-                    {% endif %}
+                        {% elif match.status == "completed" %}
+                            <div class="score">
+                                <p>Match won by {{ match.winner }}</p>
+                            </div>
+                        {% endif %}
                     <div class="player right">
                         {% if match.participants.last.player %}
                             <img src="{{ participant.player.avatar_url|default:'/main/static/main/img/default_avatar.jpg' }}" alt="{{ match.participants.last.player.username }}'s Avatar" class="player-avatar" />

@@ -3,7 +3,7 @@ import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
-from .models import Game
+from .pong import Game
 from matchmaking.models import GameSession
 from users.consumers import remove_channel_name_from_session, add_channel_name_to_session, update_user_session_id
 from asgiref.sync import async_to_sync
@@ -38,6 +38,21 @@ async def create_game_instance_async(session_id):
 @database_sync_to_async
 def get_game_session_async(session_id):
     return GameSession.objects.select_related('player1', 'player2').get(id=session_id)
+
+
+@database_sync_to_async
+def update_game_session_winner(session, winner_username):
+    if session.winner is None:
+        winner = session.player1 if session.player1.username == winner_username else session.player2
+        session.winner = winner
+        session.save()
+
+
+@database_sync_to_async
+def update_game_session_status(session, status):
+    if session.status != status:
+        session.status = status
+        session.save()
 
 
 class GameInstance:
@@ -201,6 +216,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.disconnect(1001)
         for user in [self.game.session.player1, self.game.session.player2]:
             await update_user_session_id(user, None)
+            await update_game_session_winner(self.game.session, self.game.winner)
+            await update_game_session_status(self.game.session, 'finished')
 
     async def game_state_update(self, event):
         """Send game state updates to the WebSocket client."""

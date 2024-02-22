@@ -7,8 +7,10 @@ def remove_channel_name_from_session(scope, channel_name):
     session = scope["session"]
     try:
         channel_names = session.get("channel_names", [])
+        print(f"Removing {channel_name} from {channel_names}")
         if channel_name in channel_names:
             channel_names.remove(channel_name)
+            print(f"Removed {channel_name} from {channel_names}")
             session.modified = True
             session.save()
     except Exception as e:
@@ -24,6 +26,8 @@ def add_channel_name_to_session(scope, channel_name):
         channel_names.append(channel_name)
         session.modified = True
         session.save()
+        print(f"Added {channel_name} to session")
+        print(f"Session: {session}")
 
 
 @database_sync_to_async
