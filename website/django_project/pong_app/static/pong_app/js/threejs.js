@@ -167,8 +167,7 @@ export function endGame() {
     scene = camera = ball = ballLight = paddle1 = paddle2 = gameData.animationid = null;
     
     // Disposer du renderer WebGL
-    if (gameData.renderer) {
-        gameData.renderer.dispose();
-        gameData.renderer = null;
-    }
+    gameData.renderer.dispose();
+    gameData.renderer.forceContextLoss();
+    gameData.renderer = null;
 }
