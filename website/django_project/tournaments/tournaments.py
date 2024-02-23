@@ -100,15 +100,39 @@ def eliminate_loser(match):
 
 def advance_winner(match):
     tournament = match.round.tournament
-    round = match.round
-    if round == tournament.rounds.last():
+
+    if match.round == tournament.rounds.last():
         complete_tournament(tournament)
     else:
-        next_round = tournament.rounds.get(number=round.number + 1)
+        place_winner_in_next_round(match, tournament)
+
+
+def complete_tournament(tournament):
+    tournament.status = 'completed'
+    tournament.save()
+    print(f"Tournament {tournament.id} has been completed.")
+
+
+def place_winner_in_next_round(match, tournament):
+    try:
+        next_round = tournament.rounds.get(number=match.round.number + 1)
         next_match_number = (match.number + 1) // 2
         next_match = next_round.matches.get(number=next_match_number)
-        participant = next_match.participants.get(player=None)
+        participant = next_match.participants.filter(player=None).first()
         participant.player = match.winner
         participant.save()
+        print(f"Round {match.round.number}: Winner of match {match.number} has been placed in match {next_match_number}\
+              of Round {next_round.number}.")
+    except TournamentRound.DoesNotExist:
+        print(f"Error: Next round does not exist for round number {match.round.number + 1}.")
+    except TournamentMatch.DoesNotExist:
+        print(f"Error: Match number {next_match_number} in round {match.round.number + 1} does not exist.")
+    except MatchParticipant.DoesNotExist:
+        print(f"Error: No participant placeholder found for match number {next_match_number} in round \
+        {match.round.number + 1}.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+
 
 
