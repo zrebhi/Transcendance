@@ -1,11 +1,17 @@
 import { updateNavbar } from "/main/static/main/js/SPAContentLoader.js";
 import {showUI, loadView} from "/main/static/main/js/SPAContentLoader.js";
 import { drawCanvas, handleResize } from "./draw.js";
+import { draw3dCanvas, endGame } from "./threejs.js";
+
+let render3d = true; // changer cette valeur depuis les settings, pas ingame;
+
 
 // Initializes the default state of the game.
 function initGameData() {
     return {
         myp5: null,
+        renderer: null,
+        animationId: null,
         socket: null,
         player1: null,
         player2: null,
@@ -26,12 +32,11 @@ export let gameData = initGameData();
 
 // Main entry point for starting or resuming a game session.
 export async function getGame(sessionId) {
-    console.log('Getting game:', sessionId);
     if (!window.gameSocket) {
         await initGame(sessionId);
         updateNavbar();
     } else {
-        drawCanvas();
+        render3d ? draw3dCanvas() : drawCanvas();
     }
 }
 
@@ -44,7 +49,7 @@ async function initGame(sessionId) {
     await waitForWindowData();
     setupPlayerMovement();
     getCanvasContainerSize();
-    drawCanvas();
+    render3d ? draw3dCanvas() : drawCanvas();
 }
 
 // Creates and returns a WebSocket connection for the game session.
@@ -187,8 +192,15 @@ function getScaleFactors() {
     const serverWidth = gameData.window.width;
     const serverHeight = gameData.window.height;
 
-    const canvasWidth = gameData.myp5.width;
-    const canvasHeight = gameData.myp5.height;
+    let canvasWidth, canvasHeight;
+
+    if (!render3d) {
+        canvasWidth = gameData.myp5.width;
+        canvasHeight = gameData.myp5.height;
+    } else {
+        canvasWidth = gameData.renderer.width;
+        canvasHeight = gameData.renderer.height;
+    }
 
     return {
         scaleX: canvasWidth / serverWidth,
@@ -225,6 +237,8 @@ function handleWebSocketClose(event) {
 
     if (gameData.myp5)
         gameData.myp5.noLoop();
+    if (gameData.renderer)
+        endGame();
 }
 
 function hideMenu() {
@@ -241,10 +255,16 @@ function hideMenu() {
     if (canvasContainer) {
         setTimeout(() => {
             console.log(canvasContainer.offsetWidth)
-            gameData.myp5.resizeCanvas(0, 0);
+            if (gameData.myp5)
+                gameData.myp5.resizeCanvas(0, 0);
+            else if (gameData.renderer)
+                gameData.renderer.setSize(0, 0);
             console.log(canvasContainer.offsetWidth)
             canvasContainer.style.marginLeft = '10px'; // Reset margin left
-            gameData.myp5.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+            if (gameData.myp5)
+                gameData.myp5.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+            else if (gameData.renderer)
+                gameData.renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
         }, 0);
     }
 }
@@ -282,3 +302,4 @@ export function quitGame() {
     }
     loadView('/home/').catch(error => console.error('Error:', error))
 }
+
