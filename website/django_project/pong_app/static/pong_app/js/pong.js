@@ -287,8 +287,6 @@ export function forfeitGame() {
         gameData.socket.send(JSON.stringify({
             type: 'forfeit_message'
         }));
-        if (render3d)
-            endGame();
         console.log('Forfeiting game');
     }
 }
@@ -301,8 +299,6 @@ export function quitGame() {
         }));
         console.log('Quitting game');
     }
-    if (render3d)
-        endGame();
     loadView('/home/').catch(error => console.error('Error:', error))
 }
 

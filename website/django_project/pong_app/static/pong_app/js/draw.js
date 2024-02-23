@@ -5,7 +5,11 @@ export function clearCanvas() {
     if (gameData.myp5)
         gameData.myp5.remove();
     if (gameData.renderer)
+    {
         endGame();
+        gameData.renderer.forceContextLoss();
+        gameData.renderer = null;
+    }
 }
 
 // Initializes and starts the p5 sketch for the game's canvas.

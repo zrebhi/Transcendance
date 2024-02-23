@@ -153,21 +153,23 @@ export function endGame() {
     cancelAnimationFrame(gameData.animationid);
     
     // Supprimer les éléments de la scène
-    scene.remove(ball, paddle1, paddle2, ballLight);
+    if (scene && ball && paddle1 && paddle2 && ballLight)
+        scene.remove(ball, paddle1, paddle2, ballLight);
     
     // Supprimer les éléments de texte de la scène
     for (const key in textMeshes) {
         if (textMeshes.hasOwnProperty(key)) {
             const textMesh = textMeshes[key].mesh;
-            scene.remove(textMesh);
+            if (textMesh && scene)
+                scene.remove(textMesh);
         }
     }
     
     // Réinitialiser les variables à null
     scene = camera = ball = ballLight = paddle1 = paddle2 = gameData.animationid = null;
-    
-    // Disposer du renderer WebGL
-    gameData.renderer.dispose();
-    gameData.renderer.forceContextLoss();
-    gameData.renderer = null;
+
+    if (gameData.renderer) {
+        gameData.renderer.dispose();
+        // renderer.forceContextLoss()
+    }
 }
