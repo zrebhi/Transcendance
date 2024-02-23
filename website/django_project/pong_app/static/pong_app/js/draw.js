@@ -1,8 +1,15 @@
 import { gameData } from "./pong.js";
+import { endGame } from "./threejs.js";
 
 export function clearCanvas() {
     if (gameData.myp5)
         gameData.myp5.remove();
+    if (gameData.renderer)
+    {
+        endGame();
+        gameData.renderer.forceContextLoss();
+        gameData.renderer = null;
+    }
 }
 
 // Initializes and starts the p5 sketch for the game's canvas.
@@ -76,7 +83,7 @@ function drawGameStatus(sketch) {
     }
 }
 
-function getPauseMessage() {
+export function getPauseMessage() {
     let player, paddle;
 
     if (gameData.paddle1['pause_request'] && gameData.paddle2['pause_request'])
@@ -107,14 +114,20 @@ export function resizeCanvas(sketch) {
     let newHeight = container.offsetHeight;
     console.log(`Resizing canvas to ${newWidth}x${newHeight}`);
 
-    sketch.resizeCanvas(newWidth, newHeight);
+    if (gameData.myp5)
+        sketch.resizeCanvas(newWidth, newHeight);
+    if (gameData.renderer)
+        gameData.renderer.setSize(newWidth, newHeight);
 }
 
 // Event listener for window resize to adjust canvas size
 window.addEventListener('resize', handleResize);
 
 export function handleResize() {
-    resizeCanvas(gameData.myp5);
+    if (gameData.myp5)
+        resizeCanvas(gameData.myp5);
+    if (gameData.renderer)
+        resizeCanvas();
 }
 
 // Function to resize the canvas continuously during menu transition
@@ -122,7 +135,10 @@ function resizeCanvasDuringTransition(start, duration, canvasContainer) {
     const now = performance.now();
     const elapsed = now - start;
 
-    gameData.myp5.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+    if (gameData.myp5)
+        gameData.myp5.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+    else if (gameData.renderer)
+        gameData.renderer.setSize(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
 
     if (elapsed < duration) {
         requestAnimationFrame(() => resizeCanvasDuringTransition(start, duration, canvasContainer));
@@ -145,10 +161,10 @@ document.body.addEventListener('click', function(event) {
         if (menu.classList.contains('menu-visible')) {
             canvasContainer.style.marginLeft = '20%';
         } else {
-            canvasContainer.style.marginLeft = '0';
+            canvasContainer.style.marginLeft = '10px';
         }
 
-        // Start resizing the canvas in sync with the menu transition
         resizeCanvasDuringTransition(performance.now(), transitionDuration, canvasContainer);
     }
 });
+
