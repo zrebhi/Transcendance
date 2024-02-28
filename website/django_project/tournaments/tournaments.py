@@ -96,6 +96,7 @@ def eliminate_loser(match):
     for participant in match.participants.all():
         if participant.player != match.winner:
             participant.status = 'eliminated'
+            participant.player.tournament_id = None
             participant.save()
 
 
@@ -160,5 +161,3 @@ def setup_next_round(round):
 
     except TournamentRound.DoesNotExist:
         print(f"No next round exists for round number {round.number + 1} in tournament {round.tournament.id}.")
-
-

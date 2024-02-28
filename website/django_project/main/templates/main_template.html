@@ -66,6 +66,7 @@
             {% endif %}
             {% if user.tournament_id is not None %}
                 import { tournamentWebSocketConnection} from "/tournaments/static/tournaments/js/tournaments.js";
+                console.log("user: ", {{ user.username }});
                 tournamentWebSocketConnection({{ user.tournament_id }});
             {% endif %}
         {% endif %}

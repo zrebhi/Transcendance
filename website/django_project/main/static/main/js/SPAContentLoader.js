@@ -16,8 +16,6 @@ export function loadView(viewUrl) {
     return fetch(viewUrl)
         .then(response => response.text())
         .then(data => document.getElementById('pageContainer').innerHTML = data)
-        .then(() => console.log(document.getElementById('menuToggle')))
-        .then(() => document.getElementById('tournament') ? console.log("tournament") : console.log("not tournament"))
         .catch(error => console.error('Error:', error));
 }
 

@@ -22,25 +22,21 @@ def reset_tournament(tournament):
     tournament.status = 'in progress'
     tournament.save()
     print(f"Tournament {tournament.name} has been reset to in progress.")
+    first_round_number = tournament.rounds.first().number if tournament.rounds.exists() else None
     for round in tournament.rounds.all():
-        if round == TournamentRound.objects.first():
-            round.status = 'scheduled'
-            round.save()
-            print(f"Round {round.number} has been reset to scheduled.")
-            for match in round.matches.all():
-                match.status = 'scheduled'
-                match.winner = None
-                match.save()
-                print(f"Match {match.number} in round {round.number} has been reset to scheduled.")
-        else:
-            round.status = 'created'
-            round.save()
-            print(f"Round {round.number} has been reset to created.")
-            for match in round.matches.all():
-                match.status = 'created'
-                match.winner = None
-                match.save()
-                print(f"Match {match.number} in round {round.number} has been reset to created.")
+        round.status = 'scheduled' if round.number == first_round_number else 'created'
+        round.save()
+        print(f"Round {round.number} has been reset to {round.status}.")
+        for match in round.matches.all():
+            for participant in match.participants.all():
+                participant.is_ready = False
+                if round.status != 'scheduled':
+                    participant.player = None
+                participant.save()
+            match.status = round.status
+            match.winner = None
+            match.save()
+            print(f"Match {match.number} in round {round.number} has been reset to {match.status}, participants updated.")
 
 
 def display_tournament_progress(tournament):
@@ -60,3 +56,8 @@ def display_tournament_progress(tournament):
             print(f"    Match {match.number}, Status: {match.status}, Winner: {winner_name}")
             print(f"      Participants: {', '.join(participant_names)}")
 
+
+admin = CustomUser.objects.get(username='admin')
+Zak = CustomUser.objects.get(username='Zak')
+Zak2 = CustomUser.objects.get(username='Zak2')
+Zak3 = CustomUser.objects.get(username='Zak3')
