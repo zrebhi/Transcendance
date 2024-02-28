@@ -213,8 +213,9 @@ class Game:
     def resume_game(self):
         """Resume the game."""
         if not self.paddle1.pause_request and not self.paddle2.pause_request:
+            if self.status == 'paused':
+                asyncio.create_task(self.delay_game_for(3))
             self.status = 'ongoing'
-            asyncio.create_task(self.delay_game_for(3))
 
     def get_state(self):
         """Get the current state of the game for broadcasting."""

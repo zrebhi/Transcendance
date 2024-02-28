@@ -92,7 +92,10 @@ function setupWebSocketListeners() {
     };
     gameData.socket.onmessage = handleWebSocketMessage;
     gameData.socket.onclose = handleWebSocketClose;
-    gameData.socket.onerror = (event) => console.error("WebSocket error:", event);
+    gameData.socket.onerror = (event) => {
+        console.error("Game WebSocket error:", event);
+        loadView('/home').catch(error => console.error('Error:', error));
+    }
 }
 
 // Animation loop for handling continuous tasks (keyhold).
