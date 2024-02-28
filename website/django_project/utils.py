@@ -2,13 +2,13 @@ from users.models import CustomUser
 from tournaments.models import Tournament, TournamentMatch, TournamentRound
 
 
-def clear_session_id():
+def clear_session_ids():
     for user in CustomUser.objects.all():
         user.session_id = None
         user.save()
 
 
-def clear_tournament_id():
+def clear_tournament_ids():
     for user in CustomUser.objects.all():
         user.tournament_id = None
         user.save()
@@ -18,30 +18,35 @@ def clear_tournaments():
     Tournament.objects.all().delete()
 
 
-def reset_tournament():
-    for round in TournamentRound.objects.all():
+def reset_tournament(tournament):
+    tournament.status = 'in progress'
+    tournament.save()
+    print(f"Tournament {tournament.name} has been reset to in progress.")
+    for round in tournament.rounds.all():
         if round == TournamentRound.objects.first():
             round.status = 'scheduled'
             round.save()
+            print(f"Round {round.number} has been reset to scheduled.")
             for match in round.matches.all():
                 match.status = 'scheduled'
                 match.winner = None
                 match.save()
+                print(f"Match {match.number} in round {round.number} has been reset to scheduled.")
         else:
             round.status = 'created'
             round.save()
+            print(f"Round {round.number} has been reset to created.")
             for match in round.matches.all():
                 match.status = 'created'
                 match.winner = None
                 match.save()
+                print(f"Match {match.number} in round {round.number} has been reset to created.")
 
 
 def display_tournament_progress(tournament):
     print(f"Tournament: {tournament.name}, Status: {tournament.status}")
-
     for round in tournament.rounds.all().order_by('number'):
         print(f"  Round {round.number}, Status: {round.status}")
-
         for match in round.matches.all().order_by('number'):
             participants = match.participants.all()
             participant_names = []
@@ -51,7 +56,7 @@ def display_tournament_progress(tournament):
                 else:
                     participant_name = "TBD (To Be Determined)"
                 participant_names.append(participant_name)
-
             winner_name = match.winner.username if match.winner else 'N/A'
             print(f"    Match {match.number}, Status: {match.status}, Winner: {winner_name}")
             print(f"      Participants: {', '.join(participant_names)}")
+

@@ -7,6 +7,7 @@ from .pong import Game
 from matchmaking.models import GameSession
 from users.consumers import remove_channel_name_from_session, add_channel_name_to_session, update_user_session_id
 from asgiref.sync import async_to_sync
+from main.views import main_view
 
 FPS = 60
 GLOBAL_GAMES_STORE = {}
@@ -165,18 +166,20 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         """Handle WebSocket disconnection."""
         if self.game:
-            self.handle_disconnect(self.user)
+            await self.handle_disconnect(self.user)
             await remove_channel_name_from_session(self.scope, self.channel_name)
         await self.close()
 
-    def handle_disconnect(self, user):
+    async def handle_disconnect(self, user):
         """Handle a player's disconnection."""
         if self.local_game():
-            self.game.status = 'finished'
-            return
-        player_number = 1 if user == self.game.players[0] else 2
-        self.game.players[player_number - 1] = None
-        self.game.pause_request(player_number)
+            await update_user_session_id(user, None)
+            delete_game_for_session(self.game.session.id)
+            await update_game_session_status(self.game.session, 'finished')
+        else:
+            player_number = 1 if user == self.game.players[0] else 2
+            self.game.players[player_number - 1] = None
+            self.game.pause_request(player_number)
 
     async def receive(self, text_data=None, bytes_data=None):
         """Handle incoming messages from WebSocket."""
@@ -216,6 +219,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.disconnect(1001)
         for user in [self.game.session.player1, self.game.session.player2]:
             await update_user_session_id(user, None)
+            print(f"{user.username}'s session ID updated to {user.session_id}.")
             await update_game_session_winner(self.game.session, self.game.winner)
             await update_game_session_status(self.game.session, 'finished')
 
