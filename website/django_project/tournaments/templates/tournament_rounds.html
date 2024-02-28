@@ -6,7 +6,10 @@
                              
     {% for round in tournament.rounds.all %}
         <div class="round">
-            <h2>Round {{ round.number }}</h2>
+            <div class="round-title">
+                <h2>Round {{ round.number }}</h2>       
+                <h3>{{ round.status }}</h3>
+            </div>
             {% for match in round.matches.all %}
                 <div class="match">
                     <div class="player left">

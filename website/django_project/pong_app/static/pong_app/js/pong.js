@@ -3,7 +3,7 @@ import {showUI, loadView} from "/main/static/main/js/SPAContentLoader.js";
 import { drawCanvas, handleResize } from "./draw.js";
 import { draw3dCanvas, endGame } from "./threejs.js";
 
-let render3d = true; // changer cette valeur depuis les settings, pas ingame;
+let render3d = false; // changer cette valeur depuis les settings, pas ingame;
 
 // Initializes the default state of the game.
 function initGameData() {

@@ -18,11 +18,21 @@ def clear_tournaments():
     Tournament.objects.all().delete()
 
 
-def reset_tournament_matches():
+def reset_tournament():
     for round in TournamentRound.objects.all():
-        if round.status == 'scheduled':
+        if round == TournamentRound.objects.first():
+            round.status = 'scheduled'
+            round.save()
             for match in round.matches.all():
                 match.status = 'scheduled'
+                match.winner = None
+                match.save()
+        else:
+            round.status = 'created'
+            round.save()
+            for match in round.matches.all():
+                match.status = 'created'
+                match.winner = None
                 match.save()
 
 

@@ -89,6 +89,7 @@ def handle_game_session_finish(sender, instance, **kwargs):
 def progress_tournament(match):
     eliminate_loser(match)
     advance_winner(match)
+    round_progress(match.round)
 
 
 def eliminate_loser(match):
@@ -110,6 +111,9 @@ def advance_winner(match):
 def complete_tournament(tournament):
     tournament.status = 'completed'
     tournament.save()
+    for participant in tournament.participants.all():
+        participant.user.tournament_id = None
+        participant.save()
     print(f"Tournament {tournament.id} has been completed.")
 
 
@@ -134,5 +138,26 @@ def place_winner_in_next_round(match, tournament):
         print(f"An unexpected error occurred: {e}")
 
 
+def round_progress(round):
+    if all(match.status == 'completed' for match in round.matches.all()):
+        round.status = 'completed'
+        round.save()
+        print(f"Round {round.number} of tournament {round.tournament.id} has been completed.")
 
+        setup_next_round(round)
+
+
+def setup_next_round(round):
+    try:
+        if round != round.tournament.rounds.last():
+            next_round = round.tournament.rounds.get(number=round.number + 1)
+            next_round.status = 'scheduled'
+            next_round.save()
+            print(f"Round {next_round.number} of tournament {round.tournament.id} is now scheduled.")
+            for match in next_round.matches.all():
+                match.status = "scheduled"
+                match.save()
+
+    except TournamentRound.DoesNotExist:
+        print(f"No next round exists for round number {round.number + 1} in tournament {round.tournament.id}.")
 

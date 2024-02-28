@@ -4,7 +4,7 @@ from channels.db import database_sync_to_async
 from .models import TournamentMatch, MatchParticipant
 from pong_app.consumers import broadcast_message, create_game_instance
 from matchmaking.models import GameSession
-from users.consumers import add_channel_name_to_session, remove_channel_name_from_session
+from users.consumers import add_channel_name_to_session, remove_channel_name_from_session, update_user_session_id
 
 
 class TournamentConsumer(AsyncWebsocketConsumer):
@@ -45,12 +45,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             message = json.loads(text_data)
 
             if message['type'] == 'ready_state_update':
-                print(f"Received ready state update: {message['ready_state']}")
+                print(f"{self.user.username}: Received ready state update: {message['ready_state']}")
                 await self.update_match_participant_ready_state(message['match_id'], message['ready_state'])
-                print(f"Updated ready state for match {message['match_id']} to {message['ready_state']}")
+                print(f"{self.user.username}: Updated ready state for match {message['match_id']} to {message['ready_state']}")
                 if not await self.check_and_start_match(message['match_id']):
                     await broadcast_message(self.tournament_group_name, {'type': 'tournament_message',
                                                                          'message': 'ready_state_updated'})
+            elif message['type'] == 'user_message':
+                await self.user_message(message)
 
     @database_sync_to_async
     def update_match_participant_ready_state(self, match_id, ready_state):
@@ -104,9 +106,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def notify_match_participants(self, match):
         participants = await self.get_match_participants(match)
         for participant in participants:
+            await update_user_session_id(participant.player, self.game_session.id)
             await broadcast_message(participant.player.username, {'type': 'user_message',
-                                                                  'message': 'game_start'})
-            await self.update_user_session_id(participant.player, self.game_session.id)
+                                                                  'message': 'game_start',
+                                                                  'session_id': self.game_session.id})
 
     @database_sync_to_async
     def get_match_participants(self, match):
@@ -118,34 +121,44 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         """
         return list(match.participants.select_related('player').all())
 
-    @database_sync_to_async
-    def update_user_session_id(self, user, session_id):
-        user.session_id = session_id
-        user.save()
-
     # Receive message from tournament group
     async def tournament_message(self, event):
         message = event['message']
 
-        print(f"Received message: {message}")
         try:
-            print(f"Sending message: {message}")
             await self.send(text_data=json.dumps({
                 'type': 'tournament_message',
                 'message': message
             }))
-            print(f"Sent message: {message}")
         except Exception as e:
             print(f"Error: {str(e)}")
 
     async def user_message(self, event):
         message = event['message']
-        # Send message to WebSocket
+
+        print(f"{self.user.username}: Received message: {message}")
         if message == 'game_start':
-            await self.send(text_data=json.dumps({
-                'type': 'game_start',
-                'session_id': self.game_session.id
-            }))
+            self.game_session = await self.get_game_session(event['session_id'])
+
+            if self.game_session is not None:
+                print(f"{self.user.username}: Sending message: {message}")
+                await self.send(text_data=json.dumps({
+                    'type': 'game_start',
+                    'session_id': self.game_session.id
+                }))
+
+    @database_sync_to_async
+    def get_game_session(self, session_id):
+        if self.game_session is not None:
+            return self.game_session
+
+        try:
+            print(f"{self.user.username}: Retrieving Game session: {session_id}")
+            return GameSession.objects.get(id=session_id)
+
+        except GameSession.DoesNotExist as e:
+            print(f"Error: {str(e)}")
+            return None
 
     async def leave_message(self, event):
         if event:
