@@ -30,14 +30,16 @@ export function eventHandlers() {
     // Adjust the height of the page container on load and window resize
     window.addEventListener('DOMContentLoaded', adjustPageContainerHeight);
     window.addEventListener('resize', adjustPageContainerHeight);
-    document.getElementById('setLanguage').onchange = async function(e) {
-        await (async () => {
-            console.log(e.target.value);
-            localStorage.setItem('lang', e.target.value);
-        })();
-        updatePage();
-        updateSidebar();
-    };
+    if (document.getElementById('setLanguage')) {
+        document.getElementById('setLanguage').onchange = async function(e) {
+            await (async () => {
+                console.log(e.target.value);
+                localStorage.setItem('lang', e.target.value);
+            })();
+            updatePage();
+            updateSidebar();
+        };
+    }
 
     // Listen for form submissions in the page container
     document.getElementById('pageContainer').addEventListener('submit', handleSubmit);

@@ -24,6 +24,10 @@
             <p class="card-text">Jouez contre vos amis sur la même machine !</p>
             {% if not user.is_authenticated %}<p class="card-text">(Nécessite d'être connecté)</p>{% endif %}
         </div>
-        <button id="changeRenderButton">Changer de rendu</button>
+        {% if user.is_authenticated %}
+        <div>
+            <button id="changeRenderButton">Changer le rendu</button>
+        </div>
+    {% endif %}
     </div>    
 </div>
