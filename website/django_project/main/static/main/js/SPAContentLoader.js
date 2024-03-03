@@ -12,6 +12,9 @@ export function adjustPageContainerHeight() {
 
 export function loadView(viewUrl) {
     console.log('Loading view:', viewUrl);
+    const language = getLanguage();
+    viewUrl = `${viewUrl}?language=${language}`;
+    console.log(viewUrl);
     clearPage();
     return fetch(viewUrl)
         .then(response => response.text())
@@ -26,7 +29,7 @@ export async function loadGame(sessionId) {
 
     try {
         await hideUI();
-        await loadView(`/pong/${sessionId}/`);
+        await loadView(`/pong/${sessionId}`);
         await loadScript('pong_app/static/pong_app/p5/p5.js');
         await getGame(sessionId);
 
@@ -77,7 +80,7 @@ export function clearPage() {
 }
 
 export function updateNavbar() {
-    fetch('/navbar/')
+    fetch(`/navbar?language=${getLanguage()}`)
         .then(response => response.text())
         .then(navbarHtml => {
             document.getElementById('navbarContainer').innerHTML = navbarHtml;
@@ -90,14 +93,14 @@ export function updateNavbar() {
 }
 
 export function updateSidebar() {
-    fetch('/sidebar/')
+    fetch(`/sidebar?language=${getLanguage()}`)
         .then(response => response.text())
         .then(sidebarHtml => document.getElementById('sidebarContainer').innerHTML = sidebarHtml)
         .catch(error => console.error('Error:', error));
 }
 
 export function updatePage() {
-    fetch('/')
+    fetch(`/?language=${getLanguage()}`)
         .then(response => response.text())
         .then(pageHtml => document.body.innerHTML = pageHtml)
         .then(() => loadScripts([
@@ -136,4 +139,8 @@ export function getTournamentId() {
 
 export function getCsrfToken() {
     return document.cookie.split(';').find(cookie => cookie.trim().startsWith("csrftoken="))?.split('=')[1] ?? null;
+}
+
+export function getLanguage() {
+    return localStorage.getItem('lang');
 }

@@ -23,7 +23,7 @@ export function joinTournament(event, tournamentId) {
 
 export function tournamentView(event) {
     const tournamentId = event.target.getAttribute('data-tournament-id');
-    loadView(`/tournaments/${tournamentId}/`).catch(error => console.error('Error:', error));
+    loadView(`/tournaments/${tournamentId}`).catch(error => console.error('Error:', error));
 }
 
 export function tournamentWebSocketConnection(tournamentId) {
@@ -71,7 +71,7 @@ function updateTournament(tournamentId) {
     console.log('Updating tournament:', tournamentId);
     const tournamentContainer = document.getElementById('tournament');
     if (tournamentContainer) {
-        loadView(`/tournaments/${tournamentId}/`).catch(error => console.error('Error:', error));
+        loadView(`/tournaments/${tournamentId}`).catch(error => console.error('Error:', error));
     }
 }
 

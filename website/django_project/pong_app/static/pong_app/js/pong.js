@@ -307,6 +307,6 @@ export function quitGame() {
         }));
         console.log('Quitting game');
     }
-    loadView('/home/').catch(error => console.error('Error:', error))
+    loadView('/home').catch(error => console.error('Error:', error))
 }
 

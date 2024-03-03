@@ -1,0 +1,29 @@
+{% load static %}
+
+<style>
+    
+    .home-container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+</style>
+
+<link href="/main/static/main/css/cards.css" rel="stylesheet">
+
+<div class="home-container">
+    {% csrf_token %}
+    <div class="items">
+        <div{% if user.is_authenticated %} id="joinQueueButton"{% else %} id="loginButton"{% endif %} class="item card" style="background-image: url({% static 'main/img/online_play.png' %});">
+            <p class="card-title">Jouer en ligne</p>
+            <p class="card-text">Affrontez des adversaires du monde entier !</p>
+            {% if not user.is_authenticated %}<p class="card-text">(Nécessite d'être connecté)</p>{% endif %}
+        </div>
+        <div{% if user.is_authenticated %} id="localPlayButton"{% else %} id="loginButton"{% endif %} class="item card" style="background-image: url({% static 'main/img/online_play.png' %});">
+            <p class="card-title">Partie locale</p>
+            <p class="card-text">Jouez contre vos amis sur la même machine !</p>
+            {% if not user.is_authenticated %}<p class="card-text">(Nécessite d'être connecté)</p>{% endif %}
+        </div>
+        <button id="changeRenderButton">Changer de rendu</button>
+    </div>    
+</div>

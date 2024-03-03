@@ -1,17 +1,17 @@
-import {loadView, getCsrfToken, adjustPageContainerHeight, updatePage} from './SPAContentLoader.js';
+import {loadView, getCsrfToken, adjustPageContainerHeight, updatePage, updateSidebar} from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/matchmaking/static/matchmaking/js/matchmaking.js';
 import { forfeitGame, quitGame, changeRender} from "/pong_app/static/pong_app/js/pong.js";
 import { joinTournament, tournamentView, updateReadyState } from "/tournaments/static/tournaments/js/tournaments.js";
 
 // Define actions for various buttons in the application
 const buttonActions = {
-    'homeButton': () => loadView('/home/'),
-    'loginButton': () => loadView('/users/login/'),
+    'homeButton': () => loadView('/home'),
+    'loginButton': () => loadView('/users/login'),
     'logoutButton': handleLogoutButtonClick,
-    'registerButton': () => loadView('/users/register/'),
-    'profileButton': () => loadView('/users/profile/'),
-    'tournamentsListButton': () => loadView('/tournaments/'),
-    'createTournamentButton': () => loadView('/tournaments/create/'),
+    'registerButton': () => loadView('/users/register'),
+    'profileButton': () => loadView('/users/profile'),
+    'tournamentsListButton': () => loadView('/tournaments'),
+    'createTournamentButton': () => loadView('/tournaments/create'),
     'tournamentUserReadyButton': (event) => updateReadyState(event, window.tournamentWebSocket, 'ready'),
     'tournamentUserNotReadyButton': (event) => updateReadyState(event, window.tournamentWebSocket, 'not_ready'),
     'tournamentButton': tournamentView,
@@ -30,6 +30,14 @@ export function eventHandlers() {
     // Adjust the height of the page container on load and window resize
     window.addEventListener('DOMContentLoaded', adjustPageContainerHeight);
     window.addEventListener('resize', adjustPageContainerHeight);
+    document.getElementById('setLanguage').onchange = async function(e) {
+        await (async () => {
+            console.log(e.target.value);
+            localStorage.setItem('lang', e.target.value);
+        })();
+        updatePage();
+        updateSidebar();
+    };
 
     // Listen for form submissions in the page container
     document.getElementById('pageContainer').addEventListener('submit', handleSubmit);
