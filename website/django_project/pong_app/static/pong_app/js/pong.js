@@ -1,5 +1,5 @@
 import { updateNavbar } from "/main/static/main/js/SPAContentLoader.js";
-import {showUI, loadView} from "/main/static/main/js/SPAContentLoader.js";
+import {showUI, loadView, getLanguage} from "/main/static/main/js/SPAContentLoader.js";
 import { drawCanvas, handleResize } from "./draw.js";
 import { draw3dCanvas, endGame } from "./threejs.js";
 
@@ -7,11 +7,30 @@ let render3d = false; // changer cette valeur depuis les settings, pas ingame;
 
 export function changeRender() {
     render3d = !render3d;
-    if (render3d)
-        window.alert("you change the render to 3D");
-    else
-        window.alert("you change the render to 2D");
+    let language = getLanguage();
+    let message = "";
+
+    if (render3d) {
+        if (language === 'en') {
+            message = "You changed the render to 3D";
+        } else if (language === 'fr') {
+            message = "Vous avez changé le rendu en 3D";
+        } else if (language === 'es') {
+            message = "Ha cambiado el renderizado a 3D";
+        }
+    } else {
+        if (language === 'en') {
+            message = "You changed the render to 2D";
+        } else if (language === 'fr') {
+            message = "Vous avez changé le rendu en 2D";
+        } else if (language === 'es') {
+            message = "Ha cambiado el renderizado a 2D";
+        }
+    }
+
+    window.alert(message);
 }
+
 
 // Initializes the default state of the game.
 function initGameData() {

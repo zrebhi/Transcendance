@@ -1,0 +1,32 @@
+{% load static %}
+
+<style>
+    #pongContainer {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    #canvasContainer {
+        margin: 10px;
+        padding: 0;
+        flex-grow: 1;
+        width: 100%;
+        overflow: hidden;
+    }
+
+</style>
+
+<link href="/pong_app/static/pong_app/css/forfeit_button.css" rel="stylesheet">
+<link href="/pong_app/static/pong_app/css/game_menu.css" rel="stylesheet">
+
+<div id="pongContainer">
+    {% include 'game_menu_en.html' %}
+    <div id="canvasContainer"></div>
+</div>
+
+
+

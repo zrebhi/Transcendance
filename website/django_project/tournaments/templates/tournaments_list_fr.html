@@ -1,0 +1,49 @@
+<style>
+    .card-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 20px;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+    
+    #createTournamentButton {
+        display: block;
+        margin: 20px auto;
+    }
+
+    @media (max-width: 767px) {
+        .card-container .col-md-4 {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div id="tournamentsContainer" class="container mt-4">
+    <button id="createTournamentButton" class="btn btn-primary">Creer un Tournois</button>
+    <h1 class="text-center">Tournois disponible</h1>
+    <div class="row card-container">
+        {% for tournament in tournaments %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ tournament.creator }} Tournois</h5>
+                    <p class="card-text">Joueur: {{ tournament.participants.count }}/{{ tournament.size }}</p>
+                    <p class="card-text">Status: {{ tournament.get_status_display }}</p>
+                    <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Rejoindre un tournois</button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p>Pas de tournois disponible pour le momment.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>

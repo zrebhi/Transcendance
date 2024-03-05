@@ -1,0 +1,15 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <h2 class="text-center">Connexion</h2>
+            <form method="post" action="{% url 'login_view' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-block w-100">Connexion</button>
+            </form>
+            <div class="text-center mt-3">
+                <p>Pas encore de compte?<button id="registerButton" class="btn btn-link">Creer en un!</button></p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+<link rel="stylesheet" type="text/css" href="/tournaments/static/tournaments/css/tournament_rounds.css">
+
+
+<div class="rounds">
+    
+                             
+    {% for round in tournament.rounds.all %}
+        <div class="round">
+            <h2>Round {{ round.number }}</h2>
+            {% for match in round.matches.all %}
+                <div class="match">
+                    <div class="player left">
+                        {% if match.participants.first.player %}
+                            <img src="{{ participant.player.avatar_url|default:'/main/static/main/img/default_avatar.jpg' }}" alt="{{ participant.player.username }}'s Avatar" class="player-avatar" />
+                            <span class="player-username">{{ match.participants.first.player.username }}</span>
+                        {% else %}
+                            <span class="player-username">TBD</span>
+                        {% endif %}
+                    </div>
+                    {% if match.status == "in progress" %}
+                        <div class="score">
+                            <span class="score-number">0</span>
+                            <span class="score-separator">:</span>
+                            <span class="score-number">0</span>
+                        </div>
+                    {% elif match.status == "scheduled" %}
+                        <div class="ready-state">
+                            <div class="ready-state-players">
+                                <span class="ready-state-player">
+                                    {% if match.participants.first.is_ready %}
+                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/ready.png" alt="Ready" />
+                                    {% else %}
+                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/not_ready.png" alt="Not Ready" />
+                                    {% endif %}
+                                </span>
+                                <span class="ready-state-player">
+                                    {% if match.participants.last.is_ready %}
+                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/ready.png" alt="Ready" />
+                                    {% else %}
+                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/not_ready.png" alt="Not Ready" />
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if participant and participant.match_id == match.id %}
+                                {% if not participant.is_ready %}
+                                    <button id="tournamentUserReadyButton" class="ready-state-button ready btn btn-primary w-100" data-match-id="{{ match.id }}">Pret</button>
+                                {% else %}
+                                    <button id="tournamentUserNotReadyButton" class="ready-state-button not-ready btn btn-danger w-100" data-match-id="{{ match.id }}">Pas pret</button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        {% elif match.status == "completed" %}
+                            <div class="score">
+                                <p>Match gagne par {{ match.winner }}</p>
+                            </div>
+                        {% endif %}
+                    <div class="player right">
+                        {% if match.participants.last.player %}
+                            <img src="{{ participant.player.avatar_url|default:'/main/static/main/img/default_avatar.jpg' }}" alt="{{ match.participants.last.player.username }}'s Avatar" class="player-avatar" />
+                            <span class="player-username">{{ match.participants.last.player.username }}</span>
+                        {% else %}
+                            <span class="player-username">TBD</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <p>
+                    Aucun match n'est prévu pour cette manche pour le moment.
+                </p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
