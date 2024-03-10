@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'channels',
     'daphne',
     'corsheaders',
+    'django_q',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -93,6 +94,17 @@ CHANNEL_LAYERS = {
 
 WSGI_APPLICATION = 'pong_project.wsgi.application'
 
+# For Django-Q
+Q_CLUSTER = {
+    'name': 'DjangORM',
+    'workers': 4,
+    'timeout': 90,
+    'retry': 120,
+    'queue_limit': 50,
+    'bulk': 10,
+    'orm': 'default',
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -101,6 +113,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 20,  # Value in seconds
+        },
     }
 }
 

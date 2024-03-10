@@ -1,7 +1,7 @@
 import {loadView, getCsrfToken, adjustPageContainerHeight, updatePage} from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/matchmaking/static/matchmaking/js/matchmaking.js';
 import { forfeitGame, quitGame} from "/pong_app/static/pong_app/js/pong.js";
-import { joinTournament, tournamentView, updateReadyState } from "/tournaments/static/tournaments/js/tournaments.js";
+import { joinTournament, tournamentView, updateReadyState, observeRoundTimers } from "/tournaments/static/tournaments/js/tournaments.js";
 
 // Define actions for various buttons in the application
 const buttonActions = {
@@ -47,6 +47,19 @@ export function eventHandlers() {
             joinTournament(event, tournamentId);
         }
     });
+
+    // Add a MutationObserver to observe round timers
+    observeRoundTimers();
+
+    // window.addEventListener('popstate', (event) => {
+    // // You can access the state passed to pushState() in event.state
+    //     console.log('State popped:', event.state);
+    //
+    //     // Load the view corresponding to the new URL
+    //     // Use event.state.path if you stored the URL there, or fallback to window.location.pathname
+    //     const path = window.location.pathname;
+    //     loadView(path).catch(error => console.error('Error:', error));
+    // });
 }
 
 // Generic click handler that maps buttons to their actions
@@ -102,11 +115,11 @@ function handleLogoutButtonClick(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            loadView(data["next_url"])
-            .then(updatePage)
-            .then(() => console.log("Logout successful"))
-            .catch(error => console.error('Error:', error));
+            updatePage();
+            console.log("Logout successful")
         }
     })
     .catch(error => console.error('Error:', error));
 }
+
+

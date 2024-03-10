@@ -18,7 +18,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         self.user = self.scope["user"]
-        if self.user.tournament_id is None:
+        if not self.user.is_authenticated or self.user.tournament_id is None:
             await self.close()
             return
         self.tournament_group_name = f'tournament_{self.user.tournament_id}'
@@ -73,6 +73,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.notify_match_participants(match)
                 await broadcast_message(self.tournament_group_name, {'type': 'tournament_message',
                                                                      'message': 'match_start'})
+                print(f"Broadcasted match start in {self.tournament_group_name}")
                 return True
             return False
 
@@ -125,11 +126,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def tournament_message(self, event):
         message = event['message']
 
+        print(f"{self.user.username}: Received message: {message}")
         try:
             await self.send(text_data=json.dumps({
                 'type': 'tournament_message',
                 'message': message
             }))
+            print(f"{self.user.username}: Sent message: {message}")
         except Exception as e:
             print(f"Error: {str(e)}")
 
@@ -162,4 +165,5 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def leave_message(self, event):
         if event:
+            print("Leaving message received.")
             await self.disconnect(1001)

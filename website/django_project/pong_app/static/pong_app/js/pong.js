@@ -1,6 +1,6 @@
-import { updateNavbar } from "/main/static/main/js/SPAContentLoader.js";
+import { updateNavbar, updatePage } from "/main/static/main/js/SPAContentLoader.js";
 import {showUI, loadView} from "/main/static/main/js/SPAContentLoader.js";
-import { drawCanvas, handleResize } from "./draw.js";
+import { drawCanvas } from "./draw.js";
 import { draw3dCanvas, endGame } from "./threejs.js";
 
 let render3d = false; // changer cette valeur depuis les settings, pas ingame;
@@ -61,7 +61,7 @@ function createGameSessionWebSocket(sessionId) {
 // Sets up WebSocket event listeners.
 function setupWebSocketListeners() {
     gameData.socket.onopen = () => {
-        console.log("WebSocket connection opened");
+        console.log("Game WebSocket connection opened");
         requestAnimationFrame(createAnimationLoop());
     };
     gameData.socket.onmessage = handleWebSocketMessage;
@@ -228,7 +228,7 @@ function sleep(ms) {
 
 // Handles the closing event of the WebSocket connection.
 function handleWebSocketClose(event) {
-    console.log("WebSocket connection closed:", event);
+    console.log("Game WebSocket connection closed:", event);
     window.removeEventListener('keydown', handleKeyDown);
     window.removeEventListener('keyup', handleKeyUp);
     // window.removeEventListener('resize', handleResize);
@@ -302,6 +302,6 @@ export function quitGame() {
         }));
         console.log('Quitting game');
     }
-    loadView('/home/').catch(error => console.error('Error:', error))
+    updatePage();
 }
 

@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 
 
 def tournament_list(request):
-    tournaments = Tournament.objects.filter(status="open")
+    tournaments = Tournament.objects.all()
     return render(request, 'tournaments_list.html', {'tournaments': tournaments})
 
 

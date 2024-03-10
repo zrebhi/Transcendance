@@ -10,14 +10,27 @@ export function adjustPageContainerHeight() {
     document.getElementById('pageContainer').style.height = `calc(100vh - ${navbarHeight}px)`;
 }
 
-export function loadView(viewUrl) {
-    console.log('Loading view:', viewUrl);
+export function loadView(viewPath) {
+    // Determine the base URL from the current location
+    const baseUrl = window.location.origin;
+    // Construct the full URL by combining the base URL with the viewPath
+    const fullUrl = new URL(viewPath, baseUrl).href;
+
+    console.log('Loading view:', fullUrl);
     clearPage();
-    return fetch(viewUrl)
+
+    // Update the browser's URL and history without reloading the page
+    // Use the relative path (viewPath) for pushState to maintain relative URL in the browser
+    history.pushState({ path: viewPath }, '', viewPath);
+
+    return fetch(fullUrl)
         .then(response => response.text())
-        .then(data => document.getElementById('pageContainer').innerHTML = data)
-        .catch(error => console.error('Error:', error));
+        .then(data => {
+            document.getElementById('pageContainer').innerHTML = data;
+        })
+        .catch(error => console.error('Error loading view:', error));
 }
+
 
 export async function loadGame(sessionId) {
     if (!sessionId) return;
@@ -59,8 +72,11 @@ function removeExistingScripts(scriptUrls) {
 
 function loadScript(src) {
     return new Promise((resolve, reject) => {
+        const baseUrl = window.location.origin;
+        const fullSrc = new URL(src, baseUrl).href;
+
         const script = document.createElement('script');
-        script.src = src;
+        script.src = fullSrc;
         script.type = 'module';
         script.className = 'dynamic-script';
         script.onload = resolve;
@@ -95,6 +111,7 @@ export function updateSidebar() {
 }
 
 export function updatePage() {
+    console.log('Updating page');
     fetch('/')
         .then(response => response.text())
         .then(pageHtml => document.body.innerHTML = pageHtml)
@@ -109,6 +126,7 @@ export function updatePage() {
             setupNavbar();
             eventHandlers();
             loadGame(getSessionId()).catch(error => console.error('Error:', error));
+            console.log('Tournament ID:', getTournamentId());
             tournamentWebSocketConnection(getTournamentId());
         })
         .catch(error => console.error('Error:', error));

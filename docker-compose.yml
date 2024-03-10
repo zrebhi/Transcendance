@@ -4,7 +4,7 @@ services:
     build: website
     volumes:
       - ./website/django_project:/website
-    command: python manage.py runserver 0.0.0.0:8000
+    command: /bin/bash -c "python manage.py runserver 0.0.0.0:8000"
     expose:
       - 8000
 
