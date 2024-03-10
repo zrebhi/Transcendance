@@ -48,7 +48,7 @@ def display_tournament_progress(tournament):
             participant_names = []
             for participant in participants:
                 if participant.player:
-                    participant_name = f"{participant.player.username} (Ready: {'Yes' if participant.is_ready else 'No'})"
+                    participant_name = (f"{participant.player.username} (Ready: {'Yes' if participant.is_ready else 'No'}) Status: {participant.status}")
                 else:
                     participant_name = "TBD (To Be Determined)"
                 participant_names.append(participant_name)

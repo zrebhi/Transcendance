@@ -10,24 +10,34 @@ export function adjustPageContainerHeight() {
     document.getElementById('pageContainer').style.height = `calc(100vh - ${navbarHeight}px)`;
 }
 
-export function loadView(viewUrl) {
-    console.log('Loading view:', viewUrl);
-    const language = getLanguage();
-    viewUrl = `${viewUrl}?language=${language}`;
-    console.log(viewUrl);
+export function loadView(viewPath) {
+    // Determine the base URL from the current location
+    const baseUrl = window.location.origin;
+    // Construct the full URL by combining the base URL with the viewPath
+    const fullUrl = new URL(viewPath, baseUrl).href;
+
+    console.log('Loading view:', fullUrl);
     clearPage();
-    return fetch(viewUrl)
+
+    // Update the browser's URL and history without reloading the page
+    // Use the relative path (viewPath) for pushState to maintain relative URL in the browser
+    history.pushState({ path: viewPath }, '', viewPath);
+
+    return fetch(fullUrl)
         .then(response => response.text())
-        .then(data => document.getElementById('pageContainer').innerHTML = data)
-        .catch(error => console.error('Error:', error));
+        .then(data => {
+            document.getElementById('pageContainer').innerHTML = data;
+        })
+        .catch(error => console.error('Error loading view:', error));
 }
+
 
 export async function loadGame(sessionId) {
     if (!sessionId) return;
 
     try {
         await hideUI();
-        await loadView(`/pong/${sessionId}`);
+        await loadView(`/pong/${sessionId}/`);
         await loadScript('pong_app/static/pong_app/p5/p5.js');
         await getGame(sessionId);
 
@@ -62,8 +72,11 @@ function removeExistingScripts(scriptUrls) {
 
 function loadScript(src) {
     return new Promise((resolve, reject) => {
+        const baseUrl = window.location.origin;
+        const fullSrc = new URL(src, baseUrl).href;
+
         const script = document.createElement('script');
-        script.src = src;
+        script.src = fullSrc;
         script.type = 'module';
         script.className = 'dynamic-script';
         script.onload = resolve;
@@ -78,7 +91,7 @@ export function clearPage() {
 }
 
 export function updateNavbar() {
-    fetch(`/navbar?language=${getLanguage()}`)
+    fetch('/navbar/')
         .then(response => response.text())
         .then(navbarHtml => {
             document.getElementById('navbarContainer').innerHTML = navbarHtml;
@@ -91,14 +104,15 @@ export function updateNavbar() {
 }
 
 export function updateSidebar() {
-    fetch(`/sidebar?language=${getLanguage()}`)
+    fetch('/sidebar/')
         .then(response => response.text())
         .then(sidebarHtml => document.getElementById('sidebarContainer').innerHTML = sidebarHtml)
         .catch(error => console.error('Error:', error));
 }
 
 export function updatePage() {
-    fetch(`/?language=${getLanguage()}`)
+    console.log('Updating page');
+    fetch('/')
         .then(response => response.text())
         .then(pageHtml => document.body.innerHTML = pageHtml)
         .then(() => loadScripts([
@@ -112,6 +126,7 @@ export function updatePage() {
             setupNavbar();
             eventHandlers();
             loadGame(getSessionId()).catch(error => console.error('Error:', error));
+            console.log('Tournament ID:', getTournamentId());
             tournamentWebSocketConnection(getTournamentId());
         })
         .catch(error => console.error('Error:', error));
@@ -137,8 +152,4 @@ export function getTournamentId() {
 
 export function getCsrfToken() {
     return document.cookie.split(';').find(cookie => cookie.trim().startsWith("csrftoken="))?.split('=')[1] ?? null;
-}
-
-export function getLanguage() {
-    return localStorage.getItem('lang');
 }

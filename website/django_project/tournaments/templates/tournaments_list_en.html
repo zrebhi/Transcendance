@@ -33,10 +33,12 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <h5 class="card-title">{{ tournament.creator }}'s Tournament</h5>
+                    <h5 class="card-title">{{ tournament.name }}</h5>
                     <p class="card-text">Players: {{ tournament.participants.count }}/{{ tournament.size }}</p>
                     <p class="card-text">Status: {{ tournament.get_status_display }}</p>
-                    <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Join Tournament</button>
+                    {% if tournament.status == "open" %}
+                        <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Join Tournament</button>
+                    {% endif %}
                 </div>
             </div>
         </div>

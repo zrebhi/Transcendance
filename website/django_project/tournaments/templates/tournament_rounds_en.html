@@ -9,6 +9,14 @@
             <div class="round-title">
                 <h2>Round {{ round.number }}</h2>       
                 <h3>{{ round.status }}</h3>
+                {% if round.status == "scheduled" %}
+                    <h3 class="round-timer" data-start-time="{{ round.start_time|date:"c" }}"></h3>
+                    <script type="module">
+                        console.log("script running");
+                        import { roundTimers } from "tournaments/static/tournaments/js/tournaments";
+                        roundTimers();
+                    </script>
+                {% endif %}
             </div>
             {% for match in round.matches.all %}
                 <div class="match">

@@ -29,7 +29,7 @@ class Tournament(models.Model):
 class TournamentParticipant(models.Model):
     tournament = models.ForeignKey(Tournament, related_name='participants', on_delete=models.CASCADE)
     user: 'CustomUser' = models.ForeignKey(User, related_name='tournament_participations', on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=[('active', 'Active'), ('eliminated', 'Eliminated')])
+    status = models.CharField(max_length=50, choices=[('active', 'Active'), ('eliminated', 'Eliminated')], default='active')
 
     class Meta:
         # Ensures that a user can only participate in a tournament once
@@ -44,6 +44,7 @@ class TournamentRound(models.Model):
     number = models.IntegerField()
     status = models.CharField(max_length=20, choices=[('scheduled', 'Scheduled'), ('in progress', 'In Progress'),
                                                       ('completed', 'Completed')], default='scheduled')
+    start_time = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('tournament', 'number')
@@ -60,7 +61,7 @@ class TournamentMatch(models.Model):
     status = models.CharField(choices=[('created', 'Created'), ('scheduled', 'Scheduled'),
                                        ('in progress', 'In Progress'), ('completed', 'Completed')], default='created',
                               max_length=20)
-    winner = models.ForeignKey(User, related_name='won_tournament_matches', on_delete=models.SET_NULL,
+    winner: 'CustomUser' = models.ForeignKey(User, related_name='won_tournament_matches', on_delete=models.SET_NULL,
                                null=True, blank=True)
     number = models.IntegerField(null=True, blank=True)
 
