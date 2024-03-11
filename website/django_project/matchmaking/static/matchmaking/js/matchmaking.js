@@ -39,7 +39,8 @@ export function joinQueue() {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCsrfToken(), // Include CSRF token if needed
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
         },
         credentials: 'include'  // Necessary for including cookies (like CSRF token)
     })
@@ -84,7 +85,8 @@ export function startLocalGame() {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCsrfToken(),  // Include CSRF token if needed
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
         },
         credentials: 'include'  // Necessary for including cookies (like CSRF token)
     })

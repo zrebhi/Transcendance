@@ -61,3 +61,9 @@ admin = CustomUser.objects.get(username='admin')
 Zak = CustomUser.objects.get(username='Zak')
 Zak2 = CustomUser.objects.get(username='Zak2')
 Zak3 = CustomUser.objects.get(username='Zak3')
+
+
+def delete_tournaments():
+    Tournament.objects.all().delete()
+    clear_tournament_ids()
+

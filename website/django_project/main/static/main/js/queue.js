@@ -1,7 +1,9 @@
-import { getLanguage } from "./SPAContentLoader.js";
-
 export function showQueueUI() {
-    fetch(`/queue?language=${getLanguage()}`)
+    fetch('/queue/', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
         .then(response => response.text())
         .then(data => document.getElementById('queueContainer').innerHTML = data)
         .then(() => startQueueTimer())
