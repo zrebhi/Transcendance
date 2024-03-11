@@ -72,6 +72,7 @@ function getWebSocket() {
 function updateTournament(tournamentId) {
     console.log('Updating tournament:', tournamentId);
     const tournamentContainer = document.getElementById('tournament');
+    updateNavbar();
     if (tournamentContainer) {
         loadView(`/tournaments/${tournamentId}/`).catch(error => console.error('Error:', error));
     }

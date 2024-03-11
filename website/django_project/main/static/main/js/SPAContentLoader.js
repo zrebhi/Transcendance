@@ -10,7 +10,12 @@ export function adjustPageContainerHeight() {
     document.getElementById('pageContainer').style.height = `calc(100vh - ${navbarHeight}px)`;
 }
 
-export function loadView(viewPath) {
+export function loadView(viewPath, updateHistory = true) {
+
+    // Redirect to '/home' if the viewPath is the main page
+    if (viewPath === '/')
+        viewPath = '/home';  // Update viewPath to '/home'
+
     // Determine the base URL from the current location
     const baseUrl = window.location.origin;
     // Construct the full URL by combining the base URL with the viewPath
@@ -22,14 +27,21 @@ export function loadView(viewPath) {
     // Update the browser's URL and history without reloading the page
     // Use the relative path (viewPath) for pushState to maintain relative URL in the browser
     history.pushState({ path: viewPath }, '', viewPath);
+    console.log('History state:', history);
 
-    return fetch(fullUrl)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('pageContainer').innerHTML = data;
-        })
-        .catch(error => console.error('Error loading view:', error));
+    // Include an Accept header in the fetch request
+    return fetch(fullUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('pageContainer').innerHTML = data;
+    })
+    .catch(error => console.error('Error loading view:', error));
 }
+
 
 
 export async function loadGame(sessionId) {
@@ -91,7 +103,11 @@ export function clearPage() {
 }
 
 export function updateNavbar() {
-    fetch('/navbar/')
+    fetch('/navbar/', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
         .then(response => response.text())
         .then(navbarHtml => {
             document.getElementById('navbarContainer').innerHTML = navbarHtml;
@@ -104,7 +120,11 @@ export function updateNavbar() {
 }
 
 export function updateSidebar() {
-    fetch('/sidebar/')
+    fetch('/sidebar/', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
         .then(response => response.text())
         .then(sidebarHtml => document.getElementById('sidebarContainer').innerHTML = sidebarHtml)
         .catch(error => console.error('Error:', error));

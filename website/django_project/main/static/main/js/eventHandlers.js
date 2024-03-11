@@ -51,15 +51,15 @@ export function eventHandlers() {
     // Add a MutationObserver to observe round timers
     observeRoundTimers();
 
-    // window.addEventListener('popstate', (event) => {
-    // // You can access the state passed to pushState() in event.state
-    //     console.log('State popped:', event.state);
-    //
-    //     // Load the view corresponding to the new URL
-    //     // Use event.state.path if you stored the URL there, or fallback to window.location.pathname
-    //     const path = window.location.pathname;
-    //     loadView(path).catch(error => console.error('Error:', error));
-    // });
+    window.addEventListener('popstate', (event) => {
+    // You can access the state passed to pushState() in event.state
+        console.log('State popped:', event.state);
+
+        // Load the view corresponding to the new URL
+        // Use event.state.path if you stored the URL there, or fallback to window.location.pathname
+        const path = event.state ? event.state.path : window.location.pathname;
+        loadView(path, false).catch(error => console.error('Error:', error));
+    });
 }
 
 // Generic click handler that maps buttons to their actions
