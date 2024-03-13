@@ -8,6 +8,7 @@ from django.utils import timezone
 from pong_app.consumers import broadcast_message
 from threading import Thread
 from functools import partial
+from django.contrib.auth import get_user_model
 import asyncio
 import random
 
@@ -298,10 +299,8 @@ def progress_tournament(match):
     advance_winner(match)
     round_progress(match.round)
 
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
-
 @receiver(post_save, sender=User)
 def user_post_save(sender, instance, **kwargs):
     """
@@ -310,7 +309,6 @@ def user_post_save(sender, instance, **kwargs):
     # Log the current state of the tournament_id for the user instance that was saved
     print(f"Post-save signal for {instance.username}: tournament_id is now {instance.tournament_id}")
 
-from django.db import transaction
 
 @transaction.atomic
 def eliminate_loser(match):
@@ -376,6 +374,8 @@ def complete_tournament(tournament, match):
     if match.winner:
         match.winner.tournament_id = None
         match.winner.save()
+        tournament.winner = match.winner
+        tournament.save()
 
     print(f"Tournament {tournament.id} has been completed.")
 

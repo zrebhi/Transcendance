@@ -15,6 +15,8 @@ class Tournament(models.Model):
                                                       ('completed', 'Completed')], default='open')
     creator: 'CustomUser' = models.ForeignKey(User, related_name='creator', on_delete=models.CASCADE)
     size = models.IntegerField(default=8)
+    winner: 'CustomUser' = models.ForeignKey(User, related_name='won_tournaments', on_delete=models.SET_NULL,
+                                              null=True, blank=True)
 
     def save(self, *args, **kwargs):
         # Set default name if not provided

@@ -10,24 +10,19 @@ export function adjustPageContainerHeight() {
     document.getElementById('pageContainer').style.height = `calc(100vh - ${navbarHeight}px)`;
 }
 
-export function loadView(viewPath, updateHistory = true) {
+export async function loadView(viewPath, updateHistory = true) {
 
-    // Redirect to '/home' if the viewPath is the main page
     if (viewPath === '/')
-        viewPath = '/home';  // Update viewPath to '/home'
+        viewPath = '/home';
 
-    // Determine the base URL from the current location
     const baseUrl = window.location.origin;
-    // Construct the full URL by combining the base URL with the viewPath
     const fullUrl = new URL(viewPath, baseUrl).href;
 
     console.log('Loading view:', fullUrl);
-    clearPage();
+    await clearPage();
 
-    // Update the browser's URL and history without reloading the page
-    // Use the relative path (viewPath) for pushState to maintain relative URL in the browser
-    history.pushState({ path: viewPath }, '', viewPath);
-    console.log('History state:', history);
+    if (updateHistory)
+        history.pushState({ path: viewPath }, '', viewPath);
 
     // Include an Accept header in the fetch request
     return fetch(fullUrl, {
@@ -42,8 +37,6 @@ export function loadView(viewPath, updateHistory = true) {
     .catch(error => console.error('Error loading view:', error));
 }
 
-
-
 export async function loadGame(sessionId) {
     if (!sessionId) return;
 
@@ -52,7 +45,6 @@ export async function loadGame(sessionId) {
         await loadView(`/pong/${sessionId}/`);
         await loadScript('pong_app/static/pong_app/p5/p5.js');
         await getGame(sessionId);
-
     } catch (error) {
         console.error('Error:', error);
     }
@@ -130,7 +122,7 @@ export function updateSidebar() {
         .catch(error => console.error('Error:', error));
 }
 
-export function updatePage() {
+export function updatePage(viewURL = null) {
     console.log('Updating page');
     fetch('/')
         .then(response => response.text())
@@ -141,25 +133,49 @@ export function updatePage() {
             '/static/tournaments/js/tournaments.js',
             '/static/main/bootstrap/js/bootstrap.bundle.min.js'
         ]))
-        .then(() => {
+        .then( async () => {
             adjustPageContainerHeight();
             setupNavbar();
             eventHandlers();
-            loadGame(getSessionId()).catch(error => console.error('Error:', error));
-            console.log('Tournament ID:', getTournamentId());
+
+            const sessionID = await getSessionId();
+            console.log('Session ID:', sessionID);
+            if (sessionID) await loadGame(sessionID).catch(error => console.error('Error:', error));
+            else if (viewURL) await loadView(viewURL).catch(error => console.error('Error:', error));
+
             tournamentWebSocketConnection(getTournamentId());
         })
         .catch(error => console.error('Error:', error));
 }
 
-function getSessionId() {
-    const sessionIdMeta = document.querySelector('meta[name="user-session-id"]');
+async function fetchSessionId() {
+    // Fetch the main page HTML
+    return fetch('/')
+        .then(response => response.text())
+        .then(pageHtml => {
+            // Parse the fetched HTML to find the session ID meta tag
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(pageHtml, 'text/html');
+            const sessionIdMeta = doc.querySelector('meta[name="user-session-id"]');
 
+            const sessionId = sessionIdMeta ? sessionIdMeta.getAttribute('content') : null;
+            console.log('Fetched Session ID:', sessionId);
+            return sessionId;
+        })
+        .catch(error => console.error('Error fetching session ID:', error));
+}
+
+export async function getSessionId() {
     let sessionId;
-    sessionIdMeta ? sessionId = sessionIdMeta.getAttribute('content') : null;
-
+    try {
+        sessionId = await fetchSessionId();
+    } catch (error) {
+        console.error('Failed to fetch session ID:', error);
+    }
     return sessionId;
 }
+
+
 
 export function getTournamentId() {
     const tournamentIdMeta = document.querySelector('meta[name="user-tournament-id"]');

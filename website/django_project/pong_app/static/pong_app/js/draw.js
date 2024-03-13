@@ -2,6 +2,7 @@ import { gameData } from "./pong.js";
 import { endGame } from "./threejs.js";
 
 export function clearCanvas() {
+    console.log("Clearing canvas");
     if (gameData.myp5)
         gameData.myp5.remove();
     if (gameData.renderer)
@@ -23,6 +24,8 @@ export function drawCanvas() {
 
 function setupCanvas(sketch) {
     let canvas = sketch.createCanvas(gameData.canvasContainerWidth, gameData.canvasContainerHeight);
+    let canvasContainer = document.getElementById('canvasContainer');
+    if (!canvasContainer) return;
     canvas.parent("canvasContainer");
 }
 

@@ -54,11 +54,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="/main/static/main/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script type='module'>
-        import { setupNavbar } from "/main/static/main/js/navbar.js";
-        import { eventHandlers } from "/main/static/main/js/eventHandlers.js";
-
-        setupNavbar();
-        eventHandlers();
+        import { updatePage } from '/main/static/main/js/SPAContentLoader.js'
+        
+        updatePage();
         {% if user.is_authenticated %}
             {% if user.session_id is not None %}
                 import { loadGame } from '/main/static/main/js/SPAContentLoader.js'
