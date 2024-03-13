@@ -295,13 +295,13 @@ export function forfeitGame() {
 }
 
 // For local games. Sends a quit message to the server.
-export function quitGame() {
+export function quitGame(update = true) {
+    if (!gameData) return;
     if (gameData.socket && gameData.socket.readyState === WebSocket.OPEN) {
         gameData.socket.send(JSON.stringify({
             type: 'quit_message'
         }));
         console.log('Quitting game');
     }
-    updatePage();
+    if (update) updatePage();
 }
-

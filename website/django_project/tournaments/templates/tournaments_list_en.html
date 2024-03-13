@@ -38,6 +38,8 @@
                     <p class="card-text">Status: {{ tournament.get_status_display }}</p>
                     {% if tournament.status == "open" %}
                         <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Join Tournament</button>
+                    {% elif tournament.status == "completed" %}
+                        <p class="card-text">Won by {{ tournament.winner }}</p>
                     {% endif %}
                 </div>
             </div>

@@ -1,4 +1,11 @@
-import {loadView, getCsrfToken, adjustPageContainerHeight, updatePage} from './SPAContentLoader.js';
+import {
+    loadView,
+    getCsrfToken,
+    adjustPageContainerHeight,
+    updatePage,
+    getSessionId,
+    showUI, loadGame
+} from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/matchmaking/static/matchmaking/js/matchmaking.js';
 import { forfeitGame, quitGame} from "/pong_app/static/pong_app/js/pong.js";
 import { joinTournament, tournamentView, updateReadyState, observeRoundTimers } from "/tournaments/static/tournaments/js/tournaments.js";
@@ -30,6 +37,21 @@ export function eventHandlers() {
     window.addEventListener('DOMContentLoaded', adjustPageContainerHeight);
     window.addEventListener('resize', adjustPageContainerHeight);
 
+    window.addEventListener('popstate', async (event) => {
+        console.log('State popped:', event.state);
+
+        // Use the stored state if available, or fallback to window.location.pathname
+        // This ensures that even if the state is null or undefined, the application
+        // can still load the correct view based on the URL path.
+        const path = event.state ? event.state.path : window.location.pathname;
+        await loadView(path, false).catch(error => console.error('Error:', error));
+        await quitGame(false);
+        const sessionID = await getSessionId().catch(error => console.error('Error:', error));
+        console.log("Session ID: ", sessionID);
+        if (sessionID)
+            await loadGame(sessionID).catch(error => console.error('Error:', error));
+    });
+
     // Listen for form submissions in the page container
     document.getElementById('pageContainer').addEventListener('submit', handleSubmit);
     // Add click event listeners to various containers
@@ -50,16 +72,6 @@ export function eventHandlers() {
 
     // Add a MutationObserver to observe round timers
     observeRoundTimers();
-
-    window.addEventListener('popstate', (event) => {
-    // You can access the state passed to pushState() in event.state
-        console.log('State popped:', event.state);
-
-        // Load the view corresponding to the new URL
-        // Use event.state.path if you stored the URL there, or fallback to window.location.pathname
-        const path = event.state ? event.state.path : window.location.pathname;
-        loadView(path, false).catch(error => console.error('Error:', error));
-    });
 }
 
 // Generic click handler that maps buttons to their actions

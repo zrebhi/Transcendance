@@ -193,8 +193,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.handle_player_movement(data)
             elif data.get('type') == "forfeit_message":
                 await self.handle_forfeit()
-            elif data.get('type') == "quit_message" and self.local_game():
-                await self.end_game()
+            elif data.get('type') == "quit_message":
+                if self.local_game():
+                    await self.end_game()
+                else:
+                    await self.disconnect(1001)
 
     async def send_game_init(self):
         """Send initial game data to the WebSocket client."""
