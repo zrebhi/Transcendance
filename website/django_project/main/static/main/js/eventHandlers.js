@@ -84,7 +84,7 @@ function handleClick(event) {
 }
 
 // Handles form submission with AJAX
-function handleSubmit(event) {
+async function handleSubmit(event) {
     if (event.target.matches('form')) {
         event.preventDefault();
         const form = event.target;
@@ -104,14 +104,14 @@ function handleSubmit(event) {
 }
 
 // Processes the response from form submission
-function handleFormResponse(data) {
+async function handleFormResponse(data) {
     if (data.success) {
-        loadView(data["next_url"])
-        .then(updatePage)
-        .catch(error => console.error('Error:', error));
-    } else {
+        try {
+            await loadView(data["next_url"])
+            await updatePage();
+        } catch (error) { (console.error('Error:', error)); }
+    } else
         document.getElementById('pageContainer').innerHTML = data['form_html'];
-    }
 }
 
 // Logout button handler
