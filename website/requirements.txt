@@ -3,3 +3,4 @@ django-cors-headers
 channels
 daphne
 django-q2
+web3
