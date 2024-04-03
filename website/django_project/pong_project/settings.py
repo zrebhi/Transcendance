@@ -30,7 +30,7 @@ ALLOWED_HOSTS = ['192.168.1.78', 'localhost', '127.0.0.1']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://192.168.1.78', 'https://127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'https://192.168.1.78', 'https://127.0.0.1']
 
 # Application definition
 
@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'channels',
     'daphne',
     'corsheaders',
-    'django_q',
 
     'django.contrib.admin',
     'django.contrib.auth',
