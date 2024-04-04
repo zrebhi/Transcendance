@@ -31,6 +31,8 @@ class GameSession(models.Model):
                                                     ('tournament', 'Tournament')], default='online')
     winner: 'CustomUser' = models.ForeignKey(User, related_name='game_session_winner', on_delete=models.SET_NULL,
                                              null=True, blank=True)
+    player1_score = models.IntegerField(default=0)
+    player2_score = models.IntegerField(default=0)
 
     def __str__(self):
         return (f"{self.mode} game between {self.player1.username} and {self.player2.username} "

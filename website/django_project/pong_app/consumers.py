@@ -55,6 +55,11 @@ def update_game_session_status(session, status):
         session.status = status
         session.save()
 
+@database_sync_to_async
+def update_game_session_score(session, player1_score, player2_score):
+    session.player1_score = player1_score
+    session.player2_score = player2_score
+    session.save()
 
 class GameInstance:
     """Class to run the game loop and broadcast game state updates."""
@@ -225,6 +230,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             print(f"{user.username}'s session ID updated to {user.session_id}.")
             await update_game_session_winner(self.game.session, self.game.winner)
             await update_game_session_status(self.game.session, 'finished')
+            await update_game_session_score(self.game.session, self.game.paddle1.score, self.game.paddle2.score)
 
     async def game_state_update(self, event):
         """Send game state updates to the WebSocket client."""

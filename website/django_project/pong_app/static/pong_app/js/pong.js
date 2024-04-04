@@ -123,7 +123,7 @@ function getMoveMessages() {
     let messages = [];
 
    if (gameData.mode === 'Local') {
-       if (gameData.keyState['z']) messages.push("move_up_player1");
+       if (gameData.keyState['z'] || gameData.keyState['w']) messages.push("move_up_player1");
        if (gameData.keyState['s']) messages.push("move_down_player1");
 
        if (gameData.keyState['ArrowUp']) messages.push("move_up_player2");
