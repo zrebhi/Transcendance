@@ -209,7 +209,7 @@ contract_address = '0x1ee56BDdE0256EA994B36CD48b090Fa2fb9444f7'
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
 # Exemple : Créer un nouveau tournoi
-def create_tournament(participants):
+def create_blockchain_tournament(participants):
     try:
         # Appel de la fonction de contrat pour créer un tournoi avec les participants donnés
         tx_hash = contract.functions.createTournament(participants).transact({'from': my_account})
@@ -284,9 +284,9 @@ def print_etherscan_transaction_url(tx_hash):
     etherscan_url = 'https://sepolia.etherscan.io/tx/'
     print("Transaction URL:", etherscan_url + tx_hash.hex())
 
-def set_tournament_in_blockchain(tournament):
-	tournament_id = create_tournament(partipants.stringarray) # Rajouter None dans l'array
-	for match in tournament.matches:
+def set_tournament_in_blockchain(tournament, participantsArray):
+	tournament_id = create_blockchain_tournament(participantsArray) # Rajouter None dans l'array
+	for match in tournament.matches.all():
 		add_match_to_tournament(tournament_id, match.participant1, match.participant2, match.scoreParticipant1, match.scoreParticipant2)
 	close_tournament(tournament_id)
 	print(contract.functions.getTournamentMatches(tournament_id).call())

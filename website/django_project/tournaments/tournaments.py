@@ -9,6 +9,7 @@ from pong_app.consumers import broadcast_message
 from threading import Thread
 from functools import partial
 from django.contrib.auth import get_user_model
+from blockchain import set_tournament_in_blockchain
 import asyncio
 import random
 
@@ -377,7 +378,23 @@ def complete_tournament(tournament, match):
         tournament.winner = match.winner
         tournament.save()
 
+    participants_string_array = get_participants_string_array(tournament)
+    set_tournament_in_blockchain(tournament, participants_string_array)
+
     print(f"Tournament {tournament.id} has been completed.")
+
+def get_participants_string_array(tournament):
+    participants_string_array = []
+
+    for participant in tournament.participants.all():
+        participants_string_array.append(participant.user.username)
+
+    # To handle empty slots after both player fail the ready check in a match
+    participants_string_array.append("None")
+
+    return participants_string_array
+
+
 
 
 def place_winner_in_next_round(match, tournament):
