@@ -9,7 +9,7 @@ from pong_app.consumers import broadcast_message
 from threading import Thread
 from functools import partial
 from django.contrib.auth import get_user_model
-from blockchain import set_tournament_in_blockchain
+from .blockchain import set_tournament_in_blockchain
 import asyncio
 import random
 
