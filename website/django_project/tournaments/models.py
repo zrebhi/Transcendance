@@ -68,9 +68,7 @@ class TournamentMatch(models.Model):
     number = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        participants = self.participants.all()
-        players = [participant.player.username for participant in participants]
-        return f"Match in {self.round} between {' and '.join(players)}"
+        return f"Match {self.number} in {self.round}"
 
 
 class MatchParticipant(models.Model):

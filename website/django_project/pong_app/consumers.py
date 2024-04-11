@@ -9,6 +9,7 @@ from users.consumers import remove_channel_name_from_session, add_channel_name_t
 from asgiref.sync import async_to_sync
 from main.views import main_view
 
+
 FPS = 60
 GLOBAL_GAMES_STORE = {}
 
@@ -54,6 +55,7 @@ def update_game_session_status(session, status):
     if session.status != status:
         session.status = status
         session.save()
+
 
 @database_sync_to_async
 def update_game_session_score(session, player1_score, player2_score):
@@ -230,6 +232,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             print(f"{user.username}'s session ID updated to {user.session_id}.")
             await update_game_session_winner(self.game.session, self.game.winner)
             await update_game_session_status(self.game.session, 'finished')
+            print(f"Updating GameSession Score: \
+            {self.game.paddle2.player_name} {self.game.paddle1.score} - {self.game.paddle2.score} {self.game.paddle2.player_name}")
             await update_game_session_score(self.game.session, self.game.paddle1.score, self.game.paddle2.score)
 
     async def game_state_update(self, event):

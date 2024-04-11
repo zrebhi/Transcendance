@@ -379,7 +379,7 @@ def complete_tournament(tournament, match):
         tournament.save()
 
     participants_string_array = get_participants_string_array(tournament)
-    set_tournament_in_blockchain(tournament, participants_string_array)
+    run_async_task_in_thread(set_tournament_in_blockchain,tournament, participants_string_array)
 
     print(f"Tournament {tournament.id} has been completed.")
 
