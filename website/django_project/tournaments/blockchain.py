@@ -1,5 +1,6 @@
 from web3 import Web3
 from web3.middleware import construct_sign_and_send_raw_middleware
+from channels.db import database_sync_to_async
 from eth_account import Account
 from .models import Tournament
 
@@ -288,14 +289,26 @@ def print_etherscan_transaction_url(tx_hash):
     print("Transaction URL:", etherscan_url + tx_hash.hex())
 
 
-def set_tournament_in_blockchain(tournament, participants_array):
-    tournament_id = create_blockchain_tournament(participants_array)
-    print(f"tournament_id: {tournament_id}")
+async def set_tournament_in_blockchain(tournament, participants_array):
+    tournament_blockchain_id = create_blockchain_tournament(participants_array)
+    if not tournament_blockchain_id:
+        return
+    print(f"tournament_id: {tournament_blockchain_id}")
     print(f"array: {participants_array}")
+    await add_rounds_and_matches_to_blockchain(tournament, tournament_blockchain_id)
+    close_tournament(tournament_blockchain_id)
+    print(contract.functions.getTournamentMatches(tournament_blockchain_id).call())
+
+
+@database_sync_to_async
+def add_rounds_and_matches_to_blockchain(tournament, tournament_blockchain_id):
     for round in tournament.rounds.all():
         for match in round.matches.all():
             print(f"adding match: {match}, of round {round} in the blockchain")
-            add_match_to_tournament(tournament_id, match.player1.username, match.player2.username,
-                                    match.player1_score1, match.player2_score)
-    close_tournament(tournament_id)
-    print(contract.functions.getTournamentMatches(tournament_id).call())
+            player1_score = match.game_session.player1_score if match.game_session else 0
+            player2_score = match.game_session.player2_score if match.game_session else 0
+            player1_username = match.participants.first().player.username if match.participants.first().player else "None"
+            player2_username = match.participants.last().player.username if match.participants.last().player else "None"
+            add_match_to_tournament(tournament_blockchain_id,
+                                    player1_username, player2_username,
+                                    player1_score, player2_score)
