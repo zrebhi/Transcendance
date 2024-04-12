@@ -1,6 +1,6 @@
 import {getCsrfToken, loadView, loadGame, updateNavbar} from "/main/static/main/js/SPAContentLoader.js";
 
-export function joinTournament(event, tournamentId) {
+export async function joinTournament(event, tournamentId) {
     fetch(`/tournaments/join/${tournamentId}/`, {
         method: 'POST',
         headers: {
@@ -12,7 +12,7 @@ export function joinTournament(event, tournamentId) {
     .then(data => {
         if (data.success) {
             tournamentWebSocketConnection(tournamentId);
-            loadView(data["next_url"]).catch(error => console.error('Error:', error));
+            loadView(data["next_url"]).catch(error => console.error('Error:', error))
             updateNavbar();
         } else {
             console.error('Join tournament failed:', data.message);
@@ -22,9 +22,36 @@ export function joinTournament(event, tournamentId) {
     .catch(error => console.error('Error:', error));
 }
 
+export function leaveTournament(event, tournamentId) {
+    fetch(`/tournaments/leave/${tournamentId}/`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCsrfToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Disconnect from the tournament WebSocket
+            if (window.tournamentWebSocket) {
+                window.tournamentWebSocket.close();
+            }
+            // Update UI: Show success message, update navbar, or redirect to another view
+        } else {
+            console.error('Leave tournament failed:', data.message);
+            alert(data.message);
+        }
+    })
+    .then(() => updateNavbar())
+    .then(() => loadView('/home'))
+    .catch(error => console.error('Error:', error));
+}
+
+
 export function tournamentView(event) {
     const tournamentId = event.target.getAttribute('data-tournament-id');
-    loadView(`/tournaments/${tournamentId}`).catch(error => console.error('Error:', error));
+    loadView(`/tournaments/${tournamentId}/`).catch(error => console.error('Error:', error));
 }
 
 export function tournamentWebSocketConnection(tournamentId) {
@@ -69,13 +96,12 @@ function getWebSocket() {
     return new WebSocket(wsUrl);
 }
 
-function updateTournament(tournamentId) {
+async function updateTournament(tournamentId) {
     console.log('Updating tournament:', tournamentId);
     const tournamentContainer = document.getElementById('tournament');
     updateNavbar();
-    if (tournamentContainer) {
-        loadView(`/tournaments/${tournamentId}`).catch(error => console.error('Error:', error));
-    }
+    if (tournamentContainer)
+       await loadView(`/tournaments/${tournamentId}/`).catch(error => console.error('Error:', error));
 }
 
 export function updateReadyState(event, ws, ready_state) {

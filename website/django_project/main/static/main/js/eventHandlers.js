@@ -8,7 +8,7 @@ import {
 } from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/matchmaking/static/matchmaking/js/matchmaking.js';
 import { forfeitGame, quitGame} from "/pong_app/static/pong_app/js/pong.js";
-import { joinTournament, tournamentView, updateReadyState, observeRoundTimers } from "/tournaments/static/tournaments/js/tournaments.js";
+import { joinTournament, leaveTournament, tournamentView, updateReadyState, observeRoundTimers } from "/tournaments/static/tournaments/js/tournaments.js";
 
 // Define actions for various buttons in the application
 const buttonActions = {
@@ -69,6 +69,15 @@ export function eventHandlers() {
             joinTournament(event, tournamentId);
         }
     });
+
+    document.getElementById('pageContainer').addEventListener('click', function(event) {
+        const leaveTournamentButton = event.target.closest('.leaveTournamentButton');
+        if (leaveTournamentButton) {
+            const tournamentId = leaveTournamentButton.getAttribute('data-tournament-id');
+            leaveTournament(event, tournamentId);
+        }
+    });
+    
 
     // Add a MutationObserver to observe round timers
     observeRoundTimers();
