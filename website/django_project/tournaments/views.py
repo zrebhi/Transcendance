@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from .models import Tournament, TournamentParticipant, TournamentMatch
-from .forms import TournamentCreationForm
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from .tournaments import add_participant_to_tournament, start_tournament
 from django.shortcuts import get_object_or_404
+from pong_app.consumers import broadcast_message
+from .models import Tournament, TournamentParticipant, TournamentMatch
+from .forms import TournamentCreationForm
+from .tournaments import add_participant_to_tournament, start_tournament, run_async_task_in_thread
 
 
 def tournament_list(request):
@@ -82,4 +83,26 @@ def join_tournament(request, tournament_id):
         if tournament.participants.count() >= tournament.size:
             return JsonResponse({'success': False, 'message': 'Tournament is already full'}, status=400)
         return JsonResponse({'success': False,
-                             'message': 'Could not join the tournament. You may already be registered.'}, status=400)
+                             'message': 'Could not join the tournament. You may already be registered.'}, status=401)
+
+@login_required
+@require_POST
+def leave_tournament(request, tournament_id):
+    try:
+        tournament = Tournament.objects.get(id=tournament_id)
+        participant = TournamentParticipant.objects.get(tournament=tournament, user=request.user)
+        participant.delete()
+        request.user.tournament_id = None
+        request.user.save()
+        # Broadcast a message indicating the user has left the tournament
+        run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}",
+                                 {'type': 'tournament_message',
+                                  'message': f"{request.user.username} has left the tournament."})
+        if not TournamentParticipant.objects.filter(tournament=tournament).exists():
+            tournament.delete()
+        return JsonResponse({'success': True, 'message': 'Successfully left the tournament'})
+    except Tournament.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Tournament not found'}, status=404)
+    except TournamentParticipant.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'You are not a participant in this tournament'}, status=402)
+        

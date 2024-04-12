@@ -1,17 +1,17 @@
-from .models import TournamentParticipant, TournamentRound, TournamentMatch, MatchParticipant
-from matchmaking.models import GameSession
+import random
+import asyncio
+from threading import Thread
+from functools import partial
 from django.db import transaction, IntegrityError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from channels.db import database_sync_to_async
 from django.utils import timezone
-from pong_app.consumers import broadcast_message
-from threading import Thread
-from functools import partial
 from django.contrib.auth import get_user_model
+from channels.db import database_sync_to_async
+from matchmaking.models import GameSession
+from pong_app.consumers import broadcast_message
+from .models import (TournamentParticipant, TournamentRound, TournamentMatch, MatchParticipant)
 from .blockchain import set_tournament_in_blockchain
-import asyncio
-import random
 
 
 def add_participant_to_tournament(tournament, user):

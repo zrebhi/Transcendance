@@ -7,6 +7,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /website
 
 COPY requirements.txt /website/
+COPY ./django_project /website/
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
