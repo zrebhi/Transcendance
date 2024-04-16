@@ -1,0 +1,72 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transcendance</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Rubik+Doodle+Shadow&family=Lato&family=Bungee+Spice&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/main/static/main/img/favicon.ico">
+    <link rel="stylesheet" href="/main/static/main/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/main/static/main/css/main.css">
+
+    
+    <style>
+        #sidebarContainer {
+            width: {% if user.is_authenticated %}300px;{% else %}0px{% endif %}
+        }
+    </style>
+
+    {% if user.is_authenticated %}
+        {% if user.session_id is not None %}
+            <meta name="user-session-id" content="{{ user.session_id }}">
+        {% endif %}
+        {% if user.tournament_id is not None %}
+            <meta name="user-tournament-id" content="{{ user.tournament_id }}">
+        {% endif %}
+    {% endif %}
+    
+</head>
+<body>
+    <div id="sidebarContainer">
+        {% include 'sidebar_fr.html' %}
+    </div>
+    
+    <div id="mainContentWrapper">
+        <div id="navbarContainer">
+            {% include 'navbar_fr.html' %}
+        </div>
+        
+        <div id="pageContainer">
+            {% include 'home_template_fr.html' %}
+        </div>
+        
+        <div id="queueContainer">
+            
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="/main/static/main/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script type='module'>
+        import { updatePage } from '/main/static/main/js/SPAContentLoader.js'
+        
+        updatePage();
+        {% if user.is_authenticated %}
+            {% if user.session_id is not None %}
+                import { loadGame } from '/main/static/main/js/SPAContentLoader.js'
+                loadGame({{ user.session_id }})
+            {% endif %}
+            {% if user.tournament_id is not None %}
+                console.log("Tournament ID: {{ user.tournament_id }}")
+                import { tournamentWebSocketConnection} from "/tournaments/static/tournaments/js/tournaments.js";
+                tournamentWebSocketConnection({{ user.tournament_id }});
+            {% endif %}
+        {% endif %}
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<link rel="stylesheet" type="text/css" href="/tournaments/static/tournaments/css/tournament_participants.css">
+
+<table class="participant-list">
+            <thead>
+                <tr>
+                    <th>Jugadores registrados</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participant in tournament.participants.all %}
+                    <tr>
+                        <td>
+                            <img src="/main/static/main/img/default_avatar.jpg" alt="Avatar del participante" class="participant-list-avatar">
+                            <span class="participant-list-username">{{ participant.user.username }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+</table>
+
+<button class="btn btn-sm btn-primary w-100 leaveTournamentButton" data-tournament-id="{{ tournament.id }}">Abandonar el torneo</button>

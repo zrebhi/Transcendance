@@ -1,9 +1,7 @@
-import { updateNavbar, updatePage } from "/main/static/main/js/SPAContentLoader.js";
+import { updateNavbar, updatePage, getLanguage } from "/main/static/main/js/SPAContentLoader.js";
 import {showUI, loadView} from "/main/static/main/js/SPAContentLoader.js";
 import { drawCanvas } from "./draw.js";
 import { draw3dCanvas, endGame } from "./threejs.js";
-
-let render3d = false; // changer cette valeur depuis les settings, pas ingame;
 
 // Initializes the default state of the game.
 function initGameData() {
@@ -29,6 +27,8 @@ function initGameData() {
 
 export let gameData = initGameData();
 
+let render3d = false; // changer cette valeur depuis les settings, pas ingame;
+
 // Main entry point for starting or resuming a game session.
 export async function getGame(sessionId) {
     if (!window.gameSocket) {
@@ -37,6 +37,32 @@ export async function getGame(sessionId) {
     } else {
         render3d ? draw3dCanvas() : drawCanvas();
     }
+}
+
+export function changeRender() {
+    render3d = !render3d;
+    let language = getLanguage();
+    let message = "";
+
+    if (render3d) {
+        if (language === 'en') {
+            message = "You changed the render to 3D";
+        } else if (language === 'fr') {
+            message = "Vous avez changé le rendu en 3D";
+        } else if (language === 'es') {
+            message = "Ha cambiado el renderizado a 3D";
+        }
+    } else {
+        if (language === 'en') {
+            message = "You changed the render to 2D";
+        } else if (language === 'fr') {
+            message = "Vous avez changé le rendu en 2D";
+        } else if (language === 'es') {
+            message = "Ha cambiado el renderizado a 2D";
+        }
+    }
+
+    window.alert(message);
 }
 
 // Initializes a new game session.

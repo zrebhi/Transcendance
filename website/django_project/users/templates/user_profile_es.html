@@ -1,0 +1,33 @@
+{% load static %}
+
+<link href="{% static 'users/css/user_profile.css' %}" rel="stylesheet">
+
+<div class="player-profile-container">
+    <div class="profile-header text-center">
+        <img src="{% static 'users/img/user_avatar.jpg' %}" alt="Avatar del jugador" class="avatar img-thumbnail mb-3">
+        <h2>Nombre del jugador</h2>
+        <p class="record">50V - 50D (50% de victorias)</p>
+    </div>
+
+    <div class="match-history mt-5">
+        <h3 class="text-center mb-4">Historial de partidos</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Oponente</th>
+                    <th scope="col">Resultado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Repetir esta fila para cada partido -->
+                <tr>
+                    <td>2024-01-08</td>
+                    <td>Nombre del oponente</td>
+                    <td>Ganado/Perdido</td>
+                </tr>
+                <!-- Fin de la fila de partido -->
+            </tbody>
+        </table>
+    </div>
+</div>

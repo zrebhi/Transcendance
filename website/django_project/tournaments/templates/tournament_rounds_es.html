@@ -1,0 +1,79 @@
+<link rel="stylesheet" type="text/css" href="/tournaments/static/tournaments/css/tournament_rounds.css">
+
+<div class="rounds">
+    {% for round in tournament.rounds.all %}
+        <div class="round">
+            <div class="round-title">
+                <h2>Ronda {{ round.number }}</h2>       
+                <h3>{{ round.status }}</h3>
+                {% if round.status == "scheduled" %}
+                    <h3 class="round-timer" data-start-time="{{ round.start_time|date:'c' }}"></h3>
+                    <script type="module">
+                        console.log("script running");
+                        import { roundTimers } from "/tournaments/static/tournaments/js/tournaments";
+                        roundTimers();
+                    </script>
+                {% endif %}
+            </div>
+            {% for match in round.matches.all %}
+                <div class="match">
+                    <div class="player left">
+                        {% if match.participants.first.player %}
+                            <img src="{{ match.participants.first.player.avatar_url|default:'/main/static/main/img/default_avatar.jpg' }}" alt="Avatar de {{ match.participants.first.player.username }}" class="player-avatar" />
+                            <span class="player-username">{{ match.participants.first.player.username }}</span>
+                        {% else %}
+                            <span class="player-username">Por determinar</span>
+                        {% endif %}
+                    </div>
+                    {% if match.status == "in progress" %}
+                        <div class="score">
+                            <span class="score-number">0</span>
+                            <span class="score-separator">:</span>
+                            <span class="score-number">0</span>
+                        </div>
+                    {% elif match.status == "scheduled" %}
+                        <div class="ready-state">
+                            <div class="ready-state-players">
+                                <span class="ready-state-player">
+                                    {% if match.participants.first.is_ready %}
+                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/ready.png" alt="Listo" />
+                                    {% else %}
+                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/not_ready.png" alt="No listo" />
+                                    {% endif %}
+                                </span>
+                                <span class="ready-state-player">
+                                    {% if match.participants.last.is_ready %}
+                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/ready.png" alt="Listo" />
+                                    {% else %}
+                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/not_ready.png" alt="No listo" />
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if participant and participant.match_id == match.id %}
+                                {% if not participant.is_ready %}
+                                    <button id="tournamentUserReadyButton" class="ready-state-button ready btn btn-primary w-100" data-match-id="{{ match.id }}">Listo</button>
+                                {% else %}
+                                    <button id="tournamentUserNotReadyButton" class="ready-state-button not-ready btn btn-danger w-100" data-match-id="{{ match.id }}">No listo</button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% elif match.status == "completed" %}
+                        <div class="score">
+                            <p>Partido ganado por {{ match.winner }}</p>
+                        </div>
+                    {% endif %}
+                    <div class="player right">
+                        {% if match.participants.last.player %}
+                            <img src="{{ match.participants.last.player.avatar_url|default:'/main/static/main/img/default_avatar.jpg' }}" alt="Avatar de {{ match.participants.last.player.username }}" class="player-avatar" />
+                            <span class="player-username">{{ match.participants.last.player.username }}</span>
+                        {% else %}
+                            <span class="player-username">Por determinar</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <p>No hay partidos programados para esta ronda todavía.</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>

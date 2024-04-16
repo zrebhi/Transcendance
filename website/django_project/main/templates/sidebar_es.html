@@ -1,0 +1,34 @@
+{% load static %}
+
+{% if user.is_authenticated %}
+    <link href="/main/static/main/css/sidebar.css" rel="stylesheet">
+    <!-- Barra lateral -->
+    <aside class="sidebar">
+        <!-- Sección de Información del Usuario -->
+        <div class="user-info text-center">
+            <img src="/main/static/main/img/default_avatar2.jpg" alt="Avatar del usuario" class="avatar rounded-circle">
+            <h3 class="user-name">{{ user.username }}</h3>
+        </div>
+    
+        <!-- Botones de Navegación -->
+        <div class="nav-buttons my-4">
+            <button id="profileButton" class="btn btn-primary w-100 mb-2">Página de perfil</button>
+            <a href="#accountSettings" class="btn btn-secondary w-100">Ajustes de la cuenta</a>
+        </div>
+    
+        <!-- Sección de Lista de Amigos -->
+        <div class="friend-list">
+            <h4 class="text-center my-3">Amigos</h4>
+            <ul class="list-group">
+                <!-- Lista de amigos -->
+                <li class="list-group-item">Amigo 1</li>
+                <li class="list-group-item">Amigo 2</li>
+                <li class="list-group-item">Amigo 3</li>
+                <!-- Más amigos... -->
+            </ul>
+    
+            <!-- Botón para Agregar un Nuevo Amigo -->
+            <button class="btn btn-success w-100 mt-3">Agregar un nuevo amigo</button>
+        </div>
+    </aside>
+{% endif %}

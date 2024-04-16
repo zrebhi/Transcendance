@@ -1,11 +1,11 @@
-from .forms import CustomUserCreationForm, CustomLoginForm
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from django.shortcuts import render
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-
+from .forms import CustomUserCreationForm, CustomLoginForm
+from main.utils import render_template
 
 def register_view(request):
     """
@@ -24,7 +24,7 @@ def register_view(request):
     else:
         form = CustomUserCreationForm()
 
-    return render(request, 'register.html', {'form': form})
+    return render_template(request, 'register.html', {'form': form})
 
 
 def login_view(request):
@@ -47,9 +47,9 @@ def login_view(request):
     else:
         form = CustomLoginForm()
 
-    return render(request, 'login.html', {'form': form})
+    return render_template(request, 'login.html', {'form': form})
 
-
+@login_required
 def logout_view(request):
     """
     Handle the user logout process. This includes logging out the user and
@@ -68,11 +68,11 @@ def logout_view(request):
     logout(request)
     return JsonResponse({'success': True, 'next_url': '/home/'})
 
-
+@login_required
 def user_profile_view(request):
-    return render(request, 'user_profile.html')
+    return render_template(request, 'user_profile.html')
 
-
+@login_required
 def get_user_session(request):
     return JsonResponse({'session_id': request.user.session_id})
 

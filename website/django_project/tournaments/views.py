@@ -1,20 +1,20 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from pong_app.consumers import broadcast_message
+from main.utils import render_template
 from .models import Tournament, TournamentParticipant, TournamentMatch
 from .forms import TournamentCreationForm
 from .tournaments import add_participant_to_tournament, start_tournament, run_async_task_in_thread
 
-
+@login_required
 def tournament_list(request):
     tournaments = Tournament.objects.all()
-    return render(request, 'tournaments_list.html', {'tournaments': tournaments})
+    return render_template(request, 'tournaments_list.html', {'tournaments': tournaments})
 
-
+@login_required
 def tournament_view(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     user = request.user
@@ -34,7 +34,7 @@ def tournament_view(request, tournament_id):
         'participant': participant,
     }
 
-    return render(request, 'tournament.html', context)
+    return render_template(request, 'tournament.html', context)
 
 
 @login_required
@@ -62,7 +62,7 @@ def create_tournament(request):
         # For a GET request, just display the blank form
         form = TournamentCreationForm(creator=request.user)
 
-    return render(request, 'create_tournament.html', {'form': form})
+    return render_template(request, 'create_tournament.html', {'form': form})
 
 
 @login_required

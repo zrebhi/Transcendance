@@ -1,0 +1,53 @@
+{% load static %}
+
+<link rel="stylesheet" href="/main/static/main/css/navbar.css">
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Basculer la navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <button id="homeButton" class="nav-link btn btn-link active" type="button">Accueil</button>
+                </li>
+                {% if user.is_superuser %}
+                    <li class="nav-item">
+                       <a id="adminButton" class="nav-link btn btn-link" href="https://localhost:8443/admin/" target="_blank" rel="noopener noreferrer">Admin</a>
+                    </li>
+                {% endif %}
+                {% if not user.is_authenticated %}
+                    <li class="nav-item">
+                        <button id="loginButton" class="nav-link btn btn-link" type="button">Connexion</button>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                    {% if user.tournament_id is None %}
+                        <button id="tournamentsListButton" class="nav-link btn btn-link" type="button">Tournois</button>
+                    {% else %}
+                        <button id="tournamentButton" class="nav-link btn btn-link" type="button" data-tournament-id="{{ user.tournament_id }}">
+                            Tournoi</button>
+                    {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <button id="logoutButton" class="nav-link btn btn-link" type="button">Déconnexion</button>
+                    </li>
+                    <div class="ccc">
+                        <button id="setLanguageButton" class="btn btn-primary" lan="fr">
+                          🇫🇷
+                        </button>
+                        <button id="setLanguageButton" class="btn btn-secondary" lan="en">
+                          🇬🇧
+                        </button>
+                        <button id="setLanguageButton" class="btn btn-secondary" lan="es">
+                          🇪🇸
+                        </button>
+                      </div>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script type="module" src="/main/static/main/js/navbar.js"></script>
