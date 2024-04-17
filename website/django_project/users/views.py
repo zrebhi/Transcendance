@@ -12,6 +12,9 @@ def register_view(request):
     Handle user registration. If the request is POST, process the form data
     to register a new user. If the request is GET, display the registration form.
     """
+    if request.user.is_authenticated:
+        return render_template(request, 'home_template.html')
+    
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -19,7 +22,7 @@ def register_view(request):
             login(request, user)
             return JsonResponse({'success': True, 'next_url': '/home/'})
         else:
-            form_html = render_to_string('register.html', {'form': form}, request=request)
+            form_html = render_to_string('register_en.html', {'form': form}, request=request)
             return JsonResponse({'success': False, 'form_html': form_html})
     else:
         form = CustomUserCreationForm()
@@ -32,6 +35,9 @@ def login_view(request):
     Handle user login. On POST, validate the form and authenticate the user.
     If valid, log in the user and redirect. For GET requests, show the login form.
     """
+    if request.user.is_authenticated:
+        return render_template(request, 'home_template.html')
+
     if request.method == 'POST':
         form = CustomLoginForm(data=request.POST)
         if form.is_valid():
@@ -42,7 +48,7 @@ def login_view(request):
                 return JsonResponse({'success': True, 'next_url': '/home/'})
             else:
                 form.add_error(None, 'Invalid username or password')
-        form_html = render_to_string('login.html', {'form': form}, request=request)
+        form_html = render_to_string('login_en.html', {'form': form}, request=request)
         return JsonResponse({'success': False, 'form_html': form_html})
     else:
         form = CustomLoginForm()
@@ -75,7 +81,3 @@ def user_profile_view(request):
 @login_required
 def get_user_session(request):
     return JsonResponse({'session_id': request.user.session_id})
-
-
-
-
