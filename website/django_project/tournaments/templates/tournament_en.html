@@ -1,0 +1,23 @@
+<style>
+    #tournament {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin: 20px auto;
+        padding: 10px;
+        overflow: auto;
+    }
+</style>
+
+<div id="tournament">
+
+    <h1>{{ tournament.name }}</h1>
+    <h3>{{ tournament.status }}</h3>
+    {% if tournament.status == 'open' %}
+        <h5>Awaiting More Players ({{ tournament.participants.count }}/{{ tournament.size }})</h5>
+        {% include 'tournament_participants_en.html' %}
+    {% else %}
+        {% include 'tournament_rounds_en.html' %}
+    {% endif %}
+</div>

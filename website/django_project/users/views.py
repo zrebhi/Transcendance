@@ -2,9 +2,9 @@ from .forms import CustomUserCreationForm, CustomLoginForm
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from django.shortcuts import render
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from pong_project.utils import render_template
 
 
 def register_view(request):
@@ -24,7 +24,7 @@ def register_view(request):
     else:
         form = CustomUserCreationForm()
 
-    return render(request, 'register.html', {'form': form})
+    return render_template(request, 'register.html', {'form': form})
 
 
 def login_view(request):
@@ -47,7 +47,7 @@ def login_view(request):
     else:
         form = CustomLoginForm()
 
-    return render(request, 'login.html', {'form': form})
+    return render_template(request, 'login.html', {'form': form})
 
 
 def logout_view(request):
@@ -70,7 +70,7 @@ def logout_view(request):
 
 
 def user_profile_view(request):
-    return render(request, 'user_profile.html')
+    return render_template(request, 'user_profile.html')
 
 
 def get_user_session(request):

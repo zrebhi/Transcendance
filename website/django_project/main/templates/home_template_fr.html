@@ -15,14 +15,19 @@
     {% csrf_token %}
     <div class="items">
         <div{% if user.is_authenticated %} id="joinQueueButton"{% else %} id="loginButton"{% endif %} class="item card" style="background-image: url({% static 'main/img/online_play.png' %});">
-            <p class="card-title">Play Online</p>
-            <p class="card-text">Play against foes from all around the world!</p>
-            {% if not user.is_authenticated %}<p class="card-text">(Requires to be logged in)</p>{% endif %}
+            <p class="card-title">Jouer en ligne</p>
+            <p class="card-text">Affrontez des adversaires du monde entier !</p>
+            {% if not user.is_authenticated %}<p class="card-text">(Nécessite d'être connecté)</p>{% endif %}
         </div>
         <div{% if user.is_authenticated %} id="localPlayButton"{% else %} id="loginButton"{% endif %} class="item card" style="background-image: url({% static 'main/img/online_play.png' %});">
-            <p class="card-title">Local Game</p>
-            <p class="card-text">Play against your friends on the same machine!</p>
-            {% if not user.is_authenticated %}<p class="card-text">(Requires to be logged in)</p>{% endif %}
+            <p class="card-title">Partie locale</p>
+            <p class="card-text">Jouez contre vos amis sur la même machine !</p>
+            {% if not user.is_authenticated %}<p class="card-text">(Nécessite d'être connecté)</p>{% endif %}
         </div>
-    </div>
+        {% if user.is_authenticated %}
+        <div>
+            <button id="changeRenderButton">Changer le rendu</button>
+        </div>
+    {% endif %}
+    </div>    
 </div>

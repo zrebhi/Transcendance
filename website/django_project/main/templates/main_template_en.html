@@ -34,16 +34,16 @@
 <body>
 
     <div id="sidebarContainer">
-        {% include 'sidebar.html' %}
+        {% include 'sidebar_en.html' %}
     </div>
     
     <div id="mainContentWrapper">
         <div id="navbarContainer">
-            {% include 'navbar.html' %}
+            {% include 'navbar_en.html' %}
         </div>
         
         <div id="pageContainer">
-            {% include 'home_template.html' %}
+            {% include 'home_template_en.html' %}
         </div>
         
         <div id="queueContainer">
@@ -56,7 +56,10 @@
     <script type='module'>
         import { setupNavbar } from "/main/static/main/js/navbar.js";
         import { eventHandlers } from "/main/static/main/js/eventHandlers.js";
+        import { updatePage } from '/main/static/main/js/SPAContentLoader.js';
 
+        // todo envoyer param du localstorage ici au lieux de update
+        updatePage();
         setupNavbar();
         eventHandlers();
         {% if user.is_authenticated %}
