@@ -55,7 +55,7 @@ def create_tournament(request):
             return JsonResponse({'success': True, 'next_url': f'/tournaments/{tournament.id}'})
 
         # If the form is not valid, render it again with errors
-        form_html = render_to_string('create_tournament.html', {'form': form}, request=request)
+        form_html = render_to_string('create_tournament_en.html', {'form': form}, request=request)
         return JsonResponse({'success': False, 'form_html': form_html})
 
     else:
@@ -98,6 +98,7 @@ def leave_tournament(request, tournament_id):
         run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}",
                                  {'type': 'tournament_message',
                                   'message': f"{request.user.username} has left the tournament."})
+        run_async_task_in_thread(broadcast_message, f"user_{request.user.username}", { 'type': 'leave_message' })
         if not TournamentParticipant.objects.filter(tournament=tournament).exists():
             tournament.delete()
         return JsonResponse({'success': True, 'message': 'Successfully left the tournament'})

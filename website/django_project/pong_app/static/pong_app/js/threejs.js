@@ -1,16 +1,13 @@
 import { gameData } from './pong.js';
+import { getPauseMessage } from './draw.js';
 
-let scene, camera, ball, ballLight, paddle1, paddle2, ambientLight, ballTrail, bubbleTrail;
+let scene, camera, ball, ballLight, paddle1, paddle2;
 let textMeshes = {};
 let fontLoaded = false;
 const fontLoader = new THREE.FontLoader();
 let font;
-const bubbles = [];
-const bubbleCount = 40;
-let lastBubbleSpawnTime = Date.now();
-const bubbleSpawnInterval = 100; // Spawn a bubble every 100ms
 
-fontLoader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', function (loadedFont) {
+fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (loadedFont) {
     font = loadedFont;
     fontLoaded = true;
 });
@@ -29,15 +26,14 @@ export function setupCanvas() {
             camera.position.set(600, 450, 570);
             camera.scale.y = -1;
         
-            gameData.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            gameData.renderer = new THREE.WebGLRenderer({ canvas });
             gameData.renderer.setSize(gameData.canvasContainerWidth, gameData.canvasContainerHeight);
-            gameData.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
             addElementsToScene();
-            createBubbleTrail();
         }
     }
 }
+
 
 function addElementsToScene() {
     addPaddles();
@@ -46,40 +42,9 @@ function addElementsToScene() {
     addTextMeshes();
 }
 
-function createBubbleTrail() {
-    const bubbleGeometry = new THREE.SphereGeometry(6, 30, 30);
-    const bubbleMaterial = new THREE.MeshBasicMaterial({ color: 0xadd8e6, transparent: true, opacity: 0.7 });
-
-    for (let i = 0; i < bubbleCount; i++) {
-        const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial);
-        bubble.visible = false; // Bubbles are initially invisible
-        scene.add(bubble);
-        bubbles.push(bubble);
-    }
-}
-
-function updateBubbleTrail() {
-    if (Date.now() - lastBubbleSpawnTime > bubbleSpawnInterval) {
-        lastBubbleSpawnTime = Date.now();
-        const bubble = bubbles.shift(); // Remove the oldest bubble
-        bubble.position.set(ball.position.x, ball.position.y, ball.position.z);
-        bubble.visible = true;
-        bubbles.push(bubble); // Add it back to the end of the array
-    }
-
-    bubbles.forEach(bubble => {
-        bubble.position.y -= 1; // Move bubbles upwards to create trail effect
-        bubble.material.opacity *= 0.98; // Slow fade out effect
-        if (bubble.material.opacity < 0.1) {
-            bubble.visible = false;
-            bubble.material.opacity = 0.7; // Reset opacity for reuse
-        }
-    });
-}
-
 function addPaddles() {
     const paddleGeometry = new THREE.BoxGeometry(20, 90, 10);
-    const paddleMaterial = new THREE.MeshLambertMaterial({color: 0x1E90FF}); // Blue paddles for aquatic theme
+    const paddleMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
     paddle1 = new THREE.Mesh(paddleGeometry, paddleMaterial);
     paddle2 = new THREE.Mesh(paddleGeometry, paddleMaterial);
     
@@ -89,18 +54,18 @@ function addPaddles() {
 }
 
 function addBall() {
-    const ballGeometry = new THREE.SphereGeometry(9, 16, 16);
-    const ballMaterial = new THREE.MeshPhongMaterial({color: 0x00FFFF, emissive: 0x00FFFF}); // Cyan ball for aquatic look
+    const ballGeometry = new THREE.SphereGeometry(9, 32, 32);
+    const ballMaterial = new THREE.MeshPhongMaterial({color: 0x800080, emissive: 0x800080, transparent: true, opacity: 1});
     ball = new THREE.Mesh(ballGeometry, ballMaterial);
     scene.add(ball);
 
-    ballLight = new THREE.PointLight(0x00FFFF, 30, 10000); // Cyan light to match the ball
+    ballLight = new THREE.PointLight(0x800080, 30, 10000);
     ballLight.position.set(gameData.ball.xpos, gameData.ball.ypos, -10);
     scene.add(ballLight);
 }
 
 function addLights() {
-    ambientLight = new THREE.AmbientLight(0xadd8e6, 1); // Soft blue light for underwater effect
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 }
 
@@ -118,7 +83,7 @@ function updateText(id, string, x, y) {
         return;
     }
 
-    if (!string) return;
+    if (!string) return ;
 
     const existingTextMesh = textMeshes[id]?.mesh;
 
@@ -126,11 +91,14 @@ function updateText(id, string, x, y) {
         font: font,
         size: 30,
         height: 2,
-        curveSegments: 6,
-        bevelEnabled: false,
+        curveSegments: 12,
+        bevelThickness: 10,
+        bevelSize: 8,
+        bevelOffset: 0,
+        bevelSegments: 5,
     });
     textGeometry.scale(1, -1, 1);
-    const textMaterial = new THREE.MeshPhongMaterial({ color: 0x1E90FF }); // Blue for aquatic theme
+    const textMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0xffffff });
     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
     textMesh.position.set(x, y, 0);
     scene.add(textMesh);
@@ -152,11 +120,10 @@ export function draw3dCanvas() {
 
         if (!gameData.winner && !gameData.forfeitMessage) {
             updateGameElementsPosition();
-            updateBubbleTrail();
             gameData.renderer?.render(scene, camera);
         } else if (gameData.forfeitMessage || gameData.winner) {
             handleGameEnd();
-            return;
+            return ;
         } else {
             gameData.renderer?.render(scene, camera);
         }
@@ -173,11 +140,11 @@ function updateGameElementsPosition() {
 
 function handleGameEnd() {
     if (gameData.forfeitMessage) {
-        updateText('forfeitMessage', gameData.forfeitMessage, 450, 500);
+        updateText('forfeitMessage', gameData.forfeitMessage, 500, 500);
     } else if (gameData.winner) {
-        updateText('winner', `Winner: ${gameData.winner}`, 450, 500);
-    gameData.renderer?.render(scene, camera);
+        updateText('winner', `Winner: ${gameData.winner}`, 500, 500);
     }
+    gameData.renderer?.render(scene, camera);
 
     endGame();
 }
@@ -185,9 +152,11 @@ function handleGameEnd() {
 export function endGame() {
     cancelAnimationFrame(gameData.animationid);
     
+    // Supprimer les éléments de la scène
     if (scene && ball && paddle1 && paddle2 && ballLight)
         scene.remove(ball, paddle1, paddle2, ballLight);
     
+    // Supprimer les éléments de texte de la scène
     for (const key in textMeshes) {
         if (textMeshes.hasOwnProperty(key)) {
             const textMesh = textMeshes[key].mesh;
@@ -196,9 +165,11 @@ export function endGame() {
         }
     }
     
+    // Réinitialiser les variables à null
     scene = camera = ball = ballLight = paddle1 = paddle2 = gameData.animationid = null;
 
     if (gameData.renderer) {
         gameData.renderer.dispose();
+        // renderer.forceContextLoss()
     }
 }

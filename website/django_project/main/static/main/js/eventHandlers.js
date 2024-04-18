@@ -87,11 +87,11 @@ export function eventHandlers() {
 }
 
 // Generic click handler that maps buttons to their actions
-function handleClick(event) {
+async function handleClick(event) {
     const action = buttonActions[event.target.id];
     if (action) {
         event.preventDefault();
-        action(event);
+        await action(event);
     }
 }
 

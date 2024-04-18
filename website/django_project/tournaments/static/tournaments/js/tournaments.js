@@ -32,17 +32,11 @@ export function leaveTournament(event, tournamentId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            // Disconnect from the tournament WebSocket
-            if (window.tournamentWebSocket) {
-                window.tournamentWebSocket.close();
-            }
-            // Update UI: Show success message, update navbar, or redirect to another view
-        } else {
+        if (!data.success)
             console.error('Leave tournament failed:', data.message);
             alert(data.message);
         }
-    })
+    )
     .then(() => updateNavbar())
     .then(() => loadView('/home'))
     .catch(error => console.error('Error:', error));
