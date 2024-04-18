@@ -24,10 +24,8 @@
             <p class="card-text">Play against your friends on the same machine!</p>
             {% if not user.is_authenticated %}<p class="card-text">(Requires to be logged in)</p>{% endif %}
         </div>
-        {% if user.is_authenticated %}
-            <div>
-                <button id="changeRenderButton">Change render</button>
-            </div>
-        {% endif %}
+            {% if user.is_authenticated %}
+                <button  id="changeRenderButton" class="render-button btn btn-primary mt-3">Change render</button>
+            {% endif %}
     </div>
 </div>

@@ -3,14 +3,14 @@
 <table class="participant-list">
             <thead>
                 <tr>
-                    <th>Joueurs inscrits</th>
+                    <th>Jugadores registrados</th>
                 </tr>
             </thead>
             <tbody>
                 {% for participant in tournament.participants.all %}
                     <tr>
                         <td>
-                            <img src="/main/static/main/img/default_avatar.jpg" alt="Avatar du participant" class="participant-list-avatar">
+                            <img src="/main/static/main/img/default_avatar.jpg" alt="Avatar del participante" class="participant-list-avatar">
                             <span class="participant-list-username">{{ participant.user.username }}</span>
                         </td>
                     </tr>
@@ -18,4 +18,4 @@
             </tbody>
 </table>
 
-<button class="btn btn-sm btn-primary w-100 leaveTournamentButton" data-tournament-id="{{ tournament.id }}">Quitter le tournoi</button>
+<button class="btn btn-sm btn-primary w-100 leaveTournamentButton" data-tournament-id="{{ tournament.id }}">Abandonar el torneo</button>

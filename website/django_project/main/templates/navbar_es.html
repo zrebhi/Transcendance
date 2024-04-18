@@ -4,13 +4,13 @@
 
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <button id="homeButton" class="nav-link btn btn-link active" type="button">Home</button>
+                    <button id="homeButton" class="nav-link btn btn-link active" type="button">Inicio</button>
                 </li>
                 {% if user.is_superuser %}
                     <li class="nav-item">
@@ -19,28 +19,28 @@
                 {% endif %}
                 {% if not user.is_authenticated %}
                     <li class="nav-item">
-                        <button id="loginButton" class="nav-link btn btn-link" type="button">Login</button>
+                        <button id="loginButton" class="nav-link btn btn-link" type="button">Iniciar sesión</button>
                     </li>
                 {% else %}
                     <li class="nav-item">
                     {% if user.tournament_id is None %}
-                        <button id="tournamentsListButton" class="nav-link btn btn-link" type="button">Tournaments</button>
+                        <button id="tournamentsListButton" class="nav-link btn btn-link" type="button">Torneos</button>
                     {% else %}
                         <button id="tournamentButton" class="nav-link btn btn-link" type="button" data-tournament-id="{{ user.tournament_id }}">
-                            Tournament</button>
+                            Torneo</button>
                     {% endif %}
                     </li>
                     <li class="nav-item">
-                        <button id="logoutButton" class="nav-link btn btn-link" type="button">Logout</button>
+                        <button id="logoutButton" class="nav-link btn btn-link" type="button">Cerrar sesión</button>
                     </li>
                     <div class="ccc">
                         <button id="setLanguageButton" class="btn btn-secondary" lan="fr">
                           🇫🇷
                         </button>
-                        <button id="setLanguageButton" class="btn btn-primary" lan="en">
+                        <button id="setLanguageButton" class="btn btn-secondary" lan="en">
                           🇬🇧
                         </button>
-                        <button id="setLanguageButton" class="btn btn-secondary" lan="es">
+                        <button id="setLanguageButton" class="btn btn-primary" lan="es">
                           🇪🇸
                         </button>
                       </div>
@@ -51,4 +51,3 @@
 </nav>
 
 <script type="module" src="/main/static/main/js/navbar.js"></script>
-

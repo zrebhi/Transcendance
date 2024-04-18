@@ -1,10 +1,12 @@
 from django.http import JsonResponse
 from .models import QueueEntry, GameSession
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 from pong_app.consumers import create_game_instance
 
 
 @require_http_methods(["POST"])
+@login_required
 def join_queue(request):
     if not request.user.is_authenticated:
         return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=401)
@@ -19,7 +21,7 @@ def join_queue(request):
 
     return JsonResponse({'status': 'success', 'message': 'Successfully joined the queue'})
 
-
+@login_required
 def local_game(request):
     if not request.user.is_authenticated:
         return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=400)

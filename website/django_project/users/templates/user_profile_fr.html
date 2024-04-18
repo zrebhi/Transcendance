@@ -2,16 +2,16 @@
 
 <link href="{% static 'users/css/user_profile.css' %}" rel="stylesheet">
 
-<div class="container-profil-joueur">
-    <div class="en-tete-profil text-center">
+<div class="player-profile-container">
+    <div class="profile-header text-center">
         <img src="{% static 'users/img/user_avatar.jpg' %}" alt="Avatar du joueur" class="avatar img-thumbnail mb-3">
-        <h2>Nom du Joueur</h2>
-        <p class="record">50V - 50D (Taux de Victoire 50%)</p>
+        <h2>Nom du joueur</h2>
+        <p class="record">50V - 50D (Taux de victoire de 50%)</p>
     </div>
 
-    <div class="historique-match mt-5">
-        <h3 class="text-center mb-4">Historique des Matchs</h3>
-        <table class="tableau">
+    <div class="match-history mt-5">
+        <h3 class="text-center mb-4">Historique des matchs</h3>
+        <table class="table">
             <thead>
                 <tr>
                     <th scope="col">Date</th>
@@ -23,7 +23,7 @@
                 <!-- Répéter cette ligne pour chaque match -->
                 <tr>
                     <td>2024-01-08</td>
-                    <td>Nom de l'Adversaire</td>
+                    <td>Nom de l'adversaire</td>
                     <td>Victoire/Défaite</td>
                 </tr>
                 <!-- Fin de la ligne de match -->

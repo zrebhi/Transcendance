@@ -3,6 +3,8 @@ import { eventHandlers } from './eventHandlers.js';
 import { getGame } from '/pong_app/static/pong_app/js/pong.js';
 import { clearCanvas } from '/pong_app/static/pong_app/js/draw.js';
 import { tournamentWebSocketConnection } from "/tournaments/static/tournaments/js/tournaments.js";
+import { queueSocket } from '/matchmaking/static/matchmaking/js/matchmaking.js';
+import { showQueueUI } from './queue.js';
 
 
 export function adjustPageContainerHeight() {
@@ -14,6 +16,10 @@ export async function loadView(viewPath, updateHistory = true) {
 
     if (viewPath === '/')
         viewPath = '/home';
+
+    const language = getLanguage();
+    if (!viewPath.includes('?language='))
+        viewPath = `${viewPath}?language=${language}`;
 
     const baseUrl = window.location.origin;
     const fullUrl = new URL(viewPath, baseUrl).href;
@@ -95,7 +101,7 @@ export function clearPage() {
 }
 
 export function updateNavbar() {
-    fetch('/navbar/', {
+    fetch(`/navbar?language=${getLanguage()}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
         }
@@ -112,7 +118,7 @@ export function updateNavbar() {
 }
 
 export function updateSidebar() {
-    fetch('/sidebar/', {
+    fetch(`/sidebar?language=${getLanguage()}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
         }
@@ -124,7 +130,7 @@ export function updateSidebar() {
 
 export function updatePage(viewURL = null) {
     console.log('Updating page');
-    fetch('/')
+    fetch(`/?language=${getLanguage()}`)
         .then(response => response.text())
         .then(pageHtml => document.body.innerHTML = pageHtml)
         .then(() => loadScripts([
@@ -141,16 +147,17 @@ export function updatePage(viewURL = null) {
             const sessionID = await getSessionId();
             console.log('Session ID:', sessionID);
             if (sessionID) await loadGame(sessionID).catch(error => console.error('Error:', error));
-            else if (viewURL) await loadView(viewURL).catch(error => console.error('Error:', error));
 
             tournamentWebSocketConnection(getTournamentId());
+            if (queueSocket)
+                showQueueUI();
         })
         .catch(error => console.error('Error:', error));
 }
 
 async function fetchSessionId() {
     // Fetch the main page HTML
-    return fetch('/')
+    return fetch(`/?language=${getLanguage()}`)
         .then(response => response.text())
         .then(pageHtml => {
             // Parse the fetched HTML to find the session ID meta tag
@@ -175,8 +182,6 @@ export async function getSessionId() {
     return sessionId;
 }
 
-
-
 export function getTournamentId() {
     const tournamentIdMeta = document.querySelector('meta[name="user-tournament-id"]');
 
@@ -188,4 +193,18 @@ export function getTournamentId() {
 
 export function getCsrfToken() {
     return document.cookie.split(';').find(cookie => cookie.trim().startsWith("csrftoken="))?.split('=')[1] ?? null;
+}
+
+export function getLanguage() {
+    return  localStorage.getItem("lang") || "en";
+}
+
+export function setLanguage(event) {
+    event.preventDefault();
+    const value = event.target.getAttribute("lan");
+    console.log(value);
+    if ((value !== "es" && value !== "fr") || !value)
+        localStorage.setItem("lang", "en");
+    else localStorage.setItem("lang", value);
+    updatePage();
 }

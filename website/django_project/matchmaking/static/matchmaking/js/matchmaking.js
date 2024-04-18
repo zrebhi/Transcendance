@@ -1,7 +1,7 @@
 import {getCsrfToken, loadGame } from "/main/static/main/js/SPAContentLoader.js";
 import {showQueueUI, hideQueueUI} from "/main/static/main/js/queue.js";
 
-let queueSocket = null;
+export let queueSocket = null;
 
 function connectToQueueWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
@@ -27,6 +27,7 @@ function connectToQueueWebSocket() {
 
     queueSocket.onclose = (event) => {
         console.log("Queue WebSocket connection closed:", event);
+        queueSocket = null;
     };
 
     queueSocket.onerror = (event) => {

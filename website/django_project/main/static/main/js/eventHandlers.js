@@ -4,10 +4,11 @@ import {
     adjustPageContainerHeight,
     updatePage,
     getSessionId,
-    showUI, loadGame
+    showUI, loadGame,
+    getLanguage, setLanguage
 } from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/matchmaking/static/matchmaking/js/matchmaking.js';
-import { forfeitGame, quitGame} from "/pong_app/static/pong_app/js/pong.js";
+import { forfeitGame, quitGame, changeRender} from "/pong_app/static/pong_app/js/pong.js";
 import { joinTournament, leaveTournament, tournamentView, updateReadyState, observeRoundTimers } from "/tournaments/static/tournaments/js/tournaments.js";
 
 // Define actions for various buttons in the application
@@ -27,6 +28,8 @@ const buttonActions = {
     'cancelQueueButton': cancelQueue,
     'forfeitGameButton': forfeitGame,
     'quitGameButton': quitGame,
+    'setLanguageButton': setLanguage,
+    'changeRenderButton': changeRender
 };
 
 // Initialize event handlers
@@ -142,5 +145,4 @@ function handleLogoutButtonClick(event) {
     })
     .catch(error => console.error('Error:', error));
 }
-
 

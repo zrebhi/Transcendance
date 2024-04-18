@@ -1,14 +1,14 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-4">
-            <h2 class="text-center">Connexion</h2>
+            <h2 class="text-center">Iniciar sesión</h2>
             <form method="post" action="{% url 'login_view' %}">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="btn btn-primary btn-block w-100">Connexion</button>
+                <button type="submit" class="btn btn-primary btn-block w-100">Iniciar sesión</button>
             </form>
             <div class="text-center mt-3">
-                <p>Vous n'avez pas de compte ?<button id="registerButton" class="btn btn-link">Créez-en un !</button></p>
+                <p>¿No tienes una cuenta?<button id="registerButton" class="btn btn-link">¡Crea una!</button></p>
             </div>
         </div>
     </div>

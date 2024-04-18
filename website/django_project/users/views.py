@@ -1,17 +1,20 @@
-from .forms import CustomUserCreationForm, CustomLoginForm
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from pong_project.utils import render_template
-
+from .forms import CustomUserCreationForm, CustomLoginForm
+from main.utils import render_template
 
 def register_view(request):
     """
     Handle user registration. If the request is POST, process the form data
     to register a new user. If the request is GET, display the registration form.
     """
+    if request.user.is_authenticated:
+        return render_template(request, 'home_template.html')
+    
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -19,7 +22,7 @@ def register_view(request):
             login(request, user)
             return JsonResponse({'success': True, 'next_url': '/home/'})
         else:
-            form_html = render_to_string('register.html', {'form': form}, request=request)
+            form_html = render_to_string('register_en.html', {'form': form}, request=request)
             return JsonResponse({'success': False, 'form_html': form_html})
     else:
         form = CustomUserCreationForm()
@@ -32,6 +35,9 @@ def login_view(request):
     Handle user login. On POST, validate the form and authenticate the user.
     If valid, log in the user and redirect. For GET requests, show the login form.
     """
+    if request.user.is_authenticated:
+        return render_template(request, 'home_template.html')
+
     if request.method == 'POST':
         form = CustomLoginForm(data=request.POST)
         if form.is_valid():
@@ -42,14 +48,14 @@ def login_view(request):
                 return JsonResponse({'success': True, 'next_url': '/home/'})
             else:
                 form.add_error(None, 'Invalid username or password')
-        form_html = render_to_string('login.html', {'form': form}, request=request)
+        form_html = render_to_string('login_en.html', {'form': form}, request=request)
         return JsonResponse({'success': False, 'form_html': form_html})
     else:
         form = CustomLoginForm()
 
     return render_template(request, 'login.html', {'form': form})
 
-
+@login_required
 def logout_view(request):
     """
     Handle the user logout process. This includes logging out the user and
@@ -68,14 +74,10 @@ def logout_view(request):
     logout(request)
     return JsonResponse({'success': True, 'next_url': '/home/'})
 
-
+@login_required
 def user_profile_view(request):
     return render_template(request, 'user_profile.html')
 
-
+@login_required
 def get_user_session(request):
     return JsonResponse({'session_id': request.user.session_id})
-
-
-
-

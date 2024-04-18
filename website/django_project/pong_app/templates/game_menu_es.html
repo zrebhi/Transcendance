@@ -1,0 +1,43 @@
+<style>
+    #commands {
+        text-align: center;
+        font-family: "Rubik Doodle Shadow", system-ui;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;  /* Efecto subrayado */
+        width: 75%;
+    }
+    #commands h3 {
+        font-size: 1.75em; /* Un poco más grande */
+        color: #333; /* Color más oscuro para el texto */
+        border-bottom: 1px solid #ccc; /* Efecto subrayado */
+    }
+
+    #commands p {
+        font-size: 1.25em; /* Tamaño de fuente más grande para mejor visibilidad */
+        margin: 0; /* Margen consistente */
+        padding: 0; /* Relleno consistente */
+    }
+    
+</style>
+
+<div id="menuToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+<div id="menu">
+    <div id="commands">
+        <h3>Comandos</h3>
+        {% if game_session.mode == 'local' %}
+            <p>Jugador1: Z S</p>
+            <p>Jugador2: ↑↓</p>
+        {% else %}
+            <p>Mover: ↑↓</p>
+        {% endif %}
+    </div>
+    {% if game_session.mode == 'local' %}
+        <button id="quitGameButton" class="custom-btn btn-1 w-100">Salir</button>
+    {% else %}
+        <button id="forfeitGameButton" class="custom-btn btn-1 w-100">Rendirse</button>
+    {% endif %}
+</div>
