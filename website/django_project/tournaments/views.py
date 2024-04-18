@@ -9,10 +9,12 @@ from .models import Tournament, TournamentParticipant, TournamentMatch
 from .forms import TournamentCreationForm
 from .tournaments import add_participant_to_tournament, start_tournament, run_async_task_in_thread
 
+
 @login_required
 def tournament_list(request):
     tournaments = Tournament.objects.all()
     return render_template(request, 'tournaments_list.html', {'tournaments': tournaments})
+
 
 @login_required
 def tournament_view(request, tournament_id):
@@ -85,6 +87,7 @@ def join_tournament(request, tournament_id):
         return JsonResponse({'success': False,
                              'message': 'Could not join the tournament. You may already be registered.'}, status=401)
 
+
 @login_required
 @require_POST
 def leave_tournament(request, tournament_id):
@@ -95,10 +98,10 @@ def leave_tournament(request, tournament_id):
         request.user.tournament_id = None
         request.user.save()
         # Broadcast a message indicating the user has left the tournament
+        run_async_task_in_thread(broadcast_message, f"{request.user.username}", {'type': 'leave_message'})
         run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}",
                                  {'type': 'tournament_message',
                                   'message': f"{request.user.username} has left the tournament."})
-        run_async_task_in_thread(broadcast_message, f"user_{request.user.username}", { 'type': 'leave_message' })
         if not TournamentParticipant.objects.filter(tournament=tournament).exists():
             tournament.delete()
         return JsonResponse({'success': True, 'message': 'Successfully left the tournament'})

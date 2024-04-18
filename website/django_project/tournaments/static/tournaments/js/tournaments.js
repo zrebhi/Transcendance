@@ -32,11 +32,13 @@ export function leaveTournament(event, tournamentId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (!data.success)
+        if (data.success && window.tournamentWebSocket)
+            window.tournamentWebSocket.close();
+        else {
             console.error('Leave tournament failed:', data.message);
             alert(data.message);
         }
-    )
+    })
     .then(() => updateNavbar())
     .then(() => loadView('/home'))
     .catch(error => console.error('Error:', error));
@@ -94,7 +96,7 @@ async function updateTournament(tournamentId) {
     console.log('Updating tournament:', tournamentId);
     const tournamentContainer = document.getElementById('tournament');
     updateNavbar();
-    if (tournamentContainer)
+    if (tournamentContainer && window.tournamentWebSocket)
        await loadView(`/tournaments/${tournamentId}/`).catch(error => console.error('Error:', error));
 }
 

@@ -54,6 +54,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             elif message['type'] == 'user_message':
                 await self.user_message(message)
 
+            elif message['type'] == 'leave_message':
+                await self.leave_message(message)
+
     @database_sync_to_async
     def update_match_participant_ready_state(self, match_id, ready_state):
         try:
