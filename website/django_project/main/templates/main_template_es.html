@@ -14,13 +14,6 @@
     <link rel="stylesheet" href="/main/static/main/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/main/static/main/css/main.css">
 
-    
-    <style>
-        #sidebarContainer {
-            width: {% if user.is_authenticated %}300px;{% else %}0px{% endif %}
-        }
-    </style>
-
     {% if user.is_authenticated %}
         {% if user.session_id is not None %}
             <meta name="user-session-id" content="{{ user.session_id }}">
@@ -32,9 +25,6 @@
     
 </head>
 <body>
-    <div id="sidebarContainer">
-        {% include 'sidebar_es.html' %}
-    </div>
     
     <div id="mainContentWrapper">
         <div id="navbarContainer">
