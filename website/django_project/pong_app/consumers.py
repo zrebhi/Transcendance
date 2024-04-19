@@ -25,6 +25,12 @@ async def broadcast_message(group_name, message_data):
     await channel_layer.group_send(group_name, message_data)
 
 
+async def broadcast_messages(messages):
+    """Broadcast a list of messages, one after the other, to all players."""
+    for message in messages:
+        await broadcast_message(message['group_name'], message['message_data'])
+
+
 def create_game_instance(session_id):
     game_session = GameSession.objects.select_related('player1', 'player2').get(id=session_id)
     GLOBAL_GAMES_STORE[session_id] = GameInstance(game_session=game_session)

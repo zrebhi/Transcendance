@@ -15,11 +15,11 @@
     <link rel="stylesheet" href="/main/static/main/css/main.css">
 
     
-    <style>
-        #sidebarContainer {
-            width: {% if user.is_authenticated %}300px;{% else %}0px{% endif %}
-        }
-    </style>
+{#    <style>#}
+{#        #sidebarContainer {#}
+{#            width: {% if user.is_authenticated %}300px;{% else %}0px{% endif %}#}
+{#        }#}
+{#    </style>#}
 
     {% if user.is_authenticated %}
         {% if user.session_id is not None %}
@@ -32,9 +32,9 @@
     
 </head>
 <body>
-    <div id="sidebarContainer">
-        {% include 'sidebar_en.html' %}
-    </div>
+{#    <div id="sidebarContainer">#}
+{#        {% include 'sidebar_en.html' %}#}
+{#    </div>#}
     
     <div id="mainContentWrapper">
         <div id="navbarContainer">

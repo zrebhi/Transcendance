@@ -3,16 +3,27 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
-  <component name="CMakePresetLoader"><![CDATA[{
-  "useNewFormat": true
-}]]></component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
   <component name="CMakeSettings">
     <configurations>
       <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="baa7ff7b-0c8a-4124-8483-e856fcf8c10a" name="Changes" comment="" />
+    <list default="true" id="baa7ff7b-0c8a-4124-8483-e856fcf8c10a" name="Changes" comment="Text is now centered inside the main page cards with every language setting">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/main/static/main/js/SPAContentLoader.js" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/main/static/main/js/SPAContentLoader.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/main/static/main/js/eventHandlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/main/static/main/js/eventHandlers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/main/templates/main_template_en.html" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/main/templates/main_template_en.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/main/templates/sidebar_en.html" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/main/templates/sidebar_en.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/pong_app/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/pong_app/consumers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/tournaments/static/tournaments/js/tournaments.js" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/tournaments/static/tournaments/js/tournaments.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/tournaments/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/tournaments/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/django_project/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/users/views.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,8 +33,25 @@
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "zrebhi"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:zrebhi/Transcendance.git&quot;,
+    &quot;accountId&quot;: &quot;17ca621e-27f3-428b-8955-f95192236c4d&quot;
+  }
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -31,12 +59,14 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="2eb5TjtVRubIDYtlz8yzbyX4Jfa" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -44,7 +74,7 @@
     "WebServerToolWindowFactoryState": "false",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "tournaments",
+    "git-widget-placeholder": "UI-Sidebar__removal",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -54,6 +84,14 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PY-241.14494.241" />
+        <option value="bundled-python-sdk-0509580d9d50-28c9f5db9ffe-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.14494.241" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -64,6 +102,7 @@
       <updated>1712160447240</updated>
       <workItem from="1712160448886" duration="4178000" />
       <workItem from="1712241873326" duration="2192000" />
+      <workItem from="1713534487962" duration="5211000" />
     </task>
     <task id="LOCAL-00001" summary="tournament score blockchain storage implementation">
       <created>1712244008955</created>
@@ -72,15 +111,47 @@
       <option name="project" value="LOCAL" />
       <updated>1712244008955</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Text is now centered inside the main page cards with every language setting">
+      <option name="closed" value="true" />
+      <created>1713536277679</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1713536277679</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="tournaments-leave_tournament" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="tournament score blockchain storage implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="tournament score blockchain storage implementation" />
+    <MESSAGE value="Text is now centered inside the main page cards with every language setting" />
+    <option name="LAST_COMMIT_MESSAGE" value="Text is now centered inside the main page cards with every language setting" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

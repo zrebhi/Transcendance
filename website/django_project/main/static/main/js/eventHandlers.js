@@ -58,7 +58,7 @@ export function eventHandlers() {
     // Listen for form submissions in the page container
     document.getElementById('pageContainer').addEventListener('submit', handleSubmit);
     // Add click event listeners to various containers
-    ['navbarContainer', 'pageContainer', 'sidebarContainer', 'queueContainer'].forEach(containerId => {
+    ['navbarContainer', 'pageContainer', 'queueContainer'].forEach(containerId => {
         document.getElementById(containerId).addEventListener('click', handleClick);
     });
 

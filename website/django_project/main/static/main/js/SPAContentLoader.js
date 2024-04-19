@@ -58,12 +58,10 @@ export async function loadGame(sessionId) {
 
 function hideUI() {
     document.getElementById('navbarContainer').classList.add('d-none');
-    document.getElementById('sidebarContainer').classList.add('d-none');
 }
 
 export function showUI() {
     document.getElementById('navbarContainer').classList.remove('d-none');
-    document.getElementById('sidebarContainer').classList.remove('d-none');
 }
 
 export function loadScripts(scriptUrls) {
@@ -114,17 +112,6 @@ export function updateNavbar() {
             loadScript('/static/main/js/navbar.js').catch(error => console.error('Error:', error));
             setupNavbar();
         })
-        .catch(error => console.error('Error:', error));
-}
-
-export function updateSidebar() {
-    fetch(`/sidebar?language=${getLanguage()}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-        .then(response => response.text())
-        .then(sidebarHtml => document.getElementById('sidebarContainer').innerHTML = sidebarHtml)
         .catch(error => console.error('Error:', error));
 }
 
@@ -187,7 +174,7 @@ export function getTournamentId() {
 
     let tournamentId;
     tournamentIdMeta ? tournamentId = tournamentIdMeta.getAttribute('content') : null;
-
+    console.log('GetTournament ID:', tournamentId);
     return tournamentId;
 }
 

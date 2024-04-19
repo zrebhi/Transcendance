@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from pong_app.consumers import broadcast_message
+from pong_app.consumers import broadcast_message, broadcast_messages
 from main.utils import render_template
 from .models import Tournament, TournamentParticipant, TournamentMatch
 from .forms import TournamentCreationForm
@@ -98,10 +98,13 @@ def leave_tournament(request, tournament_id):
         request.user.tournament_id = None
         request.user.save()
         # Broadcast a message indicating the user has left the tournament
-        run_async_task_in_thread(broadcast_message, f"{request.user.username}", {'type': 'leave_message'})
-        run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}",
-                                 {'type': 'tournament_message',
-                                  'message': f"{request.user.username} has left the tournament."})
+        messages = [
+            {'group_name': f"{request.user.username}", 'message_data': {'type': 'leave_message'}},
+            {'group_name': f"tournament_{tournament.id}",
+             'message_data': {'type': 'tournament_message',
+                              'message': f"{request.user.username} has left the tournament."}}
+        ]
+        run_async_task_in_thread(broadcast_messages, messages)
         if not TournamentParticipant.objects.filter(tournament=tournament).exists():
             tournament.delete()
         return JsonResponse({'success': True, 'message': 'Successfully left the tournament'})

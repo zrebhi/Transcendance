@@ -7,6 +7,7 @@ from channels.layers import get_channel_layer
 from .forms import CustomUserCreationForm, CustomLoginForm
 from main.utils import render_template
 
+
 def register_view(request):
     """
     Handle user registration. If the request is POST, process the form data
@@ -38,6 +39,8 @@ def login_view(request):
     if request.user.is_authenticated:
         return render_template(request, 'home_template.html')
 
+    next_url = request.GET.get('next', '/home/')
+
     if request.method == 'POST':
         form = CustomLoginForm(data=request.POST)
         if form.is_valid():
@@ -45,7 +48,7 @@ def login_view(request):
                                 password=form.cleaned_data['password'])
             if user is not None:
                 login(request, user)
-                return JsonResponse({'success': True, 'next_url': '/home/'})
+                return JsonResponse({'success': True, 'next_url': next_url})
             else:
                 form.add_error(None, 'Invalid username or password')
         form_html = render_to_string('login_en.html', {'form': form}, request=request)
