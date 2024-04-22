@@ -43,3 +43,14 @@
 .nav-item {
     margin: 0 5px; /* Optional: Adds spacing between items */
 }
+
+.ccc {
+    position: absolute;
+    right: 10px;
+}
+
+.username {
+    font-family: "Rubik Doodle Shadow", system-ui, sans-serif;
+    font-size: 20px;
+    margin-right: 10px;
+}

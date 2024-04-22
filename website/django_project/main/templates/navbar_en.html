@@ -33,7 +33,11 @@
                     <li class="nav-item">
                         <button id="logoutButton" class="nav-link btn btn-link" type="button">Logout</button>
                     </li>
+
                     <div class="ccc">
+                        {% if user.is_authenticated %}
+                           <span class="username"> {{ user.username }} </span>
+                        {% endif %}
                         <button id="setLanguageButton" class="btn btn-secondary" lan="fr">
                           🇫🇷
                         </button>
@@ -43,7 +47,7 @@
                         <button id="setLanguageButton" class="btn btn-secondary" lan="es">
                           🇪🇸
                         </button>
-                      </div>
+                    </div>
                 {% endif %}
             </ul>
         </div>

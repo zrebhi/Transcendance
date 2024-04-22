@@ -34,6 +34,9 @@
                         <button id="logoutButton" class="nav-link btn btn-link" type="button">Déconnexion</button>
                     </li>
                     <div class="ccc">
+                        {% if user.is_authenticated %}
+                           <span class="username"> {{ user.username }} </span>
+                        {% endif %}
                         <button id="setLanguageButton" class="btn btn-primary" lan="fr">
                           🇫🇷
                         </button>
