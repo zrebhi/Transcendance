@@ -1,4 +1,4 @@
-import { gameData } from "./pong.js";
+import { gameData, getCanvasContainerSize } from "./pong.js";
 import { endGame } from "./threejs.js";
 
 export function clearCanvas() {
@@ -8,7 +8,6 @@ export function clearCanvas() {
     if (gameData.renderer)
     {
         endGame();
-        gameData.renderer.forceContextLoss();
         gameData.renderer = null;
     }
 }
@@ -23,6 +22,10 @@ export function drawCanvas() {
 }
 
 function setupCanvas(sketch) {
+    console.log("Setting up canvas");
+    if (!gameData.canvasContainerWidth || !gameData.canvasContainerHeight) {
+        return;
+    }
     let canvas = sketch.createCanvas(gameData.canvasContainerWidth, gameData.canvasContainerHeight);
     let canvasContainer = document.getElementById('canvasContainer');
     if (!canvasContainer) return;

@@ -25,7 +25,7 @@ export async function loadView(viewPath, updateHistory = true) {
     const fullUrl = new URL(viewPath, baseUrl).href;
 
     console.log('Loading view:', fullUrl);
-    await clearPage();
+    clearPage();
 
     if (updateHistory)
         history.pushState({ path: viewPath }, '', viewPath);
@@ -33,7 +33,8 @@ export async function loadView(viewPath, updateHistory = true) {
     // Include an Accept header in the fetch request
     return fetch(fullUrl, {
         headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'Cache-Control': 'no-cache'
         }
     })
     .then(response => response.text())
@@ -47,8 +48,8 @@ export async function loadGame(sessionId) {
     if (!sessionId) return;
 
     try {
-        await hideUI();
-        await loadView(`/pong/${sessionId}/`);
+        hideUI();
+        await loadView(`/pong/${sessionId}`)
         await loadScript('pong_app/static/pong_app/p5/p5.js');
         await getGame(sessionId);
     } catch (error) {
@@ -115,36 +116,75 @@ export function updateNavbar() {
         .catch(error => console.error('Error:', error));
 }
 
-export function updatePage(viewURL = null) {
+// export function updatePage(viewURL = null) {
+//     console.log('Updating page');
+//     clearPage();
+//     fetch(`/?language=${getLanguage()}`)
+//         .then(response => response.text())
+//         .then(pageHtml => document.body.innerHTML = pageHtml)
+//         .then(() => loadScripts([
+//             '/static/main/js/eventHandlers.js',
+//             '/static/main/js/navbar.js',
+//             '/static/tournaments/js/tournaments.js',
+//             '/static/main/bootstrap/js/bootstrap.bundle.min.js'
+//         ]))
+//         .then( async () => {
+//             adjustPageContainerHeight();
+//             setupNavbar();
+//             eventHandlers();
+//
+//             const sessionID = await getSessionId();
+//             console.log('Session ID:', sessionID);
+//             if (sessionID) await loadGame(sessionID).catch(error => console.error('Error:', error));
+//
+//             const tournamentId = await getTournamentId();
+//             tournamentWebSocketConnection(tournamentId);
+//             if (queueSocket)
+//                 showQueueUI(); // TO-DO: Can be improved by using database queueEntry time for timer.
+//         })
+//         .catch(error => console.error('Error:', error));
+// }
+
+export async function updatePage(viewURL = null) {
     console.log('Updating page');
-    fetch(`/?language=${getLanguage()}`)
-        .then(response => response.text())
-        .then(pageHtml => document.body.innerHTML = pageHtml)
-        .then(() => loadScripts([
+    clearPage();
+
+    try {
+        const response = await fetch(`/?language=${getLanguage()}`, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}});
+        const pageHtml = await response.text();
+        document.body.innerHTML = pageHtml;
+
+        await loadScripts([
             '/static/main/js/eventHandlers.js',
             '/static/main/js/navbar.js',
             '/static/tournaments/js/tournaments.js',
             '/static/main/bootstrap/js/bootstrap.bundle.min.js'
-        ]))
-        .then( async () => {
-            adjustPageContainerHeight();
-            setupNavbar();
-            eventHandlers();
+        ]);
 
-            const sessionID = await getSessionId();
-            console.log('Session ID:', sessionID);
-            if (sessionID) await loadGame(sessionID).catch(error => console.error('Error:', error));
+        adjustPageContainerHeight();
+        setupNavbar();
+        eventHandlers();
 
-            tournamentWebSocketConnection(getTournamentId());
-            if (queueSocket)
-                showQueueUI();
-        })
-        .catch(error => console.error('Error:', error));
+        const sessionID = await getSessionId();
+        console.log('Session ID:', sessionID);
+        if (sessionID) await loadGame(sessionID).catch(error => console.error('Error:', error));
+
+        const tournamentId = await getTournamentId();
+        tournamentWebSocketConnection(tournamentId);
+        if (queueSocket)
+            showQueueUI(); // TO-DO: Can be improved by using database queueEntry time for timer.
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
+
 
 async function fetchSessionId() {
     // Fetch the main page HTML
-    return fetch(`/?language=${getLanguage()}`)
+    return fetch(`/?language=${getLanguage()}`, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}})
         .then(response => response.text())
         .then(pageHtml => {
             // Parse the fetched HTML to find the session ID meta tag
@@ -152,9 +192,7 @@ async function fetchSessionId() {
             const doc = parser.parseFromString(pageHtml, 'text/html');
             const sessionIdMeta = doc.querySelector('meta[name="user-session-id"]');
 
-            const sessionId = sessionIdMeta ? sessionIdMeta.getAttribute('content') : null;
-            console.log('Fetched Session ID:', sessionId);
-            return sessionId;
+            return sessionIdMeta ? sessionIdMeta.getAttribute('content') : null;
         })
         .catch(error => console.error('Error fetching session ID:', error));
 }
@@ -169,12 +207,29 @@ export async function getSessionId() {
     return sessionId;
 }
 
-export function getTournamentId() {
-    const tournamentIdMeta = document.querySelector('meta[name="user-tournament-id"]');
+async function fetchTournamentId() {
+    // Fetch the main page HTML
+    return fetch(`/?language=${getLanguage()}`, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}})
+        .then(response => response.text())
+        .then(pageHtml => {
+            // Parse the fetched HTML to find the session ID meta tag
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(pageHtml, 'text/html');
+            const tournamentIdMeta = doc.querySelector('meta[name="user-tournament-id"]');
 
+            return  tournamentIdMeta ? tournamentIdMeta.getAttribute('content') : null;
+        })
+        .catch(error => console.error('Error fetching tournament ID:', error));
+}
+
+export async function getTournamentId() {
     let tournamentId;
-    tournamentIdMeta ? tournamentId = tournamentIdMeta.getAttribute('content') : null;
-    console.log('GetTournament ID:', tournamentId);
+    try {
+        tournamentId = await fetchTournamentId();
+    } catch (error) {
+        console.error('Failed to fetch tournament ID:', error);
+    }
     return tournamentId;
 }
 

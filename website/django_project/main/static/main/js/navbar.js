@@ -9,5 +9,4 @@ export function setupNavbar() {
             this.classList.add("active");
         });
     });
-    console.log("Navbar setup complete");
 }

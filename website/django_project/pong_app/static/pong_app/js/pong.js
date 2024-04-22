@@ -1,6 +1,6 @@
 import { updateNavbar, updatePage, getLanguage } from "/main/static/main/js/SPAContentLoader.js";
 import {showUI, loadView} from "/main/static/main/js/SPAContentLoader.js";
-import { drawCanvas } from "./draw.js";
+import { drawCanvas} from "./draw.js";
 import { draw3dCanvas, endGame } from "./threejs.js";
 
 // Initializes the default state of the game.
@@ -67,6 +67,7 @@ export function changeRender() {
 
 // Initializes a new game session.
 async function initGame(sessionId) {
+    console.log("Initializing game session");
     gameData = initGameData();
     gameData.socket = createGameSessionWebSocket(sessionId);
     window.gameSocket = gameData.socket;
@@ -265,6 +266,7 @@ function handleWebSocketClose(event) {
 
     if (gameData.myp5)
         gameData.myp5.noLoop();
+
     if (gameData.renderer)
         endGame();
 }
@@ -298,16 +300,21 @@ function hideMenu() {
 }
 
 // Gets the size of the canvas container. Used for scaling the canvas.
-function getCanvasContainerSize() {
+export function getCanvasContainerSize() {
     showMenu();
+    const canvasContainer = document.getElementById('canvasContainer');
+    if (!canvasContainer) return;
     gameData.canvasContainerWidth = document.getElementById('canvasContainer').offsetWidth;
     gameData.canvasContainerHeight = document.getElementById('canvasContainer').offsetHeight;
+    console.log(`Canvas container size: ${gameData.canvasContainerWidth}x${gameData.canvasContainerHeight}`);
 }
 
 // Shows the menu if it was hidden after a game session.
 export function showMenu() {
-    document.getElementById('menuToggle').classList.remove('d-none');
-    document.getElementById('menu').classList.remove('d-none');
+    const menuToggle = document.getElementById('menuToggle');
+    if (menuToggle) menuToggle.classList.remove('d-none');
+    const menu = document.getElementById('menu');
+    if (menu) menu.classList.remove('d-none');
 }
 
 // For online games. Sends a forfeit message to the server.

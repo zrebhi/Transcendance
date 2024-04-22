@@ -5,6 +5,12 @@
     .home-container {
         margin: 20px;
         padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+    .cards {
+        display: flex;
+        flex-direction: row;
     }
 
 </style>
@@ -13,7 +19,7 @@
 
 <div class="home-container">
     {% csrf_token %}
-    <div class="items">
+    <div class="cards">
         <div {% if user.is_authenticated %}id="joinQueueButton"{% else %}id="loginButton"{% endif %} class="item card" style="background-image: url({% static 'main/img/online_play.png' %});">
             <p class="card-title">Jugar en línea</p>
             <p class="card-text">¡Enfréntate a oponentes de todo el mundo!</p>
@@ -24,8 +30,10 @@
             <p class="card-text">¡Juega contra tus amigos en la misma máquina!</p>
             {% if not user.is_authenticated %}<p class="card-text">(Requiere estar conectado)</p>{% endif %}
         </div>
+    </div>
+    <div class="changeRender">
         {% if user.is_authenticated %}
-            <button  id="changeRenderButton" class="render-button btn btn-primary mt-3">Cambiar renderizado</button>
+            <button  id="changeRenderButton" class="render-button btn btn-primary mt-3 w-100">Cambiar renderizado</button>
         {% endif %}
     </div>
 </div>

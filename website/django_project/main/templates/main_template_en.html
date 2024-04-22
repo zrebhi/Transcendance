@@ -43,20 +43,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="/main/static/main/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script type='module'>
-        import { updatePage, setLanguage } from '/main/static/main/js/SPAContentLoader.js'
-        
-        updatePage();
-        {% if user.is_authenticated %}
-            {% if user.session_id is not None %}
-                import { loadGame } from '/main/static/main/js/SPAContentLoader.js'
-                loadGame({{ user.session_id }})
-            {% endif %}
-            {% if user.tournament_id is not None %}
-                console.log("Tournament ID: {{ user.tournament_id }}")
-                import { tournamentWebSocketConnection} from "/tournaments/static/tournaments/js/tournaments.js";
-                tournamentWebSocketConnection({{ user.tournament_id }});
-            {% endif %}
-        {% endif %}
+        import { updatePage } from '/main/static/main/js/SPAContentLoader.js'
+        await updatePage();
     </script>
 </body>
 </html>

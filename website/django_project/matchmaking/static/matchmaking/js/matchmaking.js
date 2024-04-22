@@ -16,7 +16,9 @@ function connectToQueueWebSocket() {
         if (data.type === 'game_matched') {
             console.log('Game matched:', data);
             // Display "Match found" in the queue container
-            document.getElementById('queueContent').innerHTML = '<p>Match found!</p>';
+            const queueContent = document.getElementById('queueContent');
+            if (queueContent)
+                queueContent.innerHTML = '<p>Match found!</p>';
 
             setTimeout(function() {
                 hideQueueUI();

@@ -55,7 +55,6 @@ export function tournamentWebSocketConnection(tournamentId) {
     if (!tournamentId) return;
 
     let ws;
-    console.log('tournamentId:', tournamentId);
     window.tournamentWebSocket == null ? ws = getWebSocket() : ws = window.tournamentWebSocket;
 
     ws.onopen = function(event) {
