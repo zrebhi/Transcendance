@@ -127,7 +127,7 @@ async function handleFormResponse(data) {
 }
 
 // Logout button handler
-function handleLogoutButtonClick(event) {
+async function handleLogoutButtonClick(event) {
     event.preventDefault();
     fetch('/users/logout/', {
         method: 'POST',
@@ -137,10 +137,10 @@ function handleLogoutButtonClick(event) {
         }
     })
     .then(response => response.json())
-    .then(data => {
+    .then(async data =>  {
         if (data.success) {
-            updatePage();
-            console.log("Logout successful")
+            await setLanguage(event, "en");
+            console.log("Logout successful");
         }
     })
     .catch(error => console.error('Error:', error));

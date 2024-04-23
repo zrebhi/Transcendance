@@ -116,35 +116,6 @@ export function updateNavbar() {
         .catch(error => console.error('Error:', error));
 }
 
-// export function updatePage(viewURL = null) {
-//     console.log('Updating page');
-//     clearPage();
-//     fetch(`/?language=${getLanguage()}`)
-//         .then(response => response.text())
-//         .then(pageHtml => document.body.innerHTML = pageHtml)
-//         .then(() => loadScripts([
-//             '/static/main/js/eventHandlers.js',
-//             '/static/main/js/navbar.js',
-//             '/static/tournaments/js/tournaments.js',
-//             '/static/main/bootstrap/js/bootstrap.bundle.min.js'
-//         ]))
-//         .then( async () => {
-//             adjustPageContainerHeight();
-//             setupNavbar();
-//             eventHandlers();
-//
-//             const sessionID = await getSessionId();
-//             console.log('Session ID:', sessionID);
-//             if (sessionID) await loadGame(sessionID).catch(error => console.error('Error:', error));
-//
-//             const tournamentId = await getTournamentId();
-//             tournamentWebSocketConnection(tournamentId);
-//             if (queueSocket)
-//                 showQueueUI(); // TO-DO: Can be improved by using database queueEntry time for timer.
-//         })
-//         .catch(error => console.error('Error:', error));
-// }
-
 export async function updatePage(viewURL = null) {
     console.log('Updating page');
     clearPage();
@@ -184,7 +155,8 @@ export async function updatePage(viewURL = null) {
 async function fetchSessionId() {
     // Fetch the main page HTML
     return fetch(`/?language=${getLanguage()}`, {
-        headers: {'X-Requested-With': 'XMLHttpRequest'}})
+        headers: {'X-Requested-With': 'XMLHttpRequest',
+        'Cache-Control': 'no-cache'}})
         .then(response => response.text())
         .then(pageHtml => {
             // Parse the fetched HTML to find the session ID meta tag
@@ -210,7 +182,8 @@ export async function getSessionId() {
 async function fetchTournamentId() {
     // Fetch the main page HTML
     return fetch(`/?language=${getLanguage()}`, {
-        headers: {'X-Requested-With': 'XMLHttpRequest'}})
+        headers: {'X-Requested-With': 'XMLHttpRequest',
+        'Cache-Control': 'no-cache'}})
         .then(response => response.text())
         .then(pageHtml => {
             // Parse the fetched HTML to find the session ID meta tag
@@ -241,12 +214,14 @@ export function getLanguage() {
     return  localStorage.getItem("lang") || "en";
 }
 
-export function setLanguage(event) {
+export function setLanguage(event, value = null) {
     event.preventDefault();
-    const value = event.target.getAttribute("lan");
-    console.log(value);
+    if (!value) {
+        value = event.target.getAttribute("lan");
+        console.log(value);
+    }
     if ((value !== "es" && value !== "fr") || !value)
         localStorage.setItem("lang", "en");
     else localStorage.setItem("lang", value);
-    updatePage();
+    updatePage().catch(error => console.error('Error:', error));
 }
