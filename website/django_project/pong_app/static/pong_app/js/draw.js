@@ -1,5 +1,6 @@
 import { gameData, getCanvasContainerSize } from "./pong.js";
 import { endGame } from "./threejs.js";
+import { getLanguage } from "/main/static/main/js/SPAContentLoader.js";
 
 export function clearCanvas() {
     console.log("Clearing canvas");
@@ -69,9 +70,6 @@ function drawScores(sketch) {
 
 // Draws text related to the current game status, like pause or end messages.
 function drawGameStatus(sketch) {
-        sketch.textSize(getAdaptiveTextSize(gameData.myp5.width, gameData.myp5.height, 30));
-        sketch.textAlign(sketch.CENTER);
-        sketch.text(gameData.status, gameData.myp5.width / 2, 30);
     if (gameData.status === "paused") {
         sketch.textSize(getAdaptiveTextSize(gameData.myp5.width, gameData.myp5.height, 30));
         sketch.textAlign(sketch.CENTER);
@@ -80,12 +78,12 @@ function drawGameStatus(sketch) {
     if (gameData.forfeitMessage) {
         sketch.textSize(getAdaptiveTextSize(gameData.myp5.width, gameData.myp5.height, 30));
         sketch.textAlign(sketch.CENTER);
-        sketch.text(gameData.forfeitMessage, gameData.myp5.width / 2, gameData.myp5.height / 5);
+        sketch.text(getForfeitMessage(), gameData.myp5.width / 2, gameData.myp5.height / 5);
     }
     if (gameData.winner) {
         sketch.textSize(getAdaptiveTextSize(gameData.myp5.width, gameData.myp5.height, 50));
         sketch.textAlign(sketch.CENTER);
-        sketch.text(`${gameData.winner} wins!`, gameData.myp5.width / 2, gameData.myp5.height / 2.5);
+        sketch.text(getWinnerMessage(), gameData.myp5.width / 2, gameData.myp5.height / 2.5);
     }
 }
 
@@ -100,8 +98,39 @@ export function getPauseMessage() {
         paddle = gameData.paddle2;
 
     player = paddle === gameData.paddle1 ? gameData.player1 : gameData.player2;
-    return `${player} has requested a pause. 
-        Game will resume in ${paddle['pause_timer']} seconds.`;
+    const language = getLanguage();
+    const pauseMessages = {
+        'en': `${player} has requested a pause. 
+        Game will resume in ${paddle['pause_timer']} seconds.`,
+        'es': `${player} ha solicitado una pausa. 
+        El juego se reanudará en ${paddle['pause_timer']} segundos.`,
+        'fr': `${player} a demandé une pause. 
+        Le jeu reprendra dans ${paddle['pause_timer']} secondes.`,
+    }
+    return pauseMessages[language];
+}
+
+function getForfeitMessage() {
+    console.log(gameData.forfeitMessage);
+    const player = gameData.forfeitMessage.replace(' has forfeited the game', '');
+    const language = getLanguage();
+    const forfeitMessages = {
+        'en': `${player} has forfeited the game.`,
+        'es': `${player} ha abandonado el juego.`,
+        'fr': `${player} a abandonné la partie.`,
+    }
+    return forfeitMessages[language];
+}
+
+function getWinnerMessage() {
+    const winner = gameData.winner;
+    const language = getLanguage();
+    const winnerMessages = {
+        'en': `${winner} wins!`,
+        'es': `¡${winner} gana!`,
+        'fr': `${winner} gagne!`,
+    }
+    return winnerMessages[language];
 }
 
 // Function to adaptively calculate text size based on canvas size
