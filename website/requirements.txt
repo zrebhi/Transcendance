@@ -5,3 +5,4 @@ daphne
 django-q2
 web3
 eth-account
+python-dotenv

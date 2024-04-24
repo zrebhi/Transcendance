@@ -1,14 +1,18 @@
 from web3 import Web3
+import os
+from dotenv import load_dotenv
 from web3.middleware import construct_sign_and_send_raw_middleware
 from channels.db import database_sync_to_async
 from eth_account import Account
 from .models import Tournament
 
+
+load_dotenv()
 # Se connecter à un nœud Ethereum (nœud local ou RPC)
 web3 = Web3(Web3.HTTPProvider('https://eth-sepolia-public.unifra.io'))
 
 # Définir votre clé privée
-private_key = 'e3c4dd727e69bcbe43c2920b3da65ce7ab03f03917c2ac2580228ef2573882cc'
+private_key = os.environ.get('PRIVATE_KEY')
 
 # Convertir la clé privée en objet Account
 account = Account.from_key(private_key)
