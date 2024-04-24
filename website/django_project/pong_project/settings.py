@@ -93,17 +93,6 @@ CHANNEL_LAYERS = {
 
 WSGI_APPLICATION = 'pong_project.wsgi.application'
 
-# For Django-Q
-Q_CLUSTER = {
-    'name': 'DjangORM',
-    'workers': 4,
-    'timeout': 90,
-    'retry': 120,
-    'queue_limit': 50,
-    'bulk': 10,
-    'orm': 'default',
-}
-
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
