@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   website:
     build: website
@@ -8,12 +8,16 @@ services:
     expose:
       - 8000
 
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - ./postgreSQL/data:/var/lib/postgresql/data
+
   nginx:
-    # image: nginx:latest
-    # volumes:
-    #   - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    #   - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    #   - ./nginx/certs:/etc/nginx/certs
     build: nginx
     ports:
         - '8080:80'
