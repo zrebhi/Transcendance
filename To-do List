@@ -1,6 +1,11 @@
-Prevent players from joining the game twice (through multiple tabs or browsers) - Left untouched cause no apparent problem
-Translate the game to other languages
-User reconnect
-Navbar underline button
 Add game buttons for mobile devices
-Change language for forms
+Database switch
+
+DONE:
+Switch language to english on logout - 23/04/2023 19:16 - Done
+Prevent players from joining the game twice (through multiple tabs or browsers) - 23/04/2023 19:16 - Left untouched cause no apparent problem
+User reconnect - 23/04/2023 19:16 - Seems functional
+Translate the game to other languages - 23/04/2023 19:36 - Done
+Change language for forms - 23/04/2023 19:52 - Done
+Navbar underline button - 24/04/2023 16:39
+Admin button - 24/04/2023 17:00 - Done

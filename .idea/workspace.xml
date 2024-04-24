@@ -12,17 +12,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="baa7ff7b-0c8a-4124-8483-e856fcf8c10a" name="Changes" comment="Text is now centered inside the main page cards with every language setting">
+    <list default="true" id="baa7ff7b-0c8a-4124-8483-e856fcf8c10a" name="Changes" comment="Translated forms text">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/To-do List" beforeDir="false" afterPath="$PROJECT_DIR$/To-do List" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/django_project/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/django_project/main/static/main/js/SPAContentLoader.js" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/main/static/main/js/SPAContentLoader.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/django_project/main/static/main/js/eventHandlers.js" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/main/static/main/js/eventHandlers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/django_project/main/templates/main_template_en.html" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/main/templates/main_template_en.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/django_project/main/templates/sidebar_en.html" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/main/templates/sidebar_en.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/django_project/pong_app/consumers.py" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/pong_app/consumers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/django_project/tournaments/static/tournaments/js/tournaments.js" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/tournaments/static/tournaments/js/tournaments.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/django_project/tournaments/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/tournaments/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/django_project/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/website/django_project/users/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,17 +28,17 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="UI-navbar_username" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "zrebhi"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;zrebhi&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;git@github.com:zrebhi/Transcendance.git&quot;,
@@ -66,6 +59,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Docker.Docker-Compose.executor": "Run",
     "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -74,16 +68,28 @@
     "WebServerToolWindowFactoryState": "false",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "UI-Sidebar__removal",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/zak/Projects/Transcendance/docker-compose.yml",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="Docker-Compose" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="envFilePath" value="" />
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -102,7 +108,10 @@
       <updated>1712160447240</updated>
       <workItem from="1712160448886" duration="4178000" />
       <workItem from="1712241873326" duration="2192000" />
-      <workItem from="1713534487962" duration="5211000" />
+      <workItem from="1713534487962" duration="12265000" />
+      <workItem from="1713616535563" duration="2653000" />
+      <workItem from="1713799492519" duration="12880000" />
+      <workItem from="1713888788434" duration="6734000" />
     </task>
     <task id="LOCAL-00001" summary="tournament score blockchain storage implementation">
       <created>1712244008955</created>
@@ -119,7 +128,63 @@
       <option name="project" value="LOCAL" />
       <updated>1713536277679</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Removed the sidebar, changed the structure of leave_tournament view so that asynchronous functions are called subsequently after being awaited.">
+      <option name="closed" value="true" />
+      <created>1713541883046</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1713541883046</updated>
+    </task>
+    <task id="LOCAL-00004" summary="sidebar cleanup">
+      <option name="closed" value="true" />
+      <created>1713542221414</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1713542221414</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Fixed a bug causing page refresh in online game to break the app">
+      <option name="closed" value="true" />
+      <created>1713801526510</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1713801526510</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added Username to the navbar">
+      <option name="closed" value="true" />
+      <created>1713805603307</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1713805603307</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Change language to english on logout">
+      <option name="closed" value="true" />
+      <created>1713892524946</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1713892524946</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Translated 2D Game texts to selected language">
+      <option name="closed" value="true" />
+      <created>1713893837631</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1713893837631</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Translated forms text">
+      <option name="closed" value="true" />
+      <created>1713894780192</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1713894780192</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -136,7 +201,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="tournaments-leave_tournament" />
+                        <option value="game-session_id_update" />
                       </list>
                     </value>
                   </entry>
@@ -151,7 +216,14 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="tournament score blockchain storage implementation" />
     <MESSAGE value="Text is now centered inside the main page cards with every language setting" />
-    <option name="LAST_COMMIT_MESSAGE" value="Text is now centered inside the main page cards with every language setting" />
+    <MESSAGE value="Removed the sidebar, changed the structure of leave_tournament view so that asynchronous functions are called subsequently after being awaited." />
+    <MESSAGE value="sidebar cleanup" />
+    <MESSAGE value="Fixed a bug causing page refresh in online game to break the app" />
+    <MESSAGE value="Added Username to the navbar" />
+    <MESSAGE value="Change language to english on logout" />
+    <MESSAGE value="Translated 2D Game texts to selected language" />
+    <MESSAGE value="Translated forms text" />
+    <option name="LAST_COMMIT_MESSAGE" value="Translated forms text" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
