@@ -3,6 +3,7 @@ export function setupNavbar() {
 
     buttons.forEach((button) => {
         button.addEventListener("click", function () {
+            if (this.id === "adminButton") return;
             buttons.forEach((otherButton) => {
                 otherButton.classList.remove("active");
             });

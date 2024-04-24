@@ -225,3 +225,32 @@ export function setLanguage(event, value = null) {
     else localStorage.setItem("lang", value);
     updatePage().catch(error => console.error('Error:', error));
 }
+
+export function underlineNavbar(path) {
+    // Get all navbar links
+    const buttons = document.querySelectorAll(".navbar-nav .nav-link");
+
+    // Remove the 'active' class from all buttons
+    buttons.forEach(button => button.classList.remove("active"));
+
+    // Logic to determine which button to activate
+    if (path.includes("tournaments")) {
+        const tournamentsButton = document.getElementById("tournamentsListButton");
+        if (tournamentsButton) {
+            tournamentsButton.classList.add("active");
+        } else {
+            const tournamentButton = document.getElementById("tournamentButton");
+            if (tournamentButton) tournamentButton.classList.add("active");
+        }
+    } else if (path.includes("login")) {
+        const loginButton = document.getElementById("loginButton");
+        if (loginButton) loginButton.classList.add("active")
+        else underlineHomeButton();
+    } else
+        underlineHomeButton();
+}
+
+function underlineHomeButton() {
+    const homeButton = document.getElementById("homeButton");
+    if (homeButton) homeButton.classList.add("active");
+}
