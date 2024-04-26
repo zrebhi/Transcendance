@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 services:
   website:
     build: website
@@ -7,15 +7,11 @@ services:
     command: /bin/bash -c "python manage.py runserver 0.0.0.0:8000"
     expose:
       - 8000
+    depends_on:
+        - db
 
   db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
-    volumes:
-      - ./postgreSQL/data:/var/lib/postgresql/data
+    build: postgreSQL
 
   nginx:
     build: nginx

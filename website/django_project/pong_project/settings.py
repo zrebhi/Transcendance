@@ -101,8 +101,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mydatabase',  # must match POSTGRES_DB in your Docker Compose
-        'USER': 'postgres',  # must match POSTGRES_USER in your Docker Compose
-        'PASSWORD': 'mysecretpassword',  # must match POSTGRES_PASSWORD in your Docker Compose
+        'USER': 'myuser',  # must match POSTGRES_USER in your Docker Compose
+        'PASSWORD': 'mypassword',  # must match POSTGRES_PASSWORD in your Docker Compose
         'HOST': 'db',  # matches the service name of your PostgreSQL container
         'PORT': '5432',  # default PostgreSQL port
     }
