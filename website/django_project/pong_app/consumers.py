@@ -136,6 +136,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.verify_user_in_game_session()
         await self.channel_setup()
         await self.update_game_status()
+        print(f"PLAYERS: {self.game.players}")
 
     async def get_game_in_store(self):
         """Retrieve or create a Game instance for the session ID."""
@@ -148,7 +149,11 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def verify_user_in_game_session(self):
         """Verify if the connected user is part of the game session."""
         if self.user not in [self.game.session.player1, self.game.session.player2]:
-            await self.close()
+            return await self.close()
+        if self.user == self.game.session.player1:
+            self.game.players[0] = self.user
+        if self.user == self.game.session.player2:
+            self.game.players[1] = self.user
         await self.accept()
 
     async def channel_setup(self):

@@ -5,11 +5,13 @@ import {
     updatePage,
     getSessionId,
     showUI, loadGame,
-    getLanguage, setLanguage
+    getLanguage, setLanguage,
+    underlineNavbar
 } from './SPAContentLoader.js';
 import { joinQueue, cancelQueue, startLocalGame } from '/matchmaking/static/matchmaking/js/matchmaking.js';
 import { forfeitGame, quitGame, changeRender} from "/pong_app/static/pong_app/js/pong.js";
-import { joinTournament, leaveTournament, tournamentView, updateReadyState, observeRoundTimers } from "/tournaments/static/tournaments/js/tournaments.js";
+import { joinTournament, leaveTournament, tournamentView,
+    updateReadyState, observeRoundTimers, createTournament } from "/tournaments/static/tournaments/js/tournaments.js";
 
 // Define actions for various buttons in the application
 const buttonActions = {
@@ -19,7 +21,7 @@ const buttonActions = {
     'registerButton': () => loadView('/users/register/'),
     'profileButton': () => loadView('/users/profile/'),
     'tournamentsListButton': () => loadView('/tournaments/'),
-    'createTournamentButton': () => loadView('/tournaments/create/'),
+    'createTournamentButton': () => createTournament(),
     'tournamentUserReadyButton': (event) => updateReadyState(event, window.tournamentWebSocket, 'ready'),
     'tournamentUserNotReadyButton': (event) => updateReadyState(event, window.tournamentWebSocket, 'not_ready'),
     'tournamentButton': tournamentView,
@@ -51,8 +53,10 @@ export function eventHandlers() {
         console.log("Session ID: ", sessionID);
         if (sessionID)
             await loadGame(sessionID).catch(error => console.error('Error:', error));
-        else
+        else {
             await loadView(path, false).catch(error => console.error('Error:', error));
+            underlineNavbar(path);
+        }
     });
 
     // Listen for form submissions in the page container
@@ -127,7 +131,7 @@ async function handleFormResponse(data) {
 }
 
 // Logout button handler
-function handleLogoutButtonClick(event) {
+async function handleLogoutButtonClick(event) {
     event.preventDefault();
     fetch('/users/logout/', {
         method: 'POST',
@@ -137,10 +141,10 @@ function handleLogoutButtonClick(event) {
         }
     })
     .then(response => response.json())
-    .then(data => {
+    .then(async data =>  {
         if (data.success) {
-            updatePage();
-            console.log("Logout successful")
+            await setLanguage(event, "en");
+            console.log("Logout successful");
         }
     })
     .catch(error => console.error('Error:', error));

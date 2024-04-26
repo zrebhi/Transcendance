@@ -1,4 +1,4 @@
-import {getCsrfToken, loadView, loadGame, updateNavbar} from "/main/static/main/js/SPAContentLoader.js";
+import {getCsrfToken, loadView, loadGame, updateNavbar, getLanguage} from "/main/static/main/js/SPAContentLoader.js";
 
 export async function joinTournament(event, tournamentId) {
     fetch(`/tournaments/join/${tournamentId}/`, {
@@ -169,4 +169,25 @@ function roundTimers() {
         updateTimer();
         setInterval(updateTimer, 1000);
     });
+}
+
+export async function createTournament() {
+    await loadView('/tournaments/create/').catch(error => console.error('Error:', error));
+        const nameLabel = document.querySelector('label[for="id_name"]');
+        const sizeLabel = document.querySelector('label[for="id_size"]');
+        const language = getLanguage();
+        const names = {
+            'es': 'Nombre:',
+            'en': 'Name:',
+            'fr': 'Nom:',
+        };
+        const sizes = {
+            'es': 'Tamaño:',
+            'en': 'Size:',
+            'fr': 'Taille:',
+        };
+        if (nameLabel)
+            nameLabel.textContent = names[language];
+        if (sizeLabel)
+            sizeLabel.textContent = sizes[language];
 }
