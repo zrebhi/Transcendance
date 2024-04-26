@@ -22,6 +22,7 @@ function initGameData() {
         canvasContainerWidth: null,
         canvasContainerHeight: null,
         keyState: {},
+        touchState: {},
     };
 }
 
@@ -125,6 +126,97 @@ function createAnimationLoop() {
 function setupPlayerMovement() {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+
+    if (deviceHasTouch())
+        displayTouchControls();
+}
+
+function deviceHasTouch() {
+    return (
+        ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0) || // For old IE versions
+        (window.DocumentTouch && document instanceof DocumentTouch) // Deprecated but for old browsers
+    );
+}
+
+function displayTouchControls() {
+    if (gameData.mode === 'Local') {
+        document.getElementById('local-touch-controls').classList.add('d-block');
+        setupLocalTouchControls();
+    } else {
+        document.getElementById('touch-controls').classList.add('d-block');
+        setupOnlineTouchControls();
+    }
+
+    document.getElementById('canvasContainer').addEventListener('touch', function(e) {
+        e.preventDefault();
+    });
+}
+
+function setupOnlineTouchControls() {
+
+    document.getElementById('btn-up').addEventListener('touchstart', function(e) {
+        e.preventDefault(); // Prevent scrolling and other default actions
+        gameData.keyState['ArrowUp'] = true;
+    }, false);
+
+    document.getElementById('btn-up').addEventListener('touchend', function(e) {
+        e.preventDefault();
+        gameData.keyState['ArrowUp'] = false;
+    }, false);
+
+    document.getElementById('btn-down').addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        gameData.keyState['ArrowDown'] = true;
+    }, false);
+
+    document.getElementById('btn-down').addEventListener('touchend', function(e) {
+        e.preventDefault();
+        gameData.keyState['ArrowDown'] = false;
+    }, false);
+}
+
+function setupLocalTouchControls() {
+    document.getElementById('btn-up1').addEventListener('touchstart', function(e) {
+        e.preventDefault(); // Prevent scrolling and other default actions
+        gameData.keyState['z'] = true;
+    }, false);
+
+    document.getElementById('btn-up1').addEventListener('touchend', function(e) {
+        e.preventDefault();
+        gameData.keyState['z'] = false;
+    }, false);
+
+    document.getElementById('btn-down1').addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        gameData.keyState['s'] = true;
+    }, false);
+
+    document.getElementById('btn-down1').addEventListener('touchend', function(e) {
+        e.preventDefault();
+        gameData.keyState['s'] = false;
+    }, false);
+
+    document.getElementById('btn-up2').addEventListener('touchstart', function(e) {
+        e.preventDefault(); // Prevent scrolling and other default actions
+        gameData.keyState['ArrowUp'] = true;
+    }, false);
+
+    document.getElementById('btn-up2').addEventListener('touchend', function(e) {
+        e.preventDefault();
+        gameData.keyState['ArrowUp'] = false;
+    }, false);
+
+    document.getElementById('btn-down2').addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        gameData.keyState['ArrowDown'] = true;
+    }, false);
+
+    document.getElementById('btn-down2').addEventListener('touchend', function(e) {
+        e.preventDefault();
+        gameData.keyState['ArrowDown'] = false;
+    }, false);
 }
 
 function handleKeyDown(event) {
