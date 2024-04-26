@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9jwf2fhw9cpn3#ei95qa8rttv2ao!pu7sp0#_6x=$*xkbe=_g_'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -100,9 +100,9 @@ WSGI_APPLICATION = 'pong_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mydatabase',  # must match POSTGRES_DB in your Docker Compose
-        'USER': 'myuser',  # must match POSTGRES_USER in your Docker Compose
-        'PASSWORD': 'mypassword',  # must match POSTGRES_PASSWORD in your Docker Compose
+        'NAME': os.environ.get('POSTGRES_DB'),  # must match POSTGRES_DB in your Docker Compose
+        'USER': os.environ.get('POSTGRES_USER'),  # must match POSTGRES_USER in your Docker Compose
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),  # must match POSTGRES_PASSWORD in your Docker Compose
         'HOST': 'db',  # matches the service name of your PostgreSQL container
         'PORT': '5432',  # default PostgreSQL port
     }
