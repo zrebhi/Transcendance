@@ -54,7 +54,7 @@ def create_tournament(request):
             tournament.save()
             add_participant_to_tournament(tournament, request.user)
 
-            return JsonResponse({'success': True, 'next_url': f'/tournaments/{tournament.id}'})
+            return JsonResponse({'success': True, 'next_url': f'/tournaments/{tournament.id}/'})
 
         # If the form is not valid, render it again with errors
         form_html = render_to_string('create_tournament_en.html', {'form': form}, request=request)

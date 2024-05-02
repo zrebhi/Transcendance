@@ -13,7 +13,7 @@ services:
         - db
 
   db:
-    build: postgreSQL
+    build: ./postgreSQL
     env_file:
       - .env
     environment:
@@ -31,4 +31,3 @@ services:
 
     command: /bin/bash -c "rm -f /etc/nginx/sites-enabled/default &&
                             rm -f /etc/nginx/sites-available/default && nginx -g 'daemon off;'"
-                    

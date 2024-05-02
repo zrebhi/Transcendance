@@ -15,7 +15,7 @@ export function adjustPageContainerHeight() {
 export async function loadView(viewPath, updateHistory = true) {
 
     if (viewPath === '/')
-        viewPath = '/home';
+        viewPath = '/home/';
 
     const language = getLanguage();
     if (!viewPath.includes('?language='))
@@ -49,7 +49,7 @@ export async function loadGame(sessionId) {
 
     try {
         hideUI();
-        await loadView(`/pong/${sessionId}`)
+        await loadView(`/pong/${sessionId}/`)
         await loadScript('pong_app/static/pong_app/p5/p5.js');
         await getGame(sessionId);
     } catch (error) {
@@ -100,7 +100,7 @@ export function clearPage() {
 }
 
 export function updateNavbar() {
-    fetch(`/navbar?language=${getLanguage()}`, {
+    fetch(`/navbar/?language=${getLanguage()}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
         }
