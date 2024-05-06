@@ -80,7 +80,7 @@ def join_tournament(request, tournament_id):
         if tournament.participants.count() == tournament.size:
             start_tournament(tournament)
         return JsonResponse({'success': True, 'message': 'Successfully joined the tournament',
-                             'next_url': f'/tournaments/{tournament.id}'})
+                             'next_url': f'/tournaments/{tournament.id}/'})
     else:
         if tournament.participants.count() >= tournament.size:
             return JsonResponse({'success': False, 'message': 'Tournament is already full'}, status=400)

@@ -40,7 +40,7 @@ export function leaveTournament(event, tournamentId) {
         }
     })
     .then(() => updateNavbar())
-    .then(() => loadView('/home'))
+    .then(() => loadView('/home/'))
     .catch(error => console.error('Error:', error));
 }
 
