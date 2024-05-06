@@ -1,5 +1,9 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
-
+import {
+  getForfeitMessage,
+  getPauseMessage,
+  getWinnerMessage,
+} from "./draw.js";
 import { gameData } from "./pong.js";
 
 let scene,
@@ -26,7 +30,28 @@ export function setupCanvas() {
       1,
       10000
     );
-    camera.position.set(600, 900, 650);
+
+    let outerWidth = window.outerWidth;
+
+    let z = 650;
+    let y = 900;
+
+    if (outerWidth < 350) {
+      z = 3000;
+      y = 1600;
+    }
+
+    if (outerWidth < 400) {
+      z = 2000;
+      y = 1300;
+    }
+
+    if (outerWidth < 800) {
+      z = 1500;
+      y = 1000;
+    }
+
+    camera.position.set(600, y, z);
     camera.scale.y = -1;
     camera.rotation.set(-0.4, 0, 0);
 
@@ -145,12 +170,18 @@ function addContour() {
   scene.add(contour);
 }
 
+function handlePauseMessage() {
+  gameData.scoreDisplay.textContent = `${getPauseMessage()}`;
+}
+
 export function draw3dCanvas() {
   setupCanvas();
   (function animate() {
     gameData.animationid = requestAnimationFrame(animate);
 
-    if (!gameData.winner && !gameData.forfeitMessage) {
+    if (gameData.status === "paused") {
+      handlePauseMessage();
+    } else if (!gameData.winner && !gameData.forfeitMessage) {
       updateGameElementsPosition();
       updateScoreDisplay();
       gameData.renderer?.render(scene, camera);
@@ -163,15 +194,18 @@ export function draw3dCanvas() {
   })();
 }
 
-function handleGameEnd() {
+async function handleGameEnd() {
   if (gameData.forfeitMessage) {
-    gameData.scoreDisplay.textContent = `${gameData.forfeitMessage}`;
+    gameData.scoreDisplay.textContent = `${getForfeitMessage()}`;
+    gameData.scoreDisplay.classList.add("centered");
   }
-
-  endGame();
+  if (gameData.winner) {
+    gameData.scoreDisplay.textContent = `${getWinnerMessage()}`;
+    gameData.scoreDisplay.classList.add("centered");
+  }
 }
 
-function updateGameElementsPosition() {
+async function updateGameElementsPosition() {
   ball.position.set(gameData.ball?.xpos, gameData.ball?.ypos, 10);
   ballLight.position.set(gameData.ball?.xpos, gameData.ball?.ypos, -10);
   paddle1.position.set(gameData.paddle1?.xpos, gameData.paddle1?.ypos + 40, 10);
@@ -198,7 +232,6 @@ function updateScoreDisplay() {
     gameData.scoreDisplay.textContent = currentScore;
     if (currentScore !== previousScore) {
       ballLight.color.set(getRandomColor());
-      console.log("Le score a été mis à jour :", currentScore);
       previousScore = currentScore;
     }
   }
@@ -232,4 +265,5 @@ export function endGame() {
     gameData.scoreDisplay.remove();
     gameData.scoreDisplay = null;
   }
+  gameData.renderer = null;
 }
