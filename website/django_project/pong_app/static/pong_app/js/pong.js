@@ -101,7 +101,7 @@ function setupWebSocketListeners() {
   gameData.socket.onclose = handleWebSocketClose;
   gameData.socket.onerror = (event) => {
     console.error("Game WebSocket error:", event);
-    loadView("/home").catch((error) => console.error("Error:", error));
+    loadView("/home/").catch((error) => console.error("Error:", error));
   };
 }
 
