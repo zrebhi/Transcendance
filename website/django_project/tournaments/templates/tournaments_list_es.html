@@ -26,28 +26,29 @@
 </style>
 
 <div id="tournamentsContainer" class="container mt-4">
-    <button id="createTournamentButton" class="btn btn-primary">Create Tournament</button>
-    <h1 class="text-center">Open Tournaments</h1>
+    <button id="createTournamentButton" class="btn btn-primary">Crear Torneo</button>
+    <h1 class="text-center">Torneos Abiertos</h1>
     <div class="row card-container">
         {% for tournament in tournaments %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">{{ tournament.name }}</h5>
-                    <p class="card-text">Players: {{ tournament.participants.count }}/{{ tournament.size }}</p>
-                    <p class="card-text">Status: {{ tournament.get_status_display }}</p>
+                    <p class="card-text">Jugadores: {{ tournament.participants.count }}/{{ tournament.size }}</p>
+                    <p class="card-text">Estado: {{ tournament.get_status_display }}</p>
                     {% if tournament.status == "open" %}
-                        <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Join Tournament</button>
+                        <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Unirse al Torneo</button>
                     {% elif tournament.status == "completed" %}
-                        <p class="card-text">Won by {{ tournament.winner }}</p>
+                        <p class="card-text">Ganado por {{ tournament.winner }}</p>
                     {% endif %}
                 </div>
             </div>
         </div>
         {% empty %}
             <div class="col-12 text-center">
-                <p>No open tournaments at the moment.</p>
+                <p>No hay torneos abiertos en este momento.</p>
             </div>
         {% endfor %}
     </div>
 </div>
+

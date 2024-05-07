@@ -41,6 +41,7 @@ export async function loadView(viewPath, updateHistory = true) {
     .then(data => {
         document.getElementById('pageContainer').innerHTML = data;
     })
+    .then(() => { underlineNavbar(viewPath); })
     .catch(error => console.error('Error loading view:', error));
 }
 

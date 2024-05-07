@@ -50,7 +50,6 @@ export function eventHandlers() {
         // can still load the correct view based on the URL path.
         const path = event.state ? event.state.path : window.location.pathname;
         await loadView(path, false).catch(error => console.error('Error:', error));
-        underlineNavbar(path);
     });
 
     // Listen for form submissions in the page container
@@ -117,8 +116,8 @@ async function handleSubmit(event) {
 async function handleFormResponse(data) {
     if (data.success) {
         try {
-            await loadView(data["next_url"])
             await updatePage();
+            await loadView(data["next_url"])
         } catch (error) { (console.error('Error:', error)); }
     } else
         document.getElementById('pageContainer').innerHTML = data['form_html'];
