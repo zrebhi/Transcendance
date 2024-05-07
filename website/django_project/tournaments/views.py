@@ -46,6 +46,9 @@ def create_tournament(request):
     For GET requests, display the tournament creation form.
     """
     if request.method == 'POST':
+        if request.user.tournament_id is not None:
+            return JsonResponse({'success': False, 'message': 'You are already in a tournament'}, status=400)
+
         form = TournamentCreationForm(data=request.POST, creator=request.user)
         if form.is_valid():
             # Create the tournament but don't commit to the database yet so that we can add the creator
