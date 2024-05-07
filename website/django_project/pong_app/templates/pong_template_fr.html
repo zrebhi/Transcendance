@@ -12,32 +12,65 @@
     }
     
     #canvasContainer {
-        margin: 10px;
+        margin: 25px;
         padding: 0;
         flex-grow: 1;
         width: 100%;
         overflow: hidden;
     }
 
-    #scoreDisplay {
+    #touch-controls {
         position: fixed;
-        top: 10%;
         left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(255, 255, 255, 0.8);
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 18px;
-        font-family: Arial, sans-serif;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-      }
-    
+        top: 25px;
+        display: none;
+    }
+
+    #local-touch-controls {
+        display: none;
+    }
+
+    #local-touch-controls-1 {
+        position: fixed;
+        left: 15%;
+        bottom: 25px;
+    }
+
+    #local-touch-controls-2 {
+        position: fixed;
+        right: 15%;
+        bottom: 20px;
+    }
+
+    .game-btn {
+        width: 100px;
+        height: 100px;
+        margin: 5px;
+        font-size: 25px;
+        color: dodgerblue;
+        background: white;
+    }
+
 </style>
 
 <link href="/pong_app/static/pong_app/css/forfeit_button.css" rel="stylesheet">
 <link href="/pong_app/static/pong_app/css/game_menu.css" rel="stylesheet">
 
 <div id="pongContainer">
-    {% include 'game_menu_fr.html' %}
+    {% include 'game_menu_en.html' %}
     <div id="canvasContainer"></div>
+    <div id="touch-controls">
+        <button class="game-btn" id="btn-up">↑</button>
+        <button class="game-btn" id="btn-down">↓</button>
+    </div>
+    <div id="local-touch-controls">
+        <div id="local-touch-controls-1">
+            <button class="game-btn" id="btn-up1">↑</button>
+            <button class="game-btn" id="btn-down1">↓</button>
+        </div>
+        <div id="local-touch-controls-2">
+            <button class="game-btn" id="btn-up2">↑</button>
+            <button class="game-btn" id="btn-down2">↓</button>
+        </div>
+    </div>
 </div>

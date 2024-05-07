@@ -10,5 +10,3 @@ def game_view(request, session_id):
         return render_template(request, 'home_template.html')
     context = {'game_session': game_session}
     return render_template(request, 'pong_template.html', context)
-
-
