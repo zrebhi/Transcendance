@@ -23,14 +23,6 @@ export function setupCanvas() {
     const canvas = document.createElement("canvas");
     const canvasContainer = document.getElementById("canvasContainer");
 
-    if (canvasContainer) {
-      const containerWidth = canvasContainer.offsetWidth;
-      const containerHeight = canvasContainer.offsetHeight;
-
-      canvas.width = containerWidth;
-      canvas.height = containerHeight;
-    }
-
     // Initialize camera
     camera = new THREE.PerspectiveCamera(
       80,
@@ -75,7 +67,9 @@ export function setupCanvas() {
     }
 
     if (canvasContainer) {
-      canvasContainer.appendChild(canvas);
+      canvas.width = canvasContainer.offsetWidth;
+      canvas.height = canvasContainer.offsetHeight;
+      const result = canvasContainer.appendChild(canvas);
       scene = new THREE.Scene();
 
       gameData.renderer = new THREE.WebGLRenderer({ canvas });
