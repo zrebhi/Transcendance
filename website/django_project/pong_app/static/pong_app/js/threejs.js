@@ -23,6 +23,14 @@ export function setupCanvas() {
     const canvas = document.createElement("canvas");
     const canvasContainer = document.getElementById("canvasContainer");
 
+    if (canvasContainer) {
+      const containerWidth = canvasContainer.offsetWidth;
+      const containerHeight = canvasContainer.offsetHeight;
+
+      canvas.width = containerWidth;
+      canvas.height = containerHeight;
+    }
+
     // Initialize camera
     camera = new THREE.PerspectiveCamera(
       80,
