@@ -67,16 +67,14 @@ export function setupCanvas() {
     }
 
     if (canvasContainer) {
-      canvas.width = canvasContainer.offsetWidth;
-      canvas.height = canvasContainer.offsetHeight;
-      const result = canvasContainer.appendChild(canvas);
+      canvasContainer.appendChild(canvas);
       scene = new THREE.Scene();
 
       gameData.renderer = new THREE.WebGLRenderer({ canvas });
       gameData.renderer.setPixelRatio(window.devicePixelRatio); // Consider device pixel ratio
       gameData.renderer.setSize(
-        (gameData.canvasContainerWidth * window.devicePixelRatio) / 2,
-        (gameData.canvasContainerHeight * window.devicePixelRatio) / 2
+        canvasContainer.offsetWidth,
+        canvasContainer.offsetHeight
       );
       gameData.renderer.setClearColor(0x000000, 0);
       gameData.renderer.antialias = true;
