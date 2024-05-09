@@ -342,6 +342,11 @@ def eliminate_loser(match):
             print(f"{loser_user.username} has been eliminated from the tournament.")
         except TournamentParticipant.DoesNotExist:
             print(f"TournamentParticipant not found for user {loser_user.username} in tournament {tournament.name}.")
+            
+        run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}", 
+                                 {'type': 'tournament_message',
+                                  'message': f"{loser_user.username} has been eliminated from the tournament."})
+        run_async_task_in_thread(broadcast_message, loser_user.username, {'type': "leave_message"})
 
 
 def advance_winner(match):
@@ -377,6 +382,10 @@ def complete_tournament(tournament, match):
         match.winner.save()
         tournament.winner = match.winner
         tournament.save()
+        run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}", 
+                                 {'type': 'tournament_message',
+                                  'message': f"{match.winner.username} has won the tournament !"})
+        run_async_task_in_thread(broadcast_message, match.winner.username, {'type': "leave_message"})
 
     participants_string_array = get_participants_string_array(tournament)
     run_async_task_in_thread(set_tournament_in_blockchain,tournament, participants_string_array)

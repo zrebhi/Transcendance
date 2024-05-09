@@ -23,14 +23,6 @@ export function setupCanvas() {
     const canvas = document.createElement("canvas");
     const canvasContainer = document.getElementById("canvasContainer");
 
-    if (canvasContainer) {
-      const containerWidth = canvasContainer.offsetWidth;
-      const containerHeight = canvasContainer.offsetHeight;
-
-      canvas.width = containerWidth;
-      canvas.height = containerHeight;
-    }
-
     // Initialize camera
     camera = new THREE.PerspectiveCamera(
       80,
@@ -81,8 +73,8 @@ export function setupCanvas() {
       gameData.renderer = new THREE.WebGLRenderer({ canvas });
       gameData.renderer.setPixelRatio(window.devicePixelRatio); // Consider device pixel ratio
       gameData.renderer.setSize(
-        (gameData.canvasContainerWidth * window.devicePixelRatio) / 2,
-        (gameData.canvasContainerHeight * window.devicePixelRatio) / 2
+        canvasContainer.offsetWidth,
+        canvasContainer.offsetHeight
       );
       gameData.renderer.setClearColor(0x000000, 0);
       gameData.renderer.antialias = true;
