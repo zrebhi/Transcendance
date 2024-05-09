@@ -1,4 +1,4 @@
-<link rel="stylesheet" type="text/css" href="/tournaments/static/tournaments/css/tournament_participants.css">
+<link rel="stylesheet" type="text/css" href="/static/tournaments/css/tournament_participants.css">
 
 <table class="participant-list">
             <thead>
@@ -10,7 +10,7 @@
                 {% for participant in tournament.participants.all %}
                     <tr>
                         <td>
-                            <img src="/main/static/main/img/default_avatar.jpg" alt="Avatar du participant" class="participant-list-avatar">
+                            <img src="/static/main/img/default_avatar.jpg" alt="Avatar du participant" class="participant-list-avatar">
                             <span class="participant-list-username">{{ participant.user.username }}</span>
                         </td>
                     </tr>

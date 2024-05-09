@@ -1,12 +1,12 @@
 {% load static %}
 
 {% if user.is_authenticated %}
-    <link href="/main/static/main/css/sidebar.css" rel="stylesheet">
+    <link href="/static/main/css/sidebar.css" rel="stylesheet">
     <!-- Barre latérale -->
     <aside class="sidebar">
         <!-- Section Infos Utilisateur -->
         <div class="user-info text-center">
-            <img src="/main/static/main/img/default_avatar2.jpg" alt="Avatar de l'utilisateur" class="avatar rounded-circle">
+            <img src="/static/main/img/default_avatar2.jpg" alt="Avatar de l'utilisateur" class="avatar rounded-circle">
             <h3 class="user-name">{{ user.username }}</h3>
         </div>
     

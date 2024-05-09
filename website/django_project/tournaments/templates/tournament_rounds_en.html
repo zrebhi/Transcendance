@@ -1,4 +1,4 @@
-<link rel="stylesheet" type="text/css" href="/tournaments/static/tournaments/css/tournament_rounds.css">
+<link rel="stylesheet" type="text/css" href="/static/tournaments/css/tournament_rounds.css">
 
 
 <div class="rounds">
@@ -13,7 +13,7 @@
                     <h3 class="round-timer" data-start-time="{{ round.start_time|date:"c" }}"></h3>
                     <script type="module">
                         console.log("script running");
-                        import { roundTimers } from "tournaments/static/tournaments/js/tournaments";
+                        import { roundTimers } from "/static/tournaments/js/tournaments";
                         roundTimers();
                     </script>
                 {% endif %}
@@ -22,7 +22,7 @@
                 <div class="match">
                     <div class="player left">
                         {% if match.participants.first.player %}
-                            <img src="{{ participant.player.avatar_url|default:'/main/static/main/img/default_avatar.jpg' }}" alt="{{ participant.player.username }}'s Avatar" class="player-avatar" />
+                            <img src="{{ participant.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="{{ participant.player.username }}'s Avatar" class="player-avatar" />
                             <span class="player-username">{{ match.participants.first.player.username }}</span>
                         {% else %}
                             <span class="player-username">TBD</span>
@@ -37,16 +37,16 @@
                             <div class="ready-state-players">
                                 <span class="ready-state-player">
                                     {% if match.participants.first.is_ready %}
-                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/ready.png" alt="Ready" />
+                                        <img class="ready-state-icon" src="/static/tournaments/img/ready.png" alt="Ready" />
                                     {% else %}
-                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/not_ready.png" alt="Not Ready" />
+                                        <img class="ready-state-icon" src="/static/tournaments/img/not_ready.png" alt="Not Ready" />
                                     {% endif %}
                                 </span>
                                 <span class="ready-state-player">
                                     {% if match.participants.last.is_ready %}
-                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/ready.png" alt="Ready" />
+                                        <img class="ready-state-icon" src="/static/tournaments/img/ready.png" alt="Ready" />
                                     {% else %}
-                                        <img class="ready-state-icon" src="/tournaments/static/tournaments/img/not_ready.png" alt="Not Ready" />
+                                        <img class="ready-state-icon" src="/static/tournaments/img/not_ready.png" alt="Not Ready" />
                                     {% endif %}
                                 </span>
                             </div>
@@ -65,7 +65,7 @@
                         {% endif %}
                     <div class="player right">
                         {% if match.participants.last.player %}
-                            <img src="{{ participant.player.avatar_url|default:'/main/static/main/img/default_avatar.jpg' }}" alt="{{ match.participants.last.player.username }}'s Avatar" class="player-avatar" />
+                            <img src="{{ participant.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="{{ match.participants.last.player.username }}'s Avatar" class="player-avatar" />
                             <span class="player-username">{{ match.participants.last.player.username }}</span>
                         {% else %}
                             <span class="player-username">TBD</span>

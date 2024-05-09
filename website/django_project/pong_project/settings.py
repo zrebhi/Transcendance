@@ -24,13 +24,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['192.168.1.161', 'localhost', '127.0.0.1', '10.13.5.6']
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'https://192.168.1.161:8443', 'https://127.0.0.1', 'https://10.13.5.6:8443']
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # Application definition
 
@@ -56,6 +59,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware', # CORS
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -148,12 +152,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MAIN_STATIC_ROOT = os.path.join(BASE_DIR, 'main', 'static')
-PONG_STATIC_ROOT = os.path.join(BASE_DIR, 'pong_app', 'static')
-USERS_STATIC_ROOT = os.path.join(BASE_DIR, 'users', 'static')
-MATCHMAKING_STATIC_ROOT = os.path.join(BASE_DIR, 'matchmaking', 'static')
-TOURNAMENTS_STATIC_ROOT = os.path.join(BASE_DIR, 'tournaments', 'static')
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

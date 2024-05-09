@@ -17,9 +17,9 @@
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="/main/static/main/img/favicon.ico"
+      href="/static/main/img/favicon.ico"
     />
-    <link rel="stylesheet" href="/main/static/main/css/main.css" />
+    <link rel="stylesheet" href="/static/main/css/main.css" />
 
     {% if user.is_authenticated %} {% if user.session_id is not None %}
     <meta name="user-session-id" content="{{ user.session_id }}" />
@@ -49,8 +49,8 @@
       crossorigin="anonymous"
     ></script>
     <script type="module">
-      import { updatePage } from "/main/static/main/js/SPAContentLoader.js";
-      await updatePage();
+      import { updatePage } from "/static/main/js/SPAContentLoader.js";
+      updatePage();
     </script>
   </body>
 </html>
