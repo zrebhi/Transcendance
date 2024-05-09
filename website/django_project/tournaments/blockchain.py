@@ -6,8 +6,10 @@ from eth_account import Account
 from .models import Tournament
 
 
+infura_api_key = os.environ.get('INFURA_API_KEY')
+
 # Se connecter à un nœud Ethereum (nœud local ou RPC)
-web3 = Web3(Web3.HTTPProvider('https://eth-sepolia-public.unifra.io'))
+web3 = Web3(Web3.HTTPProvider(f"https://sepolia.infura.io/v3/{infura_api_key}"))
 
 # Définir votre clé privée
 private_key = os.environ.get('BLOCKCHAIN_PRIVATE_KEY')
