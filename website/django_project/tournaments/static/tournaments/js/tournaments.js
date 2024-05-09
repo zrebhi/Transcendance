@@ -122,7 +122,7 @@ export function updateReadyState(event, ws, ready_state) {
     } catch (error) {
         console.error("Failed to send message over WebSocket:", error);
     }
-}
+}4444
 
 export function observeRoundTimers() {
     // Create a new MutationObserver instance to monitor DOM changes
