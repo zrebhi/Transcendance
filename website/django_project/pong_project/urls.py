@@ -31,9 +31,4 @@ urlpatterns = [
 
 ]
 
-if settings.DEBUG:
-    urlpatterns += static('main/static/', document_root=settings.MAIN_STATIC_ROOT)
-    urlpatterns += static('pong_app/static/', document_root=settings.PONG_STATIC_ROOT)
-    urlpatterns += static('users/static/', document_root=settings.USERS_STATIC_ROOT)
-    urlpatterns += static('matchmaking/static/', document_root=settings.MATCHMAKING_STATIC_ROOT)
-    urlpatterns += static('tournaments/static/', document_root=settings.TOURNAMENTS_STATIC_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
