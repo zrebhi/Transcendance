@@ -34,6 +34,7 @@ async def broadcast_messages(messages):
 def create_game_instance(session_id):
     game_session = GameSession.objects.select_related('player1', 'player2').get(id=session_id)
     GLOBAL_GAMES_STORE[session_id] = GameInstance(game_session=game_session)
+    print(f'Game instance created for session {session_id}.')
     async_to_sync(GLOBAL_GAMES_STORE[session_id].start_game_tasks)()
 
 
@@ -131,6 +132,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.user = self.scope['user']
         self.game = await self.get_game_in_store()
         if self.game is None:
+            print(f"Game session not found.")
             await self.close()
             return
         await self.verify_user_in_game_session()
@@ -141,6 +143,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def get_game_in_store(self):
         """Retrieve or create a Game instance for the session ID."""
         game_session_id = self.scope['url_route']['kwargs']['game_session_id']
+        print(f"Game session ID: {game_session_id}")
         if game_session_id not in GLOBAL_GAMES_STORE:
             await update_user_session_id(self.user, None)
             return None
@@ -149,6 +152,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def verify_user_in_game_session(self):
         """Verify if the connected user is part of the game session."""
         if self.user not in [self.game.session.player1, self.game.session.player2]:
+            print(f"User {self.user.username} is not part of the game session.")
             return await self.close()
         if self.user == self.game.session.player1:
             self.game.players[0] = self.user
