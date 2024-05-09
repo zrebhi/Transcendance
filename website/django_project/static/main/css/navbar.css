@@ -1,0 +1,56 @@
+.navbar-custom {
+    position: relative; /* Relative position for absolute children */
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+    color: #000000; /* White text color */
+    position: relative; /* Relative position for underline */
+}
+
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+    color: #007bff; /* Red text color on hover and active */
+}
+
+/* Red underline for active and hover states */
+.navbar-custom .nav-link::after {
+    content: "";
+    position: absolute; /* Absolute position for the underline */
+    bottom: 0; /* Align at the bottom of the navbar */
+    left: 0; /* Start from the left edge */
+    right: 0; /* Stretch to the right edge */
+    width: 0; /* Initially set to zero */
+    height: 2px;
+    background-color: #007bff; /* Red color for the underline */
+    transition: width 0.3s; /* Smooth transition for the underline */
+    margin-left: auto; /* Centering */
+    margin-right: auto; /* Centering */
+}
+
+.navbar-custom .nav-link:hover::after,
+.navbar-custom .nav-link.active::after {
+    width: 100%; /* Full width on hover and active */
+}
+
+/* Centering the navbar items */
+.navbar-nav {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.nav-item {
+    margin: 0 5px; /* Optional: Adds spacing between items */
+}
+
+.ccc {
+    position: absolute;
+    right: 10px;
+}
+
+.username {
+    font-family: "Rubik Doodle Shadow", system-ui, sans-serif;
+    font-size: 20px;
+    margin-right: 10px;
+}
