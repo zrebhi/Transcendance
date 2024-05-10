@@ -42,15 +42,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         if text_data:
-            message = json.loads(text_data)
+            try:
+                message = json.loads(text_data)
 
-            if message['type'] == 'ready_state_update':
-                print(f"{self.user.username}: Received ready state update: {message['ready_state']}")
-                await self.update_match_participant_ready_state(message['match_id'], message['ready_state'])
-                print(f"{self.user.username}: Updated ready state for match {message['match_id']} to {message['ready_state']}")
-                if not await self.check_and_start_match(message['match_id']):
-                    await broadcast_message(self.tournament_group_name, {'type': 'tournament_message',
-                                                                         'message': 'ready_state_updated'})
+                if message['type'] == 'ready_state_update':
+                    print(f"{self.user.username}: Received ready state update: {message['ready_state']}")
+                    await self.update_match_participant_ready_state(message['match_id'], message['ready_state'])
+                    print(f"{self.user.username}: Updated ready state for match {message['match_id']} to {message['ready_state']}")
+                    if not await self.check_and_start_match(message['match_id']):
+                        await broadcast_message(self.tournament_group_name, {'type': 'tournament_message',
+                                                                            'message': 'ready_state_updated'})
+            except json.JSONDecodeError as e:
+                print(f"Error: {str(e)}")
 
 
     @database_sync_to_async
@@ -142,6 +145,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         print(f"{self.user.username}: Received message: {message}")
         if message == 'game_start':
+            print(f'{self.user.username}: Getting game session {event['session_id']}.')
             self.game_session = await self.get_game_session(event['session_id'])
 
             if self.game_session is not None:

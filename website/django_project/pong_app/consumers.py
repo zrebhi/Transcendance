@@ -205,7 +205,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         """Handle incoming messages from WebSocket."""
-        if text_data:
+        try:
             data = json.loads(text_data)
             if data.get('type') == "leave_message":
                 await self.disconnect(1001)
@@ -220,6 +220,12 @@ class GameConsumer(AsyncWebsocketConsumer):
                     await self.end_game()
                 else:
                     await self.disconnect(1001)
+            elif data.get('type') == "test":
+                print("Test message received")
+            else:
+                print(f"Unknown message type: {data['type']}")
+        except json.JSONDecodeError:
+            print(f"Invalid JSON received: {text_data}")
 
     async def send_game_init(self):
         """Send initial game data to the WebSocket client."""
