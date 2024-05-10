@@ -3,6 +3,7 @@ import {
   getForfeitMessage,
   getPauseMessage,
   getWinnerMessage,
+  resize3dCanvas,
 } from "./draw.js";
 import { gameData } from "./pong.js";
 
@@ -179,6 +180,7 @@ export function draw3dCanvas() {
   (function animate() {
     gameData.animationid = requestAnimationFrame(animate);
 
+    resize3dCanvas();
     if (gameData.status === "paused") {
       handlePauseMessage();
     } else if (!gameData.winner && !gameData.forfeitMessage) {
