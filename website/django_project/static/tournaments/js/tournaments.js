@@ -70,6 +70,7 @@ export function tournamentWebSocketConnection(tournamentId) {
                 await updateTournament(tournamentId);
                 break;
             case 'game_start':
+                console.log("Server session id: ", message["session_id"]);
                 await loadGame(message["session_id"])
                     .catch(error => console.error('Error:', error));
                 break;

@@ -51,11 +51,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 if not await self.check_and_start_match(message['match_id']):
                     await broadcast_message(self.tournament_group_name, {'type': 'tournament_message',
                                                                          'message': 'ready_state_updated'})
-            elif message['type'] == 'user_message':
-                await self.user_message(message)
 
-            elif message['type'] == 'leave_message':
-                await self.leave_message(message)
 
     @database_sync_to_async
     def update_match_participant_ready_state(self, match_id, ready_state):
@@ -111,9 +107,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         participants = await self.get_match_participants(match)
         for participant in participants:
             await update_user_session_id(participant.player, self.game_session.id)
-            await broadcast_message(participant.player.username, {'type': 'user_message',
-                                                                  'message': 'game_start',
-                                                                  'session_id': self.game_session.id})
+            message = {'type': 'user_message',
+                        'message': 'game_start',
+                        'session_id': self.game_session.id}
+            print(f"{participant.player.username} notify_match_participant: {message['session_id']}")
+            await broadcast_message(participant.player.username, message)
+            
 
     @database_sync_to_async
     def get_match_participants(self, match):
@@ -129,7 +128,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def tournament_message(self, event):
         message = event['message']
 
-        print(f"{self.user.username}: Received message: {message}")
         try:
             await self.send(text_data=json.dumps({
                 'type': 'tournament_message',
@@ -155,9 +153,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_game_session(self, session_id):
-        if self.game_session is not None:
-            return self.game_session
-
         try:
             print(f"{self.user.username}: Retrieving Game session: {session_id}")
             return GameSession.objects.get(id=session_id)
