@@ -84,10 +84,10 @@ export function cancelQueue() {
 }
 
 export function startLocalGame() {
-    fetch('/matchmaking/local_game/', {  // Update with the correct URL
+    fetch('/matchmaking/local_game/', { 
         method: 'POST',
         headers: {
-            'X-CSRFToken': getCsrfToken(),  // Include CSRF token if needed
+            'X-CSRFToken': getCsrfToken(),
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         },

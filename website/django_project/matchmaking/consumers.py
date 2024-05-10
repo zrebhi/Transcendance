@@ -53,15 +53,15 @@ class QueueConsumer(AsyncWebsocketConsumer):
         QueueEntry.objects.filter(user=self.user).delete()
 
     async def receive(self, text_data=None, bytes_data=None):
-        if text_data:
-            try:
-                text_data_json = json.loads(text_data)
-                message_type = text_data_json.get('type')
+        try:
+            if text_data:
+                    text_data_json = json.loads(text_data)
+                    message_type = text_data_json.get('type')
 
-                if message_type == 'leave_message':
-                    await self.leave_message(self)
-                    
-            except json.JSONDecodeError as e:
+                    if message_type == 'leave_message':
+                        await self.leave_message(self)
+
+        except json.JSONDecodeError as e:
                 print(f"Error: {str(e)}")
 
     async def leave_message(self, event):
