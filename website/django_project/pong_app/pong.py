@@ -110,8 +110,8 @@ class Game:
         self.session = None
         self.window = Window(width=1200, height=900)
         self.players = [None, None]
-        self.paddle1 = Paddle(50, ypos=self.window.height / 2 + self.paddle1.height / 2)
-        self.paddle2 = Paddle(self.window.width - 50, ypos=self.window.height / 2 + self.paddle2.height / 2)
+        self.paddle1 = Paddle(50, ypos=self.window.height / 2 - 45)
+        self.paddle2 = Paddle(self.window.width - 50, ypos=self.window.height / 2 - 45)
         self.ball = Ball(xpos=self.window.width / 2, ypos=self.window.height / 2)
         self.move_commands = []
         self.status = 'initializing'
