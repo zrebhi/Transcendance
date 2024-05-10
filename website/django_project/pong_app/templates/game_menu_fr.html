@@ -1,43 +1,44 @@
 <style>
-    #commands {
-        text-align: center;
-        font-family: "Rubik Doodle Shadow", system-ui;
-        padding: 10px;
-        border-bottom: 1px solid #ccc;  /* Effet de soulignement */
-        width: 75%;
-    }
-    #commands h3 {
-        font-size: 1.75em; /* Légèrement plus grand */
-        color: #333; /* Couleur plus foncée pour le texte */
-        border-bottom: 1px solid #ccc; /* Effet de soulignement */
-    }
+  #commands {
+    text-align: center;
+    font-family: "Rubik Doodle Shadow", system-ui;
+    padding: 10px;
+    border-bottom: 1px solid #ccc; /* Effet de soulignement */
+    width: 75%;
+  }
+  #commands h3 {
+    font-size: 1.6vw; /* Légèrement plus grand */
+    color: #333; /* Couleur plus foncée pour le texte */
+    border-bottom: 1px solid #ccc; /* Effet de soulignement */
+  }
 
-    #commands p {
-        font-size: 1.25em; /* Taille de police plus grande pour une meilleure visibilité */
-        margin: 0; /* Marge constante */
-        padding: 0; /* Rembourrage constant */
-    }
-    
+  #commands p {
+    font-size: 1.2vw; /* Taille de police plus grande pour une meilleure visibilité */
+    margin: 0; /* Marge constante */
+    padding: 0; /* Rembourrage constant */
+  }
 </style>
 
 <div id="menuToggle">
-    <span></span>
-    <span></span>
-    <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
 </div>
 <div id="menu">
-    <div id="commands">
-        <h3>Commandes</h3>
-        {% if game_session.mode == 'local' %}
-            <p>Joueur1 : Z S</p>
-            <p>Joueur2 : ↑↓</p>
-        {% else %}
-            <p>Déplacer : ↑↓</p>
-        {% endif %}
-    </div>
+  <div id="commands">
+    <h3>Commandes</h3>
     {% if game_session.mode == 'local' %}
-        <button id="quitGameButton" class="custom-btn btn-1 w-100">Quitter</button>
+    <p>Joueur1 : Z S</p>
+    <p>Joueur2 : ↑↓</p>
     {% else %}
-        <button id="forfeitGameButton" class="custom-btn btn-1 w-100">Abandonner</button>
+    <p>Déplacer : ↑↓</p>
     {% endif %}
+  </div>
+  {% if game_session.mode == 'local' %}
+  <button id="quitGameButton" class="custom-btn btn-1 w-100">Quitter</button>
+  {% else %}
+  <button id="forfeitGameButton" class="custom-btn btn-1 w-100">
+    Abandonner
+  </button>
+  {% endif %}
 </div>

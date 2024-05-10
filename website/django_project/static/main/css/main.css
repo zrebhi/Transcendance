@@ -31,6 +31,7 @@ body {
     max-width: 300px; /* Optional: maximum width */
     height: 10%;
     max-height: 150px;
+    z-index: -1;
 }
 
 /* Optional: Responsive adjustments for smaller screens */

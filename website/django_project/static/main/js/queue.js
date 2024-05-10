@@ -7,7 +7,7 @@ export function showQueueUI() {
         }
     })
         .then(response => response.text())
-        .then(data => document.getElementById('queueContainer').innerHTML = data)
+        .then(data => (document.getElementById('queueContainer').innerHTML = data, document.getElementById('queueContainer').style.zIndex = "1"))
         .then(() => startQueueTimer())
 }
 
@@ -36,4 +36,5 @@ function formatTime(milliseconds) {
 export function hideQueueUI() {
     clearInterval(queueTimerInterval);
     document.getElementById('queueContainer').innerHTML = '';
+    document.getElementById('queueContainer').style = "-1";
 }
