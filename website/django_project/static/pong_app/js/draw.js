@@ -187,6 +187,18 @@ function getAdaptiveTextSize(
 }
 
 // Function to resize the p5.js canvas
+
+export function resize3dCanvas() {
+  let container = document.getElementById("canvasContainer");
+  if (!container) return;
+
+  let newWidth = container.offsetWidth;
+  let newHeight = container.offsetHeight;
+  console.log(`Resizing canvas to ${newWidth}x${newHeight}`);
+
+  if (gameData.renderer) gameData.renderer.setSize(newWidth, newHeight);
+}
+
 export function resizeCanvas(sketch) {
   let container = document.getElementById("canvasContainer");
   if (!sketch || !container) return;
