@@ -33,6 +33,7 @@ class TournamentParticipant(models.Model):
     user: 'CustomUser' = models.ForeignKey(User, related_name='tournament_participations', on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=[('active', 'Active'), ('eliminated', 'Eliminated')], default='active')
 
+    
     class Meta:
         # Ensures that a user can only participate in a tournament once
         unique_together = ('tournament', 'user')
