@@ -50,9 +50,9 @@ def get_game_session_async(session_id):
 
 
 @database_sync_to_async
-def update_game_session_winner(session, winner_username):
+def update_game_session_winner(session, winner_alias):
     if session.winner is None:
-        winner = session.player1 if session.player1.username == winner_username else session.player2
+        winner = session.player1 if session.player1.alias == winner_alias else session.player2
         session.winner = winner
         session.save()
 
@@ -88,7 +88,7 @@ class GameInstance:
         """Determine the player name based on game type."""
         if self.game.session.mode == 'local':
             return f'Player {player_number}'
-        return self.game.session.player1.username if player_number == 1 else self.game.session.player2.username
+        return self.game.session.player1.alias if player_number == 1 else self.game.session.player2.alias
 
     async def start_game_tasks(self):
         """Start the game loop and game state broadcast tasks."""
@@ -152,7 +152,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def verify_user_in_game_session(self):
         """Verify if the connected user is part of the game session."""
         if self.user not in [self.game.session.player1, self.game.session.player2]:
-            print(f"User {self.user.username} is not part of the game session.")
+            print(f"User {self.user.alias} is not part of the game session.")
             return await self.close()
         if self.user == self.game.session.player1:
             self.game.players[0] = self.user
@@ -250,7 +250,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.disconnect(1001)
         for user in [self.game.session.player1, self.game.session.player2]:
             await update_user_session_id(user, None)
-            print(f"{user.username}'s session ID updated to {user.session_id}.")
+            print(f"{user.alias}'s session ID updated to {user.session_id}.")
             await update_game_session_winner(self.game.session, self.game.winner)
             await update_game_session_status(self.game.session, 'finished')
             print(f"Updating GameSession Score: \
@@ -285,10 +285,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def handle_forfeit(self):
         """Handle a player's forfeit."""
-        self.game.winner = self.game.session.player1.username if self.user == self.game.session.player2 \
-            else self.game.session.player2.username
+        self.game.winner = self.game.session.player1.alias if self.user == self.game.session.player2 \
+            else self.game.session.player2.alias
         await broadcast_message(self.game_group_name, {'type': 'forfeit_notification',
-                                                       'message': f'{self.user.username} has forfeited the game'})
+                                                       'message': f'{self.user.alias} has forfeited the game'})
         self.game.status = 'finished'
 
     async def forfeit_notification(self, event):

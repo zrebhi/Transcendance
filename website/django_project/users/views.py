@@ -84,3 +84,27 @@ def user_profile_view(request):
 @login_required
 def get_user_session(request):
     return JsonResponse({'session_id': request.user.session_id})
+
+@login_required
+def update_alias_user(request):
+
+    if request.user.tournament_id is not None:
+        return JsonResponse({'success': False, 'message': 'User already in a tournament', 'form_html': '<div><p>User already in a tournament</p></div>'})
+
+    if request.method == "POST":
+        new_alias = request.POST.get('alias', 'default').strip()
+
+        if not new_alias:
+            return JsonResponse({'success': False, 'message': 'Invalid or empty alias', 'form_html': '<div><p>Invalid or empty alias</p></div>'})
+
+        if len(new_alias) > 10:
+            return JsonResponse({'success': False, 'message': 'Alias must be 10 characters or less', 'form_html': '<div><p>Alias must be 10 characters or less</p></div>'})
+        
+        request.user.alias = new_alias
+        request.user.save()
+
+        return JsonResponse({'success': True, 'message': 'Alias updated successfully', 'next_url': '/home/'})
+    
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request'})
+

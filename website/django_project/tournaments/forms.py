@@ -20,5 +20,5 @@ class TournamentCreationForm(forms.ModelForm):
         creator = kwargs.pop('creator', None)
         super().__init__(*args, **kwargs)
         if creator:
-            # This will set the placeholder to the creator's username if a creator is provided
+            # This will set the placeholder to the creator's alias if a creator is provided
             self.fields['name'].widget.attrs['placeholder'] = f"{creator}'s tournament"

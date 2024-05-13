@@ -33,7 +33,7 @@ def add_participant_to_tournament(tournament, user):
                 user.save()
                 run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}",
                                          {'type': 'tournament_message',
-                                          'message': f"{user.username} has joined the tournament."})
+                                          'message': f"{user.alias} has joined the tournament."})
             return True
         except IntegrityError:
             # This happens if the user is already registered in the tournament.
@@ -234,7 +234,7 @@ def eliminate_both_players(match):
                 participant.player.tournament_id = None
                 participant.player.save()
         except TournamentParticipant.DoesNotExist:
-            print(f"Error: TournamentParticipant not found for user {participant.player.username} "
+            print(f"Error: TournamentParticipant not found for user {participant.player.alias} "
                   f"in tournament {tournament.name}.")
 
     match.status = 'completed'
@@ -308,7 +308,7 @@ def user_post_save(sender, instance, **kwargs):
     Signal to log when a User instance is saved, specifically looking for changes to the tournament_id field.
     """
     # Log the current state of the tournament_id for the user instance that was saved
-    print(f"Post-save signal for {instance.username}: tournament_id is now {instance.tournament_id}")
+    print(f"Post-save signal for {instance.alias}: tournament_id is now {instance.tournament_id}")
 
 
 @transaction.atomic
@@ -329,7 +329,7 @@ def eliminate_loser(match):
         # Attempt to update tournament_id to None
         loser_user.tournament_id = None
         loser_user.save(update_fields=['tournament_id'])
-        print(f"{loser_user.username}'s tournament ID updated to {loser_user.tournament_id}.")
+        print(f"{loser_user.alias}'s tournament ID updated to {loser_user.tournament_id}.")
 
         tournament = match.round.tournament
         try:
@@ -339,14 +339,14 @@ def eliminate_loser(match):
             )
             tournament_participant.status = 'eliminated'
             tournament_participant.save()
-            print(f"{loser_user.username} has been eliminated from the tournament.")
+            print(f"{loser_user.alias} has been eliminated from the tournament.")
         except TournamentParticipant.DoesNotExist:
-            print(f"TournamentParticipant not found for user {loser_user.username} in tournament {tournament.name}.")
+            print(f"TournamentParticipant not found for user {loser_user.alias} in tournament {tournament.name}.")
             
         run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}", 
                                  {'type': 'tournament_message',
-                                  'message': f"{loser_user.username} has been eliminated from the tournament."})
-        run_async_task_in_thread(broadcast_message, loser_user.username, {'type': "leave_message"})
+                                  'message': f"{loser_user.alias} has been eliminated from the tournament."})
+        run_async_task_in_thread(broadcast_message, loser_user.alias, {'type': "leave_message"})
 
 
 def advance_winner(match):
@@ -384,8 +384,8 @@ def complete_tournament(tournament, match):
         tournament.save()
         run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}", 
                                  {'type': 'tournament_message',
-                                  'message': f"{match.winner.username} has won the tournament !"})
-        run_async_task_in_thread(broadcast_message, match.winner.username, {'type': "leave_message"})
+                                  'message': f"{match.winner.alias} has won the tournament !"})
+        run_async_task_in_thread(broadcast_message, match.winner.alias, {'type': "leave_message"})
 
     participants_string_array = get_participants_string_array(tournament)
     run_async_task_in_thread(set_tournament_in_blockchain,tournament, participants_string_array)
@@ -396,7 +396,7 @@ def get_participants_string_array(tournament):
     participants_string_array = []
 
     for participant in tournament.participants.all():
-        participants_string_array.append(participant.user.username)
+        participants_string_array.append(participant.user.alias)
 
     # To handle empty slots after both player fail the ready check in a match
     participants_string_array.append("None")

@@ -21,11 +21,11 @@ class Tournament(models.Model):
     def save(self, *args, **kwargs):
         # Set default name if not provided
         if not self.name:
-            self.name = f"{self.creator.username}'s Tournament"
+            self.name = f"{self.creator.alias}'s Tournament"
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name} - {self.status}"
+        return f"{self.alias} - {self.status}"
 
 
 class TournamentParticipant(models.Model):
@@ -38,7 +38,7 @@ class TournamentParticipant(models.Model):
         unique_together = ('tournament', 'user')
 
     def __str__(self):
-        return f"{self.user.username} in {self.tournament.name}"
+        return f"{self.user.alias} in {self.tournament.name}"
 
 
 class TournamentRound(models.Model):

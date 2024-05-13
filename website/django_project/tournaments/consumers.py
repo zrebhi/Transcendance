@@ -26,7 +26,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         # Join tournament group
         await self.channel_layer.group_add(self.tournament_group_name, self.channel_name)
         # Join user group for individualized communication
-        await self.channel_layer.group_add(self.user.username, self.channel_name)
+        await self.channel_layer.group_add(self.user.alias, self.channel_name)
         # Adds the channel to the user's session, so we can close it on user logout
         await add_channel_name_to_session(self.scope, self.channel_name)
 
@@ -35,7 +35,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         # Leave tournament group
         await self.channel_layer.group_discard(self.tournament_group_name, self.channel_name)
-        await self.channel_layer.group_discard(self.user.username, self.channel_name)
+        await self.channel_layer.group_discard(self.user.alias, self.channel_name)
         # Remove the channel from the user's session
         await remove_channel_name_from_session(self.scope, self.channel_name)
         await self.close()
@@ -46,9 +46,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     message = json.loads(text_data)
 
                     if message['type'] == 'ready_state_update':
-                        print(f"{self.user.username}: Received ready state update: {message['ready_state']}")
+                        print(f"{self.user.alias}: Received ready state update: {message['ready_state']}")
                         await self.update_match_participant_ready_state(message['match_id'], message['ready_state'])
-                        print(f"{self.user.username}: Updated ready state for match {message['match_id']} to {message['ready_state']}")
+                        print(f"{self.user.alias}: Updated ready state for match {message['match_id']} to {message['ready_state']}")
                         if not await self.check_and_start_match(message['match_id']):
                             await broadcast_message(self.tournament_group_name, {'type': 'tournament_message',
                                                                                 'message': 'ready_state_updated'})
@@ -113,8 +113,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             message = {'type': 'user_message',
                         'message': 'game_start',
                         'session_id': self.game_session.id}
-            print(f"{participant.player.username} notify_match_participant: {message['session_id']}")
-            await broadcast_message(participant.player.username, message)
+            print(f"{participant.player.alias} notify_match_participant: {message['session_id']}")
+            await broadcast_message(participant.player.alias, message)
             
 
     @database_sync_to_async
@@ -136,20 +136,20 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'type': 'tournament_message',
                 'message': message
             }))
-            print(f"{self.user.username}: Sent message: {message}")
+            print(f"{self.user.alias}: Sent message: {message}")
         except Exception as e:
             print(f"Error: {str(e)}")
 
     async def user_message(self, event):
         message = event['message']
 
-        print(f"{self.user.username}: Received message: {message}")
+        print(f"{self.user.alias}: Received message: {message}")
         if message == 'game_start':
-            print(f'{self.user.username}: Getting game session {event['session_id']}.')
+            print(f'{self.user.alias}: Getting game session {event['session_id']}.')
             self.game_session = await self.get_game_session(event['session_id'])
 
             if self.game_session is not None:
-                print(f"{self.user.username}: Sending message: {message}")
+                print(f"{self.user.alias}: Sending message: {message}")
                 await self.send(text_data=json.dumps({
                     'type': 'game_start',
                     'session_id': self.game_session.id
@@ -158,7 +158,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_game_session(self, session_id):
         try:
-            print(f"{self.user.username}: Retrieving Game session: {session_id}")
+            print(f"{self.user.alias}: Retrieving Game session: {session_id}")
             return GameSession.objects.get(id=session_id)
 
         except GameSession.DoesNotExist as e:

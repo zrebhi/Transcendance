@@ -37,6 +37,9 @@
                         {% if user.is_authenticated %}
                            <span class="username"> {{ user.username }} </span>
                         {% endif %}
+                        {% if user.is_authenticated and user.alias is not None %}
+                            <span class="alias"> ({{ user.alias }}) </span>
+                        {% endif %}
                         <button id="setLanguageButton" class="btn btn-secondary" lan="fr">
                           🇫🇷
                         </button>

@@ -16,7 +16,7 @@ class QueueEntry(models.Model):
     joined_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} joined at {self.joined_at}"
+        return f"{self.user.alias} joined at {self.joined_at}"
 
 
 class GameSession(models.Model):
@@ -35,5 +35,5 @@ class GameSession(models.Model):
     player2_score = models.IntegerField(default=0)
 
     def __str__(self):
-        return (f"{self.mode} game between {self.player1.username} and {self.player2.username} "
+        return (f"{self.mode} game between {self.player1.alias} and {self.player2.alias} "
                 f"started at {self.created_at}, status: {self.status}")

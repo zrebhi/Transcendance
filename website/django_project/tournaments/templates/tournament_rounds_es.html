@@ -19,8 +19,8 @@
                 <div class="match">
                     <div class="player left">
                         {% if match.participants.first.player %}
-                            <img src="{{ match.participants.first.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="Avatar de {{ match.participants.first.player.username }}" class="player-avatar" />
-                            <span class="player-username">{{ match.participants.first.player.username }}</span>
+                            <img src="{{ match.participants.first.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="Avatar de {{ match.participants.first.player.alias }}" class="player-avatar" />
+                            <span class="player-username">{{ match.participants.first.player.alias }}</span>
                         {% else %}
                             <span class="player-username">Por determinar</span>
                         {% endif %}
@@ -64,8 +64,8 @@
                     {% endif %}
                     <div class="player right">
                         {% if match.participants.last.player %}
-                            <img src="{{ match.participants.last.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="Avatar de {{ match.participants.last.player.username }}" class="player-avatar" />
-                            <span class="player-username">{{ match.participants.last.player.username }}</span>
+                            <img src="{{ match.participants.last.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="Avatar de {{ match.participants.last.player.alias }}" class="player-avatar" />
+                            <span class="player-username">{{ match.participants.last.player.alias }}</span>
                         {% else %}
                             <span class="player-username">Por determinar</span>
                         {% endif %}

@@ -102,10 +102,10 @@ def leave_tournament(request, tournament_id):
         request.user.save()
         # Broadcast a message indicating the user has left the tournament
         messages = [
-            {'group_name': f"{request.user.username}", 'message_data': {'type': 'leave_message'}},
+            {'group_name': f"{request.user.alias}", 'message_data': {'type': 'leave_message'}},
             {'group_name': f"tournament_{tournament.id}",
              'message_data': {'type': 'tournament_message',
-                              'message': f"{request.user.username} has left the tournament."}}
+                              'message': f"{request.user.alias} has left the tournament."}}
         ]
         run_async_task_in_thread(broadcast_messages, messages)
         if not TournamentParticipant.objects.filter(tournament=tournament).exists():

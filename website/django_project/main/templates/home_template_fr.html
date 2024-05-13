@@ -35,5 +35,12 @@
         {% if user.is_authenticated %}
             <button  id="changeRenderButton" class="render-button btn btn-primary mt-3 w-100">Changer le rendu</button>
         {% endif %}
+        {% if user.is_authenticated and user.tournament_id is None %}
+        <form method="post" action="{% url 'update_alias_user' %}">
+            {% csrf_token %}
+            <input required maxlength="10" type="text" name="alias" placeholder="entrer votre alias ici..." />
+            <button type="submit" class="btn btn-primary btn-block w-100">Changer l'alias</button>            
+        </form>
+    {% endif %}
     </div>
 </div>

@@ -120,7 +120,10 @@ async function handleFormResponse(data) {
             await loadView(data["next_url"])
         } catch (error) { (console.error('Error:', error)); }
     } else
+    {
+      console.log(data);
         document.getElementById('pageContainer').innerHTML = data['form_html'];
+    }
 }
 
 // Logout button handler

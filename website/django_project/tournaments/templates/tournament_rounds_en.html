@@ -22,8 +22,8 @@
                 <div class="match">
                     <div class="player left">
                         {% if match.participants.first.player %}
-                            <img src="{{ participant.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="{{ participant.player.username }}'s Avatar" class="player-avatar" />
-                            <span class="player-username">{{ match.participants.first.player.username }}</span>
+                            <img src="{{ participant.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="{{ participant.player.alias }}'s Avatar" class="player-avatar" />
+                            <span class="player-username">{{ match.participants.first.player.alias }}</span>
                         {% else %}
                             <span class="player-username">TBD</span>
                         {% endif %}
@@ -65,8 +65,8 @@
                         {% endif %}
                     <div class="player right">
                         {% if match.participants.last.player %}
-                            <img src="{{ participant.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="{{ match.participants.last.player.username }}'s Avatar" class="player-avatar" />
-                            <span class="player-username">{{ match.participants.last.player.username }}</span>
+                            <img src="{{ participant.player.avatar_url|default:'/static/main/img/default_avatar.jpg' }}" alt="{{ match.participants.last.player.alias }}'s Avatar" class="player-avatar" />
+                            <span class="player-username">{{ match.participants.last.player.alias }}</span>
                         {% else %}
                             <span class="player-username">TBD</span>
                         {% endif %}
