@@ -1,53 +1,84 @@
 <style>
-    .card-container {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin: 20px;
-    }
+  .card-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px;
+  }
 
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        height: 100%;
-    }
-    
-    #createTournamentButton {
-        display: block;
-        margin: 20px auto;
-    }
+  .form-alias {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-    @media (max-width: 767px) {
-        .card-container .col-md-4 {
-            max-width: 100%;
-        }
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+  }
+
+  #createTournamentButton {
+    display: block;
+    margin: 20px auto;
+  }
+
+  @media (max-width: 767px) {
+    .card-container .col-md-4 {
+      max-width: 100%;
     }
+  }
 </style>
 
 <div id="tournamentsContainer" class="container mt-4">
-    <button id="createTournamentButton" class="btn btn-primary">Create Tournament</button>
-    <h1 class="text-center">Open Tournaments</h1>
-    <div class="row card-container">
-        {% for tournament in tournaments %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ tournament.name }}</h5>
-                    <p class="card-text">Players: {{ tournament.participants.count }}/{{ tournament.size }}</p>
-                    <p class="card-text">Status: {{ tournament.get_status_display }}</p>
-                    {% if tournament.status == "open" %}
-                        <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Join Tournament</button>
-                    {% elif tournament.status == "completed" %}
-                        <p class="card-text">Won by {{ tournament.winner }}</p>
-                    {% endif %}
-                </div>
-            </div>
+  {% if user.is_authenticated and user.tournament_id is None %}
+  <form class="form-alias" method="post" action="{% url 'update_alias_user' %}">
+    {% csrf_token %}
+    <input
+      required
+      maxlength="20"
+      type="text"
+      name="alias"
+      placeholder="Enter new alias here..."
+    />
+    <button type="submit" class="btn btn-primary btn-block w-15">
+      Change alias
+    </button>
+  </form>
+  {% endif %}
+  <button id="createTournamentButton" class="btn btn-primary">
+    Create Tournament
+  </button>
+  <h1 class="text-center">Open Tournaments</h1>
+  <div class="row card-container">
+    {% for tournament in tournaments %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ tournament.name }}</h5>
+          <p class="card-text">
+            Players: {{ tournament.participants.count }}/{{ tournament.size }}
+          </p>
+          <p class="card-text">Status: {{ tournament.get_status_display }}</p>
+          {% if tournament.status == "open" %}
+          <button
+            class="btn btn-primary joinTournamentButton"
+            data-tournament-id="{{ tournament.id }}"
+          >
+            Join Tournament
+          </button>
+          {% elif tournament.status == "completed" %}
+          <p class="card-text">Won by {{ tournament.winner }}</p>
+          {% endif %}
         </div>
-        {% empty %}
-            <div class="col-12 text-center">
-                <p>No open tournaments at the moment.</p>
-            </div>
-        {% endfor %}
+      </div>
     </div>
+    {% empty %}
+    <div class="col-12 text-center">
+      <p>No open tournaments at the moment.</p>
+    </div>
+    {% endfor %}
+  </div>
 </div>

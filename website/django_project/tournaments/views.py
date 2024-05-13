@@ -88,7 +88,7 @@ def join_tournament(request, tournament_id):
         if tournament.participants.count() >= tournament.size:
             return JsonResponse({'success': False, 'message': 'Tournament is already full'}, status=400)
         return JsonResponse({'success': False,
-                             'message': 'Could not join the tournament. You may already be registered.'}, status=401)
+                             'message': 'Could not join the tournament. You may already be registered or your alias is already used.'}, status=401)
 
 
 @login_required
