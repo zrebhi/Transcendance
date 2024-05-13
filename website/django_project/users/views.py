@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -6,7 +7,6 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .forms import CustomUserCreationForm, CustomLoginForm
 from main.utils import render_template
-
 
 def register_view(request):
     """
@@ -96,14 +96,17 @@ def update_alias_user(request):
 
         if not new_alias:
             return JsonResponse({'success': False, 'message': 'Invalid or empty alias', 'form_html': '<div><p>Invalid or empty alias</p></div>'})
+        
+        if not re.match("^[a-zA-Z0-9]*$", new_alias):
+            return JsonResponse({'success': False, 'message': 'Invalid or empty alias', 'form_html': '<div><p>Alias must contain only letters and numbers</p></div>'})
 
-        if len(new_alias) > 10:
+        if len(new_alias) > 20:
             return JsonResponse({'success': False, 'message': 'Alias must be 10 characters or less', 'form_html': '<div><p>Alias must be 10 characters or less</p></div>'})
         
         request.user.alias = new_alias
         request.user.save()
 
-        return JsonResponse({'success': True, 'message': 'Alias updated successfully', 'next_url': '/home/'})
+        return JsonResponse({'success': True, 'message': 'Alias updated successfully', 'next_url': '/tournaments/'})
     
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request'})

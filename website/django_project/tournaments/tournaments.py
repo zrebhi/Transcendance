@@ -26,6 +26,9 @@ def add_participant_to_tournament(tournament, user):
     """
     if tournament.participants.count() < tournament.size:
         try:
+            if tournament.participants.filter(user__alias=user.alias).exists():
+                return False
+
             with transaction.atomic():
                 # Ensures that if any of the database operations fail, none of them will be executed.
                 TournamentParticipant.objects.create(tournament=tournament, user=user)
