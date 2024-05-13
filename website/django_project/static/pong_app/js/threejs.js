@@ -124,6 +124,7 @@ function addPaddles() {
   // Add edges to the scene
   scene.add(edges1, edges2);
 }
+
 function addBall() {
   const ballGeometry = new THREE.SphereGeometry(10, 32, 32);
   const ballMaterial = new THREE.MeshStandardMaterial({

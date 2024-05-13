@@ -122,7 +122,7 @@ def schedule_round(round):
         round (TournamentRound): The round to be scheduled.
     """
     round.status = 'scheduled'
-    start_time = round.start_time = timezone.now() + timezone.timedelta(seconds=15)
+    start_time = round.start_time = timezone.now() + timezone.timedelta(seconds=60)
     round.save()
     run_async_task_in_thread(start_round_timer, start_time, round.id)
     print(f"Round {round.number} of tournament {round.tournament.id} is scheduled to start at {start_time}.")
