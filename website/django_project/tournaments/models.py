@@ -31,15 +31,21 @@ class Tournament(models.Model):
 class TournamentParticipant(models.Model):
     tournament = models.ForeignKey(Tournament, related_name='participants', on_delete=models.CASCADE)
     user: 'CustomUser' = models.ForeignKey(User, related_name='tournament_participations', on_delete=models.CASCADE)
+    tournament_nickname = models.CharField(max_length=20, blank=True, null=True)
     status = models.CharField(max_length=50, choices=[('active', 'Active'), ('eliminated', 'Eliminated')], default='active')
 
-    
+
     class Meta:
         # Ensures that a user can only participate in a tournament once
         unique_together = ('tournament', 'user')
 
+    def save(self, *args, **kwargs):
+        if not self.tournament_nickname:
+            self.tournament_nickname = self.user.username
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.user.username} in {self.tournament.name}"
+        return f"{self.tournament_nickname} in {self.tournament.name}"
 
 
 class TournamentRound(models.Model):

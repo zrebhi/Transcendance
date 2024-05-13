@@ -1,26 +1,35 @@
 import {getCsrfToken, loadView, loadGame, updateNavbar, getLanguage} from "/static/main/js/SPAContentLoader.js";
 
 export async function joinTournament(event, tournamentId) {
-    fetch(`/tournaments/join/${tournamentId}/`, {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRFToken': getCsrfToken()
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            tournamentWebSocketConnection(tournamentId);
-            loadView(data["next_url"]).catch(error => console.error('Error:', error))
-            updateNavbar();
-        } else {
-            console.error('Join tournament failed:', data.message);
-            alert(data.message);
-        }
-    })
-    .catch(error => console.error('Error:', error));
+    if (event.target.matches('form')) {
+        event.preventDefault();
+        const form = event.target;
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCsrfToken(),
+            },
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                tournamentWebSocketConnection(tournamentId);
+                loadView(data["next_url"]).catch(error => console.error('Error:', error));
+                updateNavbar();
+            } else {
+                console.error('Join tournament failed:', data.message);
+                alert(data.message);
+                if (data['form_html'])
+                    document.getElementById('pageContainer').innerHTML = data['form_html'];
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
 }
+
 
 export function leaveTournament(event, tournamentId) {
     fetch(`/tournaments/leave/${tournamentId}/`, {

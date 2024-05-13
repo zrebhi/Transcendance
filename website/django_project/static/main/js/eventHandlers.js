@@ -64,8 +64,13 @@ export function eventHandlers() {
     document.getElementById('pageContainer').addEventListener('click', function(event) {
         // Find the closest element with the class 'joinTournamentButton' up the DOM tree
         const joinTournamentButton = event.target.closest('.joinTournamentButton');
+        const enterTournamentButton = event.target.closest('.enterTournamentButton');
+
         if (joinTournamentButton) {
             const tournamentId = joinTournamentButton.getAttribute('data-tournament-id');
+             loadView(`/tournaments/join/${tournamentId}/`).catch(error => console.error('Error:', error));
+        } else if (enterTournamentButton) {
+            const tournamentId = enterTournamentButton.getAttribute('data-tournament-id');
             joinTournament(event, tournamentId);
         }
     });

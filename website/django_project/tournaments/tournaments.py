@@ -14,7 +14,7 @@ from .models import (TournamentParticipant, TournamentRound, TournamentMatch, Ma
 from .blockchain import set_tournament_in_blockchain
 
 
-def add_participant_to_tournament(tournament, user):
+def add_participant_to_tournament(tournament, user, nickname=None):
     """
     Registers a user as a participant in a tournament if there is available space. It attempts to create a new
     TournamentParticipant object linking the user to the specified tournament. If the tournament has reached its
@@ -28,7 +28,7 @@ def add_participant_to_tournament(tournament, user):
         try:
             with transaction.atomic():
                 # Ensures that if any of the database operations fail, none of them will be executed.
-                TournamentParticipant.objects.create(tournament=tournament, user=user)
+                TournamentParticipant.objects.create(tournament=tournament, user=user, tournament_nickname=nickname)
                 user.tournament_id = tournament.id
                 user.save()
                 run_async_task_in_thread(broadcast_message, f"tournament_{tournament.id}",

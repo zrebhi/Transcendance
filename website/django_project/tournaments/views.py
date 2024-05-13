@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from pong_app.consumers import broadcast_message, broadcast_messages
 from main.utils import render_template
 from .models import Tournament, TournamentParticipant, TournamentMatch
-from .forms import TournamentCreationForm
+from .forms import TournamentCreationForm, TournamentNicknameForm
 from .tournaments import add_participant_to_tournament, start_tournament, run_async_task_in_thread
 
 
@@ -71,24 +71,35 @@ def create_tournament(request):
 
 
 @login_required
-@require_POST
 def join_tournament(request, tournament_id):
     try:
         tournament = Tournament.objects.get(id=tournament_id)
     except Tournament.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Tournament not found'}, status=404)
 
-    if add_participant_to_tournament(tournament, request.user):
-        request.user.tournament_id = tournament.id
-        if tournament.participants.count() == tournament.size:
-            start_tournament(tournament)
-        return JsonResponse({'success': True, 'message': 'Successfully joined the tournament',
-                             'next_url': f'/tournaments/{tournament.id}/'})
+    if request.method == 'POST':
+        form = TournamentNicknameForm(request.POST, user=request.user)
+        if form.is_valid():
+            nickname = form.cleaned_data['tournament_nickname']
+            if tournament.participants.count() >= tournament.size:
+                return JsonResponse({'success': False, 'message': 'Tournament is already full'}, status=400)
+            
+            if add_participant_to_tournament(tournament, request.user, nickname):
+                request.user.tournament_id = tournament.id
+                if tournament.participants.count() == tournament.size:
+                    start_tournament(tournament)
+                return JsonResponse({'success': True, 'next_url': f'/tournaments/{tournament.id}/'})
+            else:
+                return JsonResponse({'success': False, 'message': 'You are already registered for this tournament'}, status=400)
+        else:
+            # If the form is not valid, render it again with errors
+            form_html = render_to_string('tournament_nickname_en.html', {'form': form, 'tournament': tournament}, request=request)
+            return JsonResponse({'success': False, 'form_html': form_html}, status=400)
+
     else:
-        if tournament.participants.count() >= tournament.size:
-            return JsonResponse({'success': False, 'message': 'Tournament is already full'}, status=400)
-        return JsonResponse({'success': False,
-                             'message': 'Could not join the tournament. You may already be registered.'}, status=401)
+        form = TournamentNicknameForm(request.POST, user=request.user)
+        return render_template(request, 'tournament_nickname.html', {'form': form, 'tournament': tournament})
+
 
 
 @login_required
