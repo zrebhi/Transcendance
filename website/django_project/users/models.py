@@ -8,7 +8,7 @@ class CustomUser(AbstractUser):
 
     def save(self, *args, **kwargs):
         if not self.alias:
-            self.alias = self.username[:20]  # Prend les 10 premiers caractères du username
+            self.alias = self.username[:20]  # Prend les 20 premiers caractères du username
         super(CustomUser, self).save(*args, **kwargs)
 
     def __str__(self):
