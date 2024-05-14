@@ -13,7 +13,7 @@ export function adjustPageContainerHeight() {
   ).style.height = `calc(100vh - ${navbarHeight}px)`;
 }
 
-export async function loadView(viewPath, updateHistory = true) {
+export async function loadView(viewPath, updateHistory = true, reloadGame = true) {
   if (viewPath === "/") viewPath = "/home/";
 
   const language = getLanguage();
@@ -36,11 +36,13 @@ export async function loadView(viewPath, updateHistory = true) {
     },
   })
     .then((response) => response.text())
-    .then((data) => {
-      document.getElementById("pageContainer").innerHTML = data;
-    })
-    .then(() => {
-      underlineNavbar(viewPath);
+    .then((data) => { document.getElementById("pageContainer").innerHTML = data; })
+    .then(() => { underlineNavbar(viewPath);})
+    .then(async () => { 
+      if (reloadGame) {
+        const sessionId = await getSessionId();
+        if (sessionId) await loadGame(sessionId);
+      }
     })
     .catch((error) => console.error("Error loading view:", error));
 }
@@ -50,7 +52,7 @@ export async function loadGame(sessionId) {
 
   try {
     hideUI();
-    await loadView(`/pong/${sessionId}/`);
+    await loadView(`/pong/${sessionId}/`, reloadGame = false);
     await loadScript("/static/pong_app/p5/p5.js");
     await getGame(sessionId);
   } catch (error) {
