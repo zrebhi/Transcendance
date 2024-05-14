@@ -26,11 +26,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['192.168.1.161', 'localhost', '127.0.0.1', '10.13.6.2']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', os.environ.get("IP_ADDRESS")]
 
 CORS_ALLOW_ALL_ORIGINS = False
 
-CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'https://192.168.1.161:8443', 'https://127.0.0.1', 'https://10.13.6.2:8443']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443', 'https://127.0.0.1:8443', f"https://{os.environ.get("IP_ADDRESS")}:8443"]
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True

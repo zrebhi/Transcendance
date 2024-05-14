@@ -14,7 +14,7 @@ class Tournament(models.Model):
     status = models.CharField(max_length=15, choices=[('open', 'Open'), ('in progress', 'In Progress'),
                                                       ('completed', 'Completed')], default='open')
     creator: 'CustomUser' = models.ForeignKey(User, related_name='creator', on_delete=models.CASCADE)
-    size = models.IntegerField(default=8)
+    size = models.IntegerField(default=4)
     winner: 'CustomUser' = models.ForeignKey(User, related_name='won_tournaments', on_delete=models.SET_NULL,
                                               null=True, blank=True)
 

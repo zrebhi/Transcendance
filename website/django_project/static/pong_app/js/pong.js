@@ -1,4 +1,4 @@
-import { fetchTournamentId } from "../../main/js/SPAContentLoader.js";
+import { getTournamentId } from "../../main/js/SPAContentLoader.js";
 import { drawCanvas } from "./draw.js";
 import { draw3dCanvas } from "./threejs.js";
 import {
@@ -399,7 +399,7 @@ async function waitForWindowData() {
 }
 
 // Helper function for asynchronous sleep.
-function sleep(ms) {
+export async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -416,7 +416,7 @@ async function handleWebSocketClose(event) {
 
   if (gameData.myp5) gameData.myp5.noLoop();
 
-  const tournamentId = await fetchTournamentId();
+  const tournamentId = await getTournamentId();
   if (tournamentId) {
     await loadView(`/tournaments/${tournamentId}/`).catch(console.error);
     updateNavbar();

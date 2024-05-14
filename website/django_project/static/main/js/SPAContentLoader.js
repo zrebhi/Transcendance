@@ -3,7 +3,7 @@ import { setupNavbar } from "./navbar.js";
 import { showQueueUI } from "./queue.js";
 import { queueSocket } from "/static/matchmaking/js/matchmaking.js";
 import { clearCanvas } from "/static/pong_app/js/draw.js";
-import { getGame } from "/static/pong_app/js/pong.js";
+import { getGame, sleep } from "/static/pong_app/js/pong.js";
 import { tournamentWebSocketConnection } from "/static/tournaments/js/tournaments.js";
 
 export function adjustPageContainerHeight() {
@@ -36,12 +36,8 @@ export async function loadView(viewPath, updateHistory = true) {
     },
   })
     .then((response) => response.text())
-    .then((data) => {
-      document.getElementById("pageContainer").innerHTML = data;
-    })
-    .then(() => {
-      underlineNavbar(viewPath);
-    })
+    .then((data) => { document.getElementById("pageContainer").innerHTML = data; })
+    .then(() => { underlineNavbar(viewPath);})
     .catch((error) => console.error("Error loading view:", error));
 }
 
