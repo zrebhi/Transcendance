@@ -9,3 +9,8 @@ RUN rm /etc/nginx/nginx.conf
 COPY ./default.conf /etc/nginx/conf.d/
 COPY ./nginx.conf /etc/nginx/
 COPY ./certs /etc/nginx/certs
+COPY ./entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]

@@ -4,8 +4,6 @@ services:
     env_file:
       - .env
     command: /bin/bash -c "python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - ./website/django_project:/website
     expose:
       - 8000
     depends_on:
@@ -25,8 +23,9 @@ services:
     ports:
         - '8080:80'
         - '8443:443'
+    env_file:
+        - .env
+    environment:
+        - PRIVATE_KEY=${CERTIFICATE_KEY}
     depends_on:
         - website
-
-    command: /bin/bash -c "rm -f /etc/nginx/sites-enabled/default &&
-                            rm -f /etc/nginx/sites-available/default && nginx -g 'daemon off;'"
