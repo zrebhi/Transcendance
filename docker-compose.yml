@@ -4,6 +4,8 @@ services:
     env_file:
       - .env
     command: /bin/bash -c "python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./website/django_project:/website
     expose:
       - 8000
     depends_on:

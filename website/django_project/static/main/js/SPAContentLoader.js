@@ -41,6 +41,7 @@ export async function loadView(viewPath, updateHistory = true, reloadGame = true
     .then(async () => { 
       if (reloadGame) {
         const sessionId = await getSessionId();
+        console.log("Reloading Session ID:", sessionId);
         if (sessionId) await loadGame(sessionId);
       }
     })
@@ -52,7 +53,7 @@ export async function loadGame(sessionId) {
 
   try {
     hideUI();
-    await loadView(`/pong/${sessionId}/`, reloadGame = false);
+    await loadView(`/pong/${sessionId}/`, true, false);
     await loadScript("/static/pong_app/p5/p5.js");
     await getGame(sessionId);
   } catch (error) {
