@@ -80,6 +80,8 @@ export function tournamentWebSocketConnection(tournamentId) {
     ws.onclose = function(event) {
         console.log('Tournament WebSocket connection closed:', event);
         window.tournamentWebSocket = null;
+        loadView('/home/').catch(error => console.error('Error:', error));
+        updateNavbar();
     };
 
     ws.onerror = function(event) {
