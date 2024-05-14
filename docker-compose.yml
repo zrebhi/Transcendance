@@ -3,8 +3,6 @@ services:
     build: website
     env_file:
       - .env
-    volumes:
-      - ./website/django_project:/website
     command: /bin/bash -c "python manage.py runserver 0.0.0.0:8000"
     expose:
       - 8000
