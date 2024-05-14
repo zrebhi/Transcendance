@@ -49,8 +49,13 @@ export function eventHandlers() {
         // This ensures that even if the state is null or undefined, the application
         // can still load the correct view based on the URL path.
        
-        const path = event.state ? event.state.path : window.location.pathname;
-        await loadView(path, false, true).catch(error => console.error('Error:', error));
+        const sessionId = await getSessionId();
+        if (sessionId) {
+            await loadGame(sessionId);
+        } else {
+            const path = event.state ? event.state.path : window.location.pathname;
+            await loadView(path, false).catch(error => console.error('Error:', error));
+        }
     });
 
     // Listen for form submissions in the page container

@@ -399,7 +399,7 @@ async function waitForWindowData() {
 }
 
 // Helper function for asynchronous sleep.
-function sleep(ms) {
+export async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 

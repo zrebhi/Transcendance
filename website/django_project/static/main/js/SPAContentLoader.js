@@ -3,7 +3,7 @@ import { setupNavbar } from "./navbar.js";
 import { showQueueUI } from "./queue.js";
 import { queueSocket } from "/static/matchmaking/js/matchmaking.js";
 import { clearCanvas } from "/static/pong_app/js/draw.js";
-import { getGame } from "/static/pong_app/js/pong.js";
+import { getGame, sleep } from "/static/pong_app/js/pong.js";
 import { tournamentWebSocketConnection } from "/static/tournaments/js/tournaments.js";
 
 export function adjustPageContainerHeight() {
@@ -13,7 +13,7 @@ export function adjustPageContainerHeight() {
   ).style.height = `calc(100vh - ${navbarHeight}px)`;
 }
 
-export async function loadView(viewPath, updateHistory = true, reloadGame = true) {
+export async function loadView(viewPath, updateHistory = true) {
   if (viewPath === "/") viewPath = "/home/";
 
   const language = getLanguage();
@@ -38,13 +38,6 @@ export async function loadView(viewPath, updateHistory = true, reloadGame = true
     .then((response) => response.text())
     .then((data) => { document.getElementById("pageContainer").innerHTML = data; })
     .then(() => { underlineNavbar(viewPath);})
-    .then(async () => { 
-      if (reloadGame) {
-        const sessionId = await getSessionId();
-        console.log("Reloading Session ID:", sessionId);
-        if (sessionId) await loadGame(sessionId);
-      }
-    })
     .catch((error) => console.error("Error loading view:", error));
 }
 
@@ -53,7 +46,7 @@ export async function loadGame(sessionId) {
 
   try {
     hideUI();
-    await loadView(`/pong/${sessionId}/`, true, false);
+    await loadView(`/pong/${sessionId}/`);
     await loadScript("/static/pong_app/p5/p5.js");
     await getGame(sessionId);
   } catch (error) {
