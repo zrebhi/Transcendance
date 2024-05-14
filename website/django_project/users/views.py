@@ -85,29 +85,49 @@ def user_profile_view(request):
 def get_user_session(request):
     return JsonResponse({'session_id': request.user.session_id})
 
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+import re
+
 @login_required
 def update_alias_user(request):
-
-    if request.user.tournament_id is not None:
-        return JsonResponse({'success': False, 'message': 'User already in a tournament', 'form_html': '<div><p>User already in a tournament</p></div>'})
-
     if request.method == "POST":
+        language = request.POST.get('lang', 'en')
+
+        if language == 'es':
+            already_in_tournament = 'Usuario ya en un torneo'
+            invalid_alias = 'Alias inválido o vacío'
+            alias_must_contain = 'El alias debe contener solo letras y números'
+            alias_must_be_10 = 'El alias debe tener 10 caracteres o menos'
+        elif language == 'fr':
+            already_in_tournament = 'Utilisateur déjà dans un tournoi'
+            invalid_alias = 'Alias invalide ou vide'
+            alias_must_contain = 'L\'alias ne doit contenir que des lettres et des chiffres'
+            alias_must_be_10 = 'L\'alias doit comporter 10 caractères ou moins'
+        else:
+            already_in_tournament = 'User already in a tournament'
+            invalid_alias = 'Invalid or empty alias'
+            alias_must_contain = 'Alias must contain only letters and numbers'
+            alias_must_be_10 = 'Alias must be 10 characters or less'
+
+        if request.user.tournament_id is not None:
+            return JsonResponse({'success': False, 'message': already_in_tournament, 'form_html': f'<div><p>{already_in_tournament}</p></div>'})
+
         new_alias = request.POST.get('alias', 'default').strip()
 
         if not new_alias:
-            return JsonResponse({'success': False, 'message': 'Invalid or empty alias', 'form_html': '<div><p>Invalid or empty alias</p></div>'})
-        
+            return JsonResponse({'success': False, 'message': invalid_alias, 'form_html': f'<div><p>{invalid_alias}</p></div>'})
+
         if not re.match("^[a-zA-Z0-9]*$", new_alias):
-            return JsonResponse({'success': False, 'message': 'Invalid or empty alias', 'form_html': '<div><p>Alias must contain only letters and numbers</p></div>'})
+            return JsonResponse({'success': False, 'message': alias_must_contain, 'form_html': f'<div><p>{alias_must_contain}</p></div>'})
 
         if len(new_alias) > 20:
-            return JsonResponse({'success': False, 'message': 'Alias must be 10 characters or less', 'form_html': '<div><p>Alias must be 10 characters or less</p></div>'})
-        
+            return JsonResponse({'success': False, 'message': alias_must_be_10, 'form_html': f'<div><p>{alias_must_be_10}</p></div>'})
+
         request.user.alias = new_alias
         request.user.save()
 
         return JsonResponse({'success': True, 'message': 'Alias updated successfully', 'next_url': '/tournaments/'})
-    
+
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request'})
-

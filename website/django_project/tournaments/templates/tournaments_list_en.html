@@ -43,20 +43,11 @@
             <form class="form-alias" method="post" action="{% url 'update_alias_user' %}">
               {% csrf_token %}
               <div class="mb-3">
-                <input
-                  class="form-control"
-                  required
-                  maxlength="20"
-                  type="text"
-                  name="alias"
-                  placeholder="Enter new alias here..."
-                  aria-label="New alias"
-                />
+                <input class="form-control" required maxlength="20" type="text" name="alias" placeholder="Enter new alias here..." aria-label="New alias" />
+                <input type="hidden" id="language-field" name="lang" value="en" />
               </div>
               <div class="d-grid gap-2 mx-auto">
-                <button type="submit" class="btn btn-primary">
-                  Change Alias
-                </button>
+                <button type="submit" class="btn btn-primary">Change Alias</button>
               </div>
             </form>
           </div>
@@ -64,11 +55,9 @@
       </div>
     </div>
   </div>
-  
   {% endif %}
-  <button id="createTournamentButton" class="btn btn-primary">
-    Create Tournament
-  </button>
+
+  <button id="createTournamentButton" class="btn btn-primary">Create Tournament</button>
   <h1 class="text-center">Open Tournaments</h1>
   <div class="row card-container">
     {% for tournament in tournaments %}
@@ -76,17 +65,19 @@
       <div class="card h-100">
         <div class="card-body text-center">
           <h5 class="card-title">{{ tournament.name }}</h5>
+          <p class="card-text">Players: {{ tournament.participants.count }}/{{ tournament.size }}</p>
           <p class="card-text">
-            Players: {{ tournament.participants.count }}/{{ tournament.size }}
+            Status: 
+            {% if tournament.status == "open" %}
+              Open
+            {% elif tournament.status == "completed" %}
+              Completed
+            {% elif tournament.status == "in progress" %}
+              In Progress
+            {% endif %}
           </p>
-          <p class="card-text">Status: {{ tournament.get_status_display }}</p>
           {% if tournament.status == "open" %}
-          <button
-            class="btn btn-primary joinTournamentButton"
-            data-tournament-id="{{ tournament.id }}"
-          >
-            Join Tournament
-          </button>
+          <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Join Tournament</button>
           {% elif tournament.status == "completed" %}
           <p class="card-text">Won by {{ tournament.winner }}</p>
           {% endif %}

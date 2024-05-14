@@ -34,41 +34,29 @@
 
 <div id="tournamentsContainer" class="container mt-4">
   {% if user.is_authenticated and user.tournament_id is None %}
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-md-6">
-            <div class="card shadow-sm my-4">
-              <div class="card-body text-center">
-                <h5 class="card-title">Choisis un alias</h5>
-                <form class="form-alias" method="post" action="{% url 'update_alias_user' %}">
-                  {% csrf_token %}
-                  <div class="mb-3">
-                    <input
-                      class="form-control"
-                      required
-                      maxlength="20"
-                      type="text"
-                      name="alias"
-                      placeholder="Entre ton alias ici"
-                      aria-label="New alias"
-                    />
-                  </div>
-                  <div class="d-grid gap-2 mx-auto">
-                    <button type="submit" class="btn btn-primary">
-                      Changer l'alias
-                    </button>
-                  </div>
-                </form>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card shadow-sm my-4">
+          <div class="card-body text-center">
+            <h5 class="card-title">Choisis un alias</h5>
+            <form class="form-alias" method="post" action="{% url 'update_alias_user' %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <input class="form-control" required maxlength="20" type="text" name="alias" placeholder="Entre ton alias ici" aria-label="New alias" />
+                <input type="hidden" id="language-field" name="lang" value="fr" />
               </div>
-            </div>
+              <div class="d-grid gap-2 mx-auto">
+                <button type="submit" class="btn btn-primary">Changer l'alias</button>
+              </div>
+            </form>
           </div>
         </div>
-      </div>    
-
+      </div>
+    </div>
+  </div>
   {% endif %}
-  <button id="createTournamentButton" class="btn btn-primary">
-    Créer un tournoi
-  </button>
+  <button id="createTournamentButton" class="btn btn-primary">Créer un tournoi</button>
   <h1 class="text-center">Tournois Ouverts</h1>
   <div class="row card-container">
     {% for tournament in tournaments %}
@@ -76,17 +64,19 @@
       <div class="card h-100">
         <div class="card-body text-center">
           <h5 class="card-title">{{ tournament.name }}</h5>
+          <p class="card-text">Joueurs : {{ tournament.participants.count }}/{{ tournament.size }}</p>
           <p class="card-text">
-            Joueurs : {{ tournament.participants.count }}/{{ tournament.size }}
+            Statut : 
+            {% if tournament.status == "open" %}
+              Ouvert
+            {% elif tournament.status == "completed" %}
+              Complété
+            {% elif tournament.status == "in progress" %}
+              En cours
+            {% endif %}
           </p>
-          <p class="card-text">Statut : {{ tournament.get_status_display }}</p>
           {% if tournament.status == "open" %}
-          <button
-            class="btn btn-primary joinTournamentButton"
-            data-tournament-id="{{ tournament.id }}"
-          >
-            Rejoindre le tournoi
-          </button>
+          <button class="btn btn-primary joinTournamentButton" data-tournament-id="{{ tournament.id }}">Rejoindre le tournoi</button>
           {% elif tournament.status == "completed" %}
           <p class="card-text">Gagné par {{ tournament.winner }}</p>
           {% endif %}
