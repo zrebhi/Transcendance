@@ -1,0 +1,5 @@
+<form method="post" action="/tournaments/join/{{ tournament.id }}/">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary enterTournamentButton" data-tournament-id="{{ tournament.id }}">Rejoindre le Tournoi</button>
+</form>

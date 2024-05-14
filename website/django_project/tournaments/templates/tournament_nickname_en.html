@@ -1,0 +1,24 @@
+<style>
+.form-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="post" action="/tournaments/join/{{ tournament.id }}/" class="card p-4">
+                {% csrf_token %}
+                <div class="mb-3 form-content">
+                    {{form.as_p}}
+                </div>
+                <button type="submit" class="btn btn-primary enterTournamentButton" data-tournament-id="{{ tournament.id }}">Join Tournament</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
