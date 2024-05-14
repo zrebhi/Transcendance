@@ -4,14 +4,9 @@ from .models import Tournament
 
 class TournamentCreationForm(forms.ModelForm):
 
-    size = forms.ChoiceField( 
-        choices=[(4, '4'), (8, '8')],
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-
     class Meta:
         model = Tournament
-        fields = ['name', 'size']
+        fields = ['name']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Default placeholder'}),
         }
