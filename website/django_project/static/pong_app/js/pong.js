@@ -1,3 +1,4 @@
+import { fetchTournamentId } from "../../main/js/SPAContentLoader.js";
 import { drawCanvas } from "./draw.js";
 import { draw3dCanvas } from "./threejs.js";
 import {
@@ -92,13 +93,13 @@ function createGameSessionWebSocket(sessionId) {
 }
 
 // Sets up WebSocket event listeners.
-function setupWebSocketListeners() {
+async function setupWebSocketListeners() {
   gameData.socket.onopen = () => {
     console.log("Game WebSocket connection opened");
     requestAnimationFrame(createAnimationLoop());
   };
   gameData.socket.onmessage = handleWebSocketMessage;
-  gameData.socket.onclose = handleWebSocketClose;
+  gameData.socket.onclose = await handleWebSocketClose;
   gameData.socket.onerror = (event) => {
     console.error("Game WebSocket error:", event);
     loadView("/home/").catch((error) => console.error("Error:", error));
@@ -403,7 +404,7 @@ function sleep(ms) {
 }
 
 // Handles the closing event of the WebSocket connection.
-function handleWebSocketClose(event) {
+async function handleWebSocketClose(event) {
   console.log("Game WebSocket connection closed:", event);
   window.removeEventListener("keydown", handleKeyDown);
   window.removeEventListener("keyup", handleKeyUp);
@@ -414,6 +415,13 @@ function handleWebSocketClose(event) {
   hideMenu();
 
   if (gameData.myp5) gameData.myp5.noLoop();
+
+  const tournamentId = await fetchTournamentId();
+  if (tournamentId) {
+    await loadView(`/tournaments/${tournamentId}/`).catch(console.error);
+    updateNavbar();
+  }
+
 }
 
 function hideMenu() {

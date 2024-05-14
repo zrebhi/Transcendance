@@ -188,7 +188,7 @@ export async function getSessionId() {
   return sessionId;
 }
 
-async function fetchTournamentId() {
+export async function fetchTournamentId() {
   // Fetch the main page HTML
   return fetch(`/?language=${getLanguage()}`, {
     headers: {
