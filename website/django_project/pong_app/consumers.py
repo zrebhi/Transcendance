@@ -74,7 +74,7 @@ class GameInstance:
     """Class to run the game loop and broadcast game state updates."""
 
     def __init__(self, game_session):
-        self.game = Game(winning_score=50)
+        self.game = Game(winning_score=3)
         self.game.session = game_session
         self.game_group_name = f'game_{self.game.session.id}'
         self.assign_players()
